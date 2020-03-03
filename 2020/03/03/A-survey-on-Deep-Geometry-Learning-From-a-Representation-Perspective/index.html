@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="paper,3D shape representation," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="A survey on Deep Geometry Learning-From a Representation PerspectiveAbstract深度学习在2D领域取得了巨大的成功，但是在3D领域由于多种多样的表示方法，没有一种通用的算法能够在所有的表示方法上取得很好的效果。本文从表示的角度对不同的算法归纳优点和缺点，并且介绍了在这些表示领域的数据集同时讨论了未来的研究方向。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective">
+<meta property="og:url" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="A survey on Deep Geometry Learning-From a Representation PerspectiveAbstract深度学习在2D领域取得了巨大的成功，但是在3D领域由于多种多样的表示方法，没有一种通用的算法能够在所有的表示方法上取得很好的效果。本文从表示的角度对不同的算法归纳优点和缺点，并且介绍了在这些表示领域的数据集同时讨论了未来的研究方向。">
+<meta property="og:image" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/A%20survey%20on%20Deep%20Geometry%20Learning_From%20a%20Representation%20Perspective/timeline.png">
+<meta property="og:image" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/A%20survey%20on%20Deep%20Geometry%20Learning_From%20a%20Representation%20Perspective/PointNet.png">
+<meta property="og:image" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/A%20survey%20on%20Deep%20Geometry%20Learning_From%20a%20Representation%20Perspective/Pixel2Mesh.png">
+<meta property="og:image" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/A%20survey%20on%20Deep%20Geometry%20Learning_From%20a%20Representation%20Perspective/3D%20Model%20Datasets.png">
+<meta property="og:image" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/A%20survey%20on%20Deep%20Geometry%20Learning_From%20a%20Representation%20Perspective/shape%20classification%20accuracy.png">
+<meta property="article:published_time" content="2020-03-03T06:49:23.000Z">
+<meta property="article:modified_time" content="2020-03-03T06:54:22.347Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="paper">
+<meta property="article:tag" content="3D shape representation">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/A%20survey%20on%20Deep%20Geometry%20Learning_From%20a%20Representation%20Perspective/timeline.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/"/>
+
+
+
+
+
+  <title>A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-03T14:49:23+08:00">
+                2020-03-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B2%BE%E8%AF%BB%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">精读论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/" class="leancloud_visitors" data-flag-title="A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective"><a href="#A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective" class="headerlink" title="A survey on Deep Geometry Learning-From a Representation Perspective"></a>A survey on Deep Geometry Learning-From a Representation Perspective</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>深度学习在2D领域取得了巨大的成功，但是在3D领域由于多种多样的表示方法，没有一种通用的算法能够在所有的表示方法上取得很好的效果。本文从表示的角度对不同的算法归纳优点和缺点，并且介绍了在这些表示领域的数据集同时讨论了未来的研究方向。</p>
+<a id="more"></a>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>3D形状的表示主要分为：深度图和多视角图像；体素；基于表面的表示；隐含表面的表示；基于结构的表示；基于形变的表示</p>
+<ul>
+<li><p>imaged-based representation</p>
+<p>  应用于2d的算法可以直接应用，但是这种表示方法缺少了几何特征。</p>
+</li>
+<li><p>voxel</p>
+<p>  像素在三维的扩展，与像素一样，体素在三维空间有规律的结构，在2d领域的神经网络<a href="#40">[40]</a>,<a href="#42">[42]</a>,能够轻易地扩展至体素格式。但是增加一维数据就意味着随着分辨率的增加需要更大的内存以及计算力</p>
+</li>
+<li><p>surface-based representation</p>
+<p>  主要包括点云以及网格。点云和网格都是3d表面离散化的表示方法。点云是一堆无序点的集合，缺少顺序以及连接性，能很轻易的从传感器得到，但是也较处理。研究者们用顺序不变的操作例如最大池化在深度神经网络中应用。<a href="#63">[63]</a>,<a href="#65">[65]PointNet++</a>。Mesh网格的方法能够高质量的描述3D形状，而且相比点云和体素占用更少的内存以及计算资源。Mesh网格包括顶点集和边集。研究者们利用图神经网络来处理Mesh网格。Mesh网格还有易于形变的特点，在变换顶点的同时保持顶点之间的连接性。</p>
+</li>
+<li><p>Implicit surface representation</p>
+<p>  implicit surface是通过implicit function定义的曲面。例如occupancy function（占据栅格：在一个栅格内只有两种状态，有或者没有）和signed distance function（判断一个点是否在区域内）来描述3D形状。在implicit surface应用深度神经网络要定义点和面的空间关系。能够用合理的内存消耗来表示3D形状的无穷大分辨率，并且能够用改变拓扑结构的方式表示3D形状。但是这种表示方法不能够直接反应3D形状的几何特征，通常需要转换为显式的表示方法，例如Mesh网格。许多方法<a href="#50">[50]</a> 应用等值面提取算法（ISO-surfacingExtract）例如Marching cubes（在体素中用三角面片逼近曲面形状）来处理，但这是耗时的。</p>
+</li>
+<li><p>Structured representation</p>
+<p>  将3D形状的几何特征和结构特征分开就是Structured representation。很多方法将3D形状分为part的集合，将他们以线性或者分层的方式组织。这种方法可以应用RNNs<a href="#98">[98]</a> 或者RvNNs <a href="#43">[43]</a> 来处理。他们将每一个part用非结构化的模型来处理。这种方法更关注不同part之间的几何关系（对称、支撑与被支撑等）。</p>
+</li>
+<li><p>Deformation-based representation</p>
+<p>  在三维世界中除了刚性的3D物体还有非刚性（例如铰接的）的3D物体，比如人的身体。许多方法利用旋转不变的局部特征来描述这些3D物体的变形，以期望能够减少扭曲同时保持几何细节。</p>
+</li>
+</ul>
+<p>本文的章节安排如下：第2章介绍了基于图像的表示方法；第3章和第4章介绍了基于体素和基于表面的表示方法；第5章介绍了基于implicit surface的表示方法；第6章和第7章回顾了基于结构和基于形变的表示方法；在第8章总结了典型的数据集，第9章介绍了3D形状分析和重建的典型应用。第10章总结全文。<a href="#图1">图1</a> 描述了深度学习应用于不同3D表示方法的时间轴。<br><img src="./A survey on Deep Geometry Learning_From a Representation Perspective/timeline.png" style="zoom:80%" id="图1" /></p>
+<h2 id="2-image-based-methods"><a href="#2-image-based-methods" class="headerlink" title="2. image-based methods"></a>2. image-based methods</h2><p><a href="#73">[73]</a>提出一种用卷积神经网络和递归神经网络的方法进行3D目标检测。利用CNN从RGBD图像中提取特征，利用RNN融合特征。<a href="#16">[16]</a>首次提出从单目图像中重建深度图，并且在训练阶段采取一种尺度不变的损失函数。<a href="#31">[31]</a>将深度图编码为距离，高度和角度三个通道。<a href="#30">[30]</a>,<a href="#75">[75]</a>在3D目标检测任务上比前面的方法效果更好。<a href="#76">[76]</a>对3D目标检测任务提出了MVCNN（Multi-View Convolutional Neural Network）。MVCNN将多个视角的图像分别用CNN处理，再利用View-pooling层将不同视角的特征聚合起来，最后用CNN的剩余部分合并特征。<a href="#64">[64]</a>再MVCNN的基础上增加了多分辨率，从而提高了分类的准确率。</p>
+<h2 id="3-Voxel-based-representation"><a href="#3-Voxel-based-representation" class="headerlink" title="3. Voxel-based representation"></a>3. Voxel-based representation</h2><h3 id="3-1-Dense-Voxel-representation"><a href="#3-1-Dense-Voxel-representation" class="headerlink" title="3.1 Dense Voxel representation"></a>3.1 Dense Voxel representation</h3><p>基于体素的表示方法是一种稠密的表示。其将3D形状用小正方体来表示，每个小正方体记录了该正方体的状态（occupied or unoccupied）。早期的方法是<a href="#90">[90]</a>，提出了3D ShapeNets。其将2.5D深度图产生的体素分为三种状态：observed，unobserved，free。3D ShapeNets将DBN（deep belief network）<a href="#35">[35]</a>从像素扩展到体素，并且将DBN的全连接层改为卷积层。该模型输入体素，输出类别标签并且通过迭代计算预测3D形状。最近<a href="#53">[53]</a>提出用3D卷积神经网络（3D CNNs）处理体素，并且设计了VoxNet<a href="#54">[54]</a>来进行目标检测。VoxNet根据2D领域的卷积网络定义了volumetric层，包括输出层，卷积层，池化层和全连接层。</p>
+<p>除了DBN和CNN被应用于体素，auto-encoders和GANs<a href="#27">[27]</a>同样被应用于体素。受DAEs（Denoising Auto-Encoders）<a href="#81">[81]</a>,<a href="#82">[82]</a>启发，<a href="#69">[69]</a>提出了一个用于处理体素的自编码模型VConv-DAE。这是第一种用无监督学习来处理体素地方法。VConv-DAE将类间均方误差和交叉熵作为损失函数。</p>
+<p><a href="#13">[13]</a>提出3D-R2N2方法，其输入为单张或者多视角图像，在occupancy方格中实现重建。3D-R2N2将输入的一张或多张图像当成一组序列，根据LSTM<a href="#36">[36]</a>和GRU（Gated Recurrent Unit）<a href="#12">[12]</a>设计了3D递归神经网络。其网络结构为：一个编码器从图像中抽取特征，3D-LSTM预测隐藏的状态作为最终3D模型的粗表示，最后由一个解码器来增加分辨率并最终生成3D目标模型。</p>
+<p><a href="#88">[88]</a>将GAN应用于体素数据，设计了3D-GAN。3D-GAN从被采样的latent vector z来合成3D模型，该向量空间具有概率分布P(z)。而且<a href="#88">[88]</a>受VAE-GAN<a href="#41">[41]</a>启发设计了3D-VAE-GAN，其在3D-GAN前面增加了一个编码器用来从2D图像中推断出 latent vector z并且与3D—GAN共享解码器。</p>
+<p>在这些模型被提出后，研究者们开始优化这些网络结构以取得更高的精度，但是将2D领域的网络简单拓展至三维空间却难以取得好的效果，例如MVCNN。主要的问题在于过拟合，方向，数据稀疏以及低分辨率。</p>
+<p><a href="#64">[64]</a>提出了两种网络结构用来改进体素CNN的表现。一个是引入额外的任务，即在子体素空间内预测类别来防止过拟合；另一个是使用拉长的核来压缩3D信息至二维，以便直接使用CNN。这两种都使用了mlpconv层<a href="#47">[47]</a>来替代传统的卷积层。<a href="#64">[64]</a>使用增广的数据（加入更多不同角度的样本）来改善预测结果受旋转角度的影响。<a href="#68">[68]</a>提出了一个新模型ORION，其简单拓展了VoxNet，使用全连接层来同时预测类别和方向标签。</p>
+<h3 id="3-2-Sparse-Voxel-Representation（Octree）"><a href="#3-2-Sparse-Voxel-Representation（Octree）" class="headerlink" title="3.2 Sparse Voxel Representation（Octree）"></a>3.2 Sparse Voxel Representation（Octree）</h3><p>基于体素的方法通常会伴随很大的计算量，许多方法不能在合理的时间处理高分辨率的模型。例如3DShapeNet和Vconv-DAE只能处理$24^3$个体素，VoxNet、3D-R2N2和ORION只能处理$32^3$个体素，3D-GAN最多处理$64^3$个体素。基于这个问题，<a href="#46">[46]</a>提出了FPNN来处理数据稀疏。</p>
+<p>一些方法通过将体素编码为八叉树<a href="#55">[55]</a>的方法来降低输入数据的维度。<a href="#32">[32]</a>提出一种以八叉树的形式提升体素精度的方法（HSP）。他们发现在高精度体素中只需要预测物体表面的体素即可。在HSP中八叉树的每个节点是一个体素块，同样这个体素块也有occupied、boundary和free三种状态。模型的解码器将特征向量作为输入来分层地预测对应体素块的特征。HSP定义八叉树由5层，每个体素块由$16^3$个体素，因此HSP可以生成$256^3$个体素。<a href="#79">[79]</a>提出了一个能够生成高分辨率体素表示的方法OGN。在OGN中，八叉树的每个节点被分为：empty、filled、mixed三种状态，八叉树就可以代表一个3D形状，其特征图存储在哈希表中，通过空间位置和八叉树的层数来索引。为了处理存储在哈希表中的特征图，他们设计了一种新的卷积操作OGN-Conv。将卷积操作转变为矩阵乘法，通过在特征图上进行卷积能够得到不同分辨率的体素，然后通过特点的标签来决定是否将这些特征传播至下一层（如果标签为boundary则传播，如果为mixed则跳过特征传播）。</p>
+<p>由于八叉树的结构，深度学习很难直接应用于八叉树。<a href="#66">[66]</a>提出了OctNet。这种八叉树相比普通八叉树具有更强的相关性和规律。<a href="#85">[85]</a>同样提出了八叉树上的卷积神经网络O-CNN。</p>
+<h2 id="4-Surface-based-representation"><a href="#4-Surface-based-representation" class="headerlink" title="4. Surface-based representation"></a>4. Surface-based representation</h2><h3 id="4-1-Point-based-Representation"><a href="#4-1-Point-based-Representation" class="headerlink" title="4.1 Point-based Representation"></a>4.1 Point-based Representation</h3><p>点云或点集通常可以由3D扫描设备直接得到，由于其无序性以及不规律的结构很难用传统的深度学习网络。<a href="#17">[17]</a>在2017年最早提出用深度学习方法处理点云。其神经网络学习一个在点云分布上的取样器，网络输入为一张图像和乱序点，输出$N\times3$的矩阵来代表预测的点集。其使用chamfer distance（CD）以及Earth Mover’s Distance（EMD）作为损失函数来训练网络。</p>
+<p>几乎在同一时刻，<a href="#63">[63]</a>提出了PointNet，其是第一个直接在点云上应用深度学习并且不用经过排序的方法。PointNet的网络结构如<a href="#图2">[图2]</a>所示，PointNet的结构主要包括三个部分：对于无序性，使用最大池化层作为对称功能来处理；级联局部和全局特征；共同对齐网络以实现变换不变性。基于PointNet<a href="#65">[65]</a>提出了PointNet++，其解决了PointNet因为度量空间点而不能捕捉和处理局部特征的问题。相比PointNet，PointNet++引入了分层的结构，因此模型可以捕捉不同层的特征。PointNet和PointNet++在形状分类和语义分割任务上表现SOTA。越来越多的深度学习模型被应用于点云表示方式。<br><img src="./A survey on Deep Geometry Learning_From a Representation Perspective/PointNet.png" style="zoom:80%" id="图2" /><br><a href="#39">[39]</a>将点云以kd-tree的方式组织，提出了Kd-Network。<a href="#94">[94]</a>提出了FoldingNet，是一种无监督学习的压缩点云信息的端到端的自编码器。点云可以通过folding操作变换为2d网格。<a href="#56">[56]</a>提出DiscoNet，其结合针对不同3D物体训练的自编码器来实现3D物体的editing。</p>
+<p>尽管点云数据可以方便的从3D扫描设备得到，但是其因为稀疏性以及噪声并不适合用来对3D物体分析。因此相比其他表示方式，上采样点云以获得更加细粒度的点云模型就显得很重要。比如PU-NET<a href="#96">[96]</a>，MPU<a href="#95">[95]</a>，PU-GAN<a href="#44">[44]</a>等等。<a href="#29">[29]</a>是在点云领域应用深度学习方法的综述，提供了更多这个领域的细节。</p>
+<h3 id="4-2-Mesh-based-Representation"><a href="#4-2-Mesh-based-Representation" class="headerlink" title="4.2 Mesh-based Representation"></a>4.2 Mesh-based Representation</h3><p>相比点云表示，网格表示还包括了点之间的连接信息，因此他们很适合描述在表面上的局部区域。作为一种典型的非欧几里得空间上的表示方法，网格表示可以在空域和频域上应用深度学习方法<a href="#7">[7]</a>。然而对无规律的数据结构直接应用CNNs是不简单的，因此少数方法如<a href="#51">[51]</a>，<a href="#72">[72]</a>将3D物体表面转换为2D几何图像在应用传统2D CNNs。然而这些方法没有利用网格方法的优点，在本小节我们将介绍直接将网格作为输入并且在网格上生成3D模型的深度学习方法。</p>
+<p>由于Mesh网格是由顶点与边组成的，那么就可以将其当成图来处理。许多方法基于图理论。<a href="#1">[1]</a>，<a href="#8">[8]</a>，<a href="#14">[14]</a>，<a href="#34">[34]</a>，<a href="#38">[38]</a>都是基于拉普拉斯矩阵的本征分解来对图进行CNN操作。<a href="#80">[80]</a>提出了另一个基于图的CNN，叫FeaStNet，它能够动态的计算卷积操作的感受野。其通过网络中获得特征来确定相邻边的分配。<a href="#33">[33]</a>同样提出了在三角网格上的卷积操作，池化和反池化操作，提出的网络结构叫MeshCNN。不同于其他基于图的方法，MeshCNN主要处理边的特征。同时提出了应用在边上固定邻边数量的卷积操作和基于边塌缩的池化操作。MeshCNN能够针对特定任务提取3D物体的特征，可以保留有用的特征，忽视不重要的特征。</p>
+<p>Mesh网格可以看作是2-manifolds的离散化。2-manifolds的许多工作使用一系列精制的CNN操作来适应非欧几里得空间。<a href="#52">[52]</a>对于manifolds提出了GCNNs（Geodesic Convolutional Neural Networks）…（不太理解流形学习，懒得写了…）</p>
+<p>从Mesh网格生成3D模型有很多方法。<a href="#84">[84]</a>提出了Pixel2Mesh用于从单目图像重建3D物体，通过变形椭圆球体模板的方法生成目标三角网格。如<a href="#图3">[图3]</a>所示，Pixel2Mesh通过GCNs（Graph-based Convolutional Networks）<a href="#7">[7]</a> 实现，由粗到精的生成Mesh网格。<a href="#87">[87]</a>改进了Pixel2Mesh，提出Pixel2Mesh++，将单目图像拓展至多视角图像。Pixel2Mesh++引进了Multi-View Deformation Network（MDN），MDN在生成Mesh网格的过程总融合了多视角图像的交叉信息。<a href="#28">[28]</a>提出了AtlasNet，能够通过multiple patches生成3D表面。AtlasNet学习将2D方块patches转换为2-manifolds，通过MLP（Multi-Layer Perception）来覆盖3D物体的表面。<a href="#2">[2]</a>提出了一个multi-chart生成模型，该方法使用multi-chart作为输入，在标准GAN<a href="#27">[27]</a>的基础上建立网络模型。3D物体表面和multi-chart的转换基于<a href="#51">[51]</a>。<br><img src="./A survey on Deep Geometry Learning_From a Representation Perspective/Pixel2Mesh.png" style="zoom:80%" id="图3" /></p>
+<h2 id="5-Implicit-Representation"><a href="#5-Implicit-Representation" class="headerlink" title="5. Implicit Representation"></a>5. Implicit Representation</h2><p>近些年的研究中隐式的表示方法越来越流行。一个主要的原因是隐式的表示方法可以不受固定的拓补结构和分辨率的影响。Occupancy/Indicator Function就是一种隐式的3D表示方法。Occupancy Network由<a href="#57">[57]</a>提出，其通过神经网络学习一个连续的occupancy function作为3D物体的表示方法。occupancy function反映了3D物体表面点的状态，1代表在表面里面，0则反之。研究者们将这个问题当作一个二分类问题来处理，同时设计了一个occupancy network，输入为3D点位置和3D形状的observation，输出为occupancy的概率。生成的implicit field再经过一个多分辨率等值面抽取的方法MISE和marching cubes算法<a href="#50">[50]</a>来获得Mesh网格。另外，研究者们还介绍了一个编码器网络来获取latent embeddings。<a href="#11">[11]</a>设计了IMNET作为学习生成模型的解码器，它能够以indicator function的方式表示implicit function。</p>
+<p>Signed Distance Function（SDFs）同样是一种隐式的表示方式。Signed Distance Function将3D点映射为一个实际的值而不是概率，这个实际的值代表了3D点与3D表面的位置关系以及距离。假设3D点$x \in {R^3}$，那么$SDF(x)&gt;0$就表示点$x$在3D表面的外面，反之则在里面，$SDF(x)=0$表示点在面上。$SDF(x)$的绝对值代表了3D点与表面之间的距离。<a href="#62">[62]</a>提出了DeepSDF并且介绍了基于DeepSDF的自解码器作为一种新的3D表示方式。<a href="#93">[93]</a>提出了Deep Implicit Surface Networks（DISNs）实现基于SDFs的单目图像三维重建。基于SDF的优越性，DISN是第一种具有复杂的拓补结构和精细结构的单目图像三维重建方法。</p>
+<p>Function Sets：occupancy function和Signed Distance Function都是通过深度神经网络学习一个单一的函数来表示3D物体。<a href="#24">[24]</a>,<a href="#25">[25]</a>提出一种结合一个形状元素集合的方式来表示3D物体。在<a href="#25">[25]</a>中，研究者们提出Structured Implicit Functions（SIFs）,SIFs用a scaled axis-aligned anisotropic 3D Gaussian（缩放轴对齐的各向异性3D高斯函数）来表示集合中的每一个物体，这些物体的总和就代表了整个3D物体。高斯函数的参数通过CNN来学习。<a href="#24">[24]</a>改进了SIF并提出了Deep Structured Implicit Functions（DSIFs）,其添加了深度神经网络作为Deep Implicit Functions（DIFs）来提供局部的几何细节。总结一下，DSIF利用SIF来描述每个形状元素的粗信息，DIF用来提供局部形状细节。</p>
+<p>Unsupervised Approaches：上述的隐式表示模型都需要在3D物体bounding box中采样3D点作为ground truth，然后进行监督训练。<a href="#48">[48]</a>首次提出了不需要3D ground truth的网络来学习隐式表示。该模型利用field probing算法来衔接3D物体与2D图像。并且设计一种轮廓损失来约束3D形状的外表，用集合正则化来使表面是合理的。</p>
+<h2 id="6-Structure-based-representation"><a href="#6-Structure-based-representation" class="headerlink" title="6. Structure-based representation"></a>6. Structure-based representation</h2><p>越来越多的研究者开始注意到3D物体结构的重要性并努力将结构信息融合进入深度学习网络。Primitive Representation是一种典型的基于结构表示的方法。Primitive Representation用3D物体的基元来描述，例如定向的3D box。与描述几何细节不同，Primitive Representation更多聚焦在3D物体的总体结构，它将3D物体表示为一个由紧凑参数集合组成的一些基元。</p>
+<p>Linearly Organized：通过观测发现人们经常将3D物体视为一些部分的集合，<a href="#98">[98]</a>提出了3D-PRNN，将LSTM应用于一个基元生成器，那么3D-PRNN就可以产生一组基元序列。生成的Primitive Representation在描述简单和规则3D物体方面有很好的效率。<a href="#89">[89]</a>进一步提出了基于RCNN的方法PQ-NET，其同样将3D物体当作一组序列。不同的是PQ-NET在网络中编码了几何特征。<a href="#22">[22]</a>提出一个深度生成模型SDM-NET（Structured Deformation Mesh-Net）。他们设计了一个两层的VAE，包括一个PartVAE描述每一个part的几何信息以及一个SP——VAE（Structured Parts VAE）描述结构和几何信息。在<a href="#22">[22]</a>中每一个part都以一种well designed的形式编码，能够记录结构信息（对称，支撑和被支撑）和几何特征。</p>
+<p>Hierarchically Organized：<a href="#43">[43]</a>提出了GRASS（Generative Recursive Autoencoders For Shape Structures），是第一种尝试利用神经网络编码3D结构信息的方法。他们将物体的结构信息描述为一个分层的二叉树，子节点和父节点之间如若是相邻或对称的关系，那么两个节点可以融合。结构中的叶子节点代表每一个part的定向的bounding boxes（OBBs）和几何特征，中间节点代表子节点的几何特征和子节点之间的关系。受递归神经网络（RvNNs）的启发<a href="#73">[73]</a>，<a href="#74">[74]</a>，GRASS都递归地将代表OBBs的码融合为root codes，root codes就代表了整个物体的结构。GRASS的网络结构可以分为三个部分：通过RvNN编码器将3D物体编码为固定长度的码；一个GAN来学习root codes的分布并且生成合理的结构；受<a href="#26">[26]</a>的启发，另一个自编码器来合成不同part的几何信息。再进一步，以体素的形式合成细粒度的几何形状。</p>
+<p>然而GRASS以二叉树的形式组织part的结构，这有可能会导致二义性。因此二叉树对数据量大的数据集不适合。为了解决这个问题，<a href="#58">[58]</a>提出了StructureNet，以图的形式分层地组织结构。<a href="#10">[10]</a>提出的BSP-NET（Binary Space Partitioning-Net）是第一种描述锐利的几何特征的方法，它将3D物体通过BSP-tree构造为凸面。<a href="#10">[10]</a>中定义的Binary Space Partitioning（BSP）树通过凸面的集合来表示3D物体，它包括三层，分别是超平面提取，超平面聚合，形状组装。凸面被看作基元的一种新形式，相比普通的结构能更好的表示3D物体的几何细节。</p>
+<p>Structure and Geometry：研究者们尝试分开<a href="#43">[43]</a>或者结合<a href="#91">[91]</a>结构信息和几何信息来编码3D物体。<a href="#83">[83]</a>提出了Global-to-Local（G2L）来由粗到精的生成人为制造的3D物体，其是为了解决GANs不能很好的生成物体的几何细节的问题。G2L先使用GANs来生成粗粒度带有语义信息的体素，语义信息表示了物体在全局层面的结构，然后将体素按照不同的语义信息分离成一个自编码器叫Part Refiner（PR）在局部层面来优化每一个part的几何细节。<a href="#91">[91]</a>提出了SAGNet来生成细粒度的3D模型，其将结构和几何信息通过GRU<a href="#12">[12]</a>结构编码在一起，以找到他们的内在联系。SAGNet比其他基于结构的学习模型在结构和集合信息的结合上表现更好。</p>
+<h2 id="7-Deformation-based-representation"><a href="#7-Deformation-based-representation" class="headerlink" title="7. Deformation-based representation"></a>7. Deformation-based representation</h2><p>基于Deformation的表示方法将Deformation信息参数化，对于处理非刚性的3D物体有更好的表现。</p>
+<p>Meshed-based Deformation Description：Mesh22网格可以看作一种图，当改变顶点位置的时候还能保持顶点之间的连接性，因此许多方法选择用Mesh网格来表示3D物体。而且图结构很容易用顶点特征存储deformation信息。<a href="#19">[19]</a>提出了一种旋转不变性的deformation表示方法Rotation-Invariant Mesh Difference（RIMD），在shape重建，变形，定位上有很好的效果。基于<a href="#19">[19]</a>,<a href="#77">[77]</a>提出了Mesh VAE来对变形物体分析和合成，其将RIMD作为特征输入VAE，用全连接层做编码器和解码器。为了解决在大尺度变形中变形梯度不work的问题，<a href="#20">[20]</a>设计了as-consistent-as-possible（ACAP）representation在deformable网格中来约束相邻顶点的旋转角度和旋转轴。<a href="#78">[78]</a>基于ACAP表示提出了SparseAE，在网络中应用图卷积操作<a href="#15">[15]</a>。<a href="#21">[21]</a>对于未配对的mesh deformation变换提出了VC-GAN（VAE CycleGAN），将ACAP作为输入然后将这种表示通过VAE编码到latent space，然后在latent space中基于CycleGAN在源和目标之间转换。</p>
+<p>Implicit surface based approaches：随着implicit surface表示的发展，<a href="#37">[37]</a>提出Neural Articulated Shape Approximation（NASA）用位姿参数来表示铰接变形的物体。pose parameters记录了模型中定义的bones的变化。</p>
+<h2 id="8-Datasets"><a href="#8-Datasets" class="headerlink" title="8. Datasets"></a>8. Datasets</h2><p>RGB-D Image：RGB-D图像可以由深度传感器获得例如Microsoft Kinect。大多数RGB-D数据集可以被视作视频的序列。室内RGB-D数据集NYU Depth<a href="#70">[70]</a>，<a href="#71">[71]</a>是第一个为分割任务而产生的数据集。其第一个版本<a href="#70">[70]</a>收集了64个类别，而第二个版本<a href="#71">[71]</a>收集了464个类别。KITTI数据集<a href="#23">[23]</a>提供了用于自动驾驶的室外场景图像，包含5个类别：马路，城市，住宅，校园和行人。其深度图可以通过KITTI数据集提供的开发套件计算。并且KITTI数据集还包括了应用于3D物体检测的标记。</p>
+<p>Man-made 3D Object Datasets：ModelNet<a href="#90">[90]</a>是一个著名的CAD模型数据集，包含了662个类别的127915个3D CAD模型。ModelNet有两个子数据集ModelNet10和ModelNet40.ModelNet10包含ModelNet中的10个类别，并且是手动对齐的3D模型。同样的ModelNet包含了40个类别，其3D模型同样手动对齐。ShapeNet<a href="#9">[9]</a>提供了一个大批量的数据集包含超过4000个类别的300万个模型。ShapeNet同样有两个子数据集ShapeNetCore和ShapeNetSem。对于多样的几何应用，ShapeNet数据集为3D物体提供了丰富的标记，包含类别标签，part标签，对称信息等等。PartNet提供了一个更加详细的细粒度的分层地CAD模型数据集，为语义分割，shape编辑，shape生成等任务带来了大量应用和资源。</p>
+<p>Non-Rigid Model Datasets：TOSCA<a href="#6">[6]</a>是一个高分辨率3D非刚性物体的数据集，包含9个类别的80个目标。模型使用Mesh网格来表示，每一个类别中的物体都具有相同的分辨率。FAUST<a href="#3">[3]</a>是一个3D人身扫描的数据集，包含10个人的不同动作和对应的ground truth。因为FAUST是真实场景中的shape定位，数据集中扫描会有噪声和不完整，但是对应的ground truth是water-tight和对齐的。<br><img src="./A survey on Deep Geometry Learning_From a Representation Perspective/3D Model Datasets.png" style="zoom:80%" /></p>
+<h2 id="9-Shape-Analysis-and-Reconstruction"><a href="#9-Shape-Analysis-and-Reconstruction" class="headerlink" title="9. Shape Analysis and Reconstruction"></a>9. Shape Analysis and Reconstruction</h2><p>上文中提到的shape表示是shape分析和shape重建的基础，在这一节我们总结了在这两个方向上的工作并且对比了实验效果。</p>
+<h3 id="9-1-Shape-Analysis"><a href="#9-1-Shape-Analysis" class="headerlink" title="9.1 Shape Analysis"></a>9.1 Shape Analysis</h3><p>Shape Analysis方法通过不同的网络结构从不同的3D shape表示中提取latent codes。这些latent codes会被用于特定的任务例如shape分类，shape恢复，shape分割等。不同的表示方式适用不同的应用。我们现在回顾一下不同表示的不同模型的表现，讨论对于特定的任务合适的表示。</p>
+<p>Shape Classification and Retrieval是shape分析的基本问题。这两个都依赖从分析网络中抽取的特征向量。对于shape分类，ModelNet10和ModelNet40用的较多。<a href="#表2">[表2]</a>展示了在ModelNet10和ModelNet40上不同方法的准确率。对于shape恢复，给定一个3D shape，目标是在数据集中找到最相似的shape。恢复方法通常要习得在latent space中一个紧凑的code来表示3D物体，然后基于欧几里得距离，Mahalanobis距离或者其他距离度量方法，查找最近的物体作为结果。不同于分类任务，shape恢复有很多评价指标，包括准确率，召回率，mAp（mean average precision）等等。<br><img src="./A survey on Deep Geometry Learning_From a Representation Perspective/shape classification accuracy.png" style="zoom:80%" id="表2" /></p>
+<p>Shape Segmentation致力于辨析3D shape的part的类别。这个任务在3D shape的理解中很重要。mIOU通常用于分割任务的准确性度量，对于分割任务，大多数研究者选择基于点云的表示方法<a href="#39">[39]</a>，<a href="#45">[45]</a>，<a href="#63">[63]</a>，<a href="#65">[65]</a>。</p>
+<h3 id="Shape-Reconstruction"><a href="#Shape-Reconstruction" class="headerlink" title="Shape Reconstruction"></a>Shape Reconstruction</h3><p>重建任务包括单目shape重建，shape生成，shape编辑等，对于体素表示，基于学习的方法预测网格中每个体素的occupancy概率。对于点云表示，基于学习的方法通过在space中采样3D点或者将2D网格折成3D目标。对于Mesh网格的表示，大多数选择将Mesh模板变形为最终的Mesh网格。在最近的研究中，越来越多的人选择用基于结构的表示生成由粗到精的3D shape。</p>
+<h2 id="10-Summary"><a href="#10-Summary" class="headerlink" title="10. Summary"></a>10. Summary</h2><p>在本篇综述中，我们回顾了深度学习方法应用在不同表示方法的3D物体中。首先回顾了不同的3D物体表示方法。学习几何信息的方法通常使用更少的计算力和更小的内存。然后我们介绍了广泛用于研究的3D数据集，这些数据集对于数据驱动的学习方法提供了丰富的资源和评价方法。最后我们讨论了基于不同表示方法3D shape的应用场景。对于特定的任务应该选用合适的表示方法。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><span id="1"> [1] :J. Atwood and D. Towsley Diffusion convolutional neural networks. In advances in Neural Information Processing Systems, pages 1993-2001.2016</p>
+<p><span id="2"> [2] :H. Ben-Hamu.H. Maron. I Kezurer G. avineri and Y. Lipman. Multi-chart generative surface modeling. In SIGGRAPH Asia 2018 Technical Papers, page 215. ACM, 2018</p>
+<p><span id="3"> [3] :F. Bogo, J. Romero, M. Loper, and M.J Black. FaUST:Dataset and evaluation for 3D mesh registration. In Proceedings of the IeeE Conference on Computer Vision and Pattern Recogmition, pages 3794-3801， 2014</p>
+<p><span id="6"> [6] :A. M. Bronstein, M. M. BI tonstein, and R. Kimmel. Numerical geometry of non-rigid shapes. Springer Science Business Media 2008.</p>
+<p><span id="7"> [7] :M.M. Bronstein.J. Bruna. Y Le Cun.A. szlam and P Vandergheynst. Geometric deep learning going beyond Euclidean data. IEEE Signal Processing Magazine, 34（4）：18-42， 2017</p>
+<p><span id="8"> [8] :J. Bruna, W. Zaremba, A. Szlam, and Y. Le Cun. Spectral networks and locally connected networks on graphs. ar Xiv preprint ar Xiv：1319.6203.2013</p>
+<p><span id="9"> [9] :A. X. Chang, T. Funkhouser, L. Guibas P. Hanrahan, Q. Huang, Z. Li, S. Savarese, M. Savva, S. Song, H. Su, et al. ShapeNet An information-rich 3D model repository arXiv preprint arXiv：1512.08012， 2015</p>
+<p><span id="10"> [10] :Z. Chen, A. Tagliasacchi, and H. Zhang BSP-Net:Generating compact meshes via binary space partitioning. ar Xiu preprint arXv：1911.06971,2019</p>
+<p><span id="11"> [11] :Z. Chen and H. Zhang. Learning implicit fields for generative shape modeling. In Proceedings of the Ieee Conference on Computer vision and Pattern Recognition, pages 5939-5948， 2019</p>
+<p><span id="12"> [12] :K. Cho. B. Van Merrienboer. C. Gulcehre D. Bahdanau. F. Bougares. H. Schwenk. and Y. Bengio. Learning phrase representations using RNN encoder-decoder for statistical machine translation.  arXiv preprint：1406.1078,2014</p>
+<p><span id="13"> [13] :C.B. Choy, D. Xu, J. Gwak, K. Chen, and S. Savarese. 3D-R2N2：A unified approach for single and multi-view 3d object reconstruction In European Conference on Computer vision（ECCV）， pages 628-644. Springer, 2016</p>
+<p><span id="14"> [14] :M Defferrard,X Breasson and P. Vandergheynst. Convolutional neural networks on graphs with fast localized spectral filtering. In Advances in neural information processing systems, pages 3844 3852， 2016</p>
+<p><span id="15"> [15] :D.K. Duvenaud, D. Maclaurin, J Iparraguirre R. Bombarell, T. hirzel, A. Aspuru-Guzik, and R. P. Adams Convolutional networks on graphs for learning molecular fingerprints. In Advances in neural information processing systems, pages 22242232.2015.</p>
+<p><span id="16"> [16] :D. Eigen, C. Puhrsch, and R. Fergus. Depth map prediction from a single image using a multi-scale deep network. In Advances in neural information processing systems, pages 23662374.2014.</p>
+<p><span id="17"> [17] :H. Fan.H. Su. and l.. guibas. A point set generation network for 3D object reconstruction from a single image. In Proceedings of the IeeE conference on computer vision and pattern recognition, pages 605-613， 2017</p>
+<p><span id="19"> [19] :L. Gao, Y.K. Lai, D. Liang, S.Y.Chen and s. Xia. Efficient and fexible deformation representation for data-driven surface modeling ACM Transactions on Graphics （TOG，35（5）：158,2016.</p>
+<p><span id="20"> [20] :L. Gao, Y.K. Lai, J. Yang, Z. Ling- Xiao S. Xia, and L. Kobbelt. Sparse data driven mesh deformation leee transactions on visualization and computer graphics, 2019</p>
+<p><span id="21"> [21] :L. Gao, J. Yang, Y.-L. Qiao, Y.-K. Lai, P. L Rosin,W.ⅹu,andS.ⅹia. Automatic unpaired shape deformation transfer. In SIGGRAPH Asia 2018 Technical Papers, page 237. ACM 2018</p>
+<p><span id="22"> [22] :L Gao, J. Yang, T. Wu, Y.J. Yuan, H. Fu Y.K. Lai, and H. Zhang. SDM-NET:Deep generative network for structured deformable mesh. ACM Transactions on Graphics（TOG），38（6）：243,2019</p>
+<p><span id="23"> [23] :A. Geiger, P. Lenz, C. Stiller, and R. Urtasun Vision meets robotics:The kitti dataset The International ournal of robotics Research 32（11）：1231-1237,2013</p>
+<p><span id="24"> [24] :K. Genova. F. Cole. A. Sud. A. Sarna. and T. Funkhouser. Deep structured implicit functions. arXiv preprint ar Xiv：1912.06126，2019.</p>
+<p><span id="25"> [25] :K. Genova. F. Cole. D. Vlasic. A. Sarna.W. T Freeman, and t. Funkhouser. Learning shape templates with structured implicit functions arXiv preprint ar Xiv：1904.06447， 2019</p>
+<p><span id="26"> [26] :R. Girdhar, D. Fouhey, M. rodriguez, and A Gupta. Learning a predictable and generative vector representation for objects. In E uropean Conference on Computer Vision（ECCV）， 2016</p>
+<p><span id="27"> [27] :I. Goodfellow, J. Pouget-Abadie, M. Mi Irza B. Xu. D. Warde-Farley. s. Ozair. A. Courville and Y. Bengio. Generative adversarial nets In Advances in neural information processing systems, pages 2672-2680， 2014</p>
+<p><span id="28"> [28] :Groueix, T., Fisher, M., Kim, V. G., Russell, B. C., &amp; Aubry, M. (2018). A papier-mâché approach to learning 3d surface generation. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 216-224).</p>
+<p><span id="30"> [30] :S. Gupta, P. Arbelaez, R. Girshick, and J. Malik. Aligning 3D models to RGB-D images of cluttered scenes. In Proceedings of the Ieee Conference on Computer Vision and Pattern recognition, pages 4731-4740 2015</p>
+<p><span id="31"> [31] :Gupta, R. Girshick, P. Arbelaez. and Malik. Learning rich features from rgB-D images for object detection and segmentation In European conference on computer vision, pages 345-360. Springer, 2014</p>
+<p><span id="32"> [32] :C. Hane. S. Tulsiani and Malik. Hierarchical surface prediction for 3D object reconstruction In 2017 International Conference on 3D Vision（DV）， pages 412-420. IEEE, 2017</p>
+<p><span id="33"> [33] :R. Hanocka, A. Hertz, N. Fish, R. Giryes S. Fleishman and d. Cohen-Or. Meshcnn:a network with an edge. ACM Transactions on Graphics（OG，38（4）：90,2019</p>
+<p><span id="34"> [34] :M. Henaff, J. Bruna, and Y. LeCun. Deep convolutional networks on graph-structured data. arXiv preprint arXiv：1506.05163， 2015</p>
+<p><span id="35"> [35] :G. E. Hinton. s. Osindero, and Y.-W. Teh a fast learning algorithm for deep belief nets Neural computation，18（7）：1527-1554,2006</p>
+<p><span id="36"> [36] :S. Hochreiter and J. Schmidhuber. Long short-term memory. Neural computation, 9 （8）：17351780.1997.</p>
+<p><span id="37"> [37] :T.Jeruzalski, B. Deng, M. Norouzi, J. Lewis G. Hinton, and A. Tagliasacchi. NASA:Neural articulated shape approximation. arXiv preprint arXi0：1919.03207.2019.</p>
+<p><span id="38"> [38] :T.N. Kipf and M. Welling. Semi-supervised classification with graph convolutional networks. arXiv preprint arXiv：1609.029072016</p>
+<p><span id="39"> [39] :R. Klokov and V. lempitsky. Escape from cells Deep kd-networks for the recognition of 3D point cloud models. In Proceedings of the IEEE International Conference on Computer vision pages863872,2017</p>
+<p><span id="40"> [40] :A. Krizhevsky, I. Sutskever, and G. E. Hinton ImageNet classification with deep convolutional neural networks. In Advances in neural information processing systems, pages 1097-1105.2012</p>
+<p><span id="42">[42] :Y.Le Cun, K. Kavukcuoglu, and C. Farabet Convolutional networks and applications in vision In Proceedings of 2010 IEEE International Symposium on Circuits and Systems, pages 253-256. IEEE, 2010</p>
+<p><span id="43">[43] :J. Li, K. Xu, S Chaudhuri, E. Yumer, H Zhang, and L. Guibas. GRASS:Generative recursive autoencoders for shape structures. ACM Transactions on Graphics （TOG）， 36（4）：522017.</p>
+<p><span id="44">[44] :R. Li. X. Li. C -W. Fu. D. Cohen-Or and p A. Heng. PU-GAN:a point cloud upsampling adversarial network. In Proceedings of the Ieee International Conference on Computer vision pages7203-7212,2019.</p>
+<p><span id="45">[45] :Y. Li. R. Bu. M. Sun. W. Wu. X. Di and b. chen. Point cnn:Convolution on x transformed points. In Advances in neura information processing systems, pages 820-8302018.</p>
+<p><span id="46">[46] :Y. Li, S. Pirk, H. Su, C. R. Qi, and L. J Guibas. FPNN:Field probing neural networks for 3d data. In Advances in Neural Information Processing Systems, pages 307-315， 2016</p>
+<p><span id="47">[47] :M. Lin, Q. Chen, and s. Yan. Network in network. arXiv preprint ar Xiv：1312.4400， 2013</p>
+<p><span id="48">[48] :S Liu,S. saito, W. Chen, and H. Li. Learning to infer implicit surfaces without 3D supervision In Advances in Neural Information Processin ystems, pages 8293-8304， 2019</p>
+<p><span id="50">[50] :W.E. Lorensen and H. E. Cline. Marching cubes a high resolution 3D surface construction algorithm. In ACM siggraph computer graphics, volume 21，pages 163-169. ACM,1987</p>
+<p><span id="51">[51] :H. Maron, M. Galun, N. Aigerman, M. Trope, N. Dym, E. Yumer, V. G. Kim, and Y Lipman Convolutional neural networks on surfaces via seamless toric covers. ACM Trans. Graph 36（4）：71-1,2017</p>
+<p><span id="52">[52] :J. Masci, D. Boscaini, M. Bronstein, and P. Vandergheynst. Geodesic convolutional neural networks on Riemannian manifolds In Proceedings of the Ieee international conference on computer vision workshops, pages 37-45,2015</p>
+<p><span id="53">[53] :D. Maturana and s. Scherer. 3D convolutional neural networks for landing zone detection from LiDAR. In 2015 IEEE International conference on Robotics and Automation （ICRA）， pages 3471-3478.TEEE，2015.</p>
+<p><span id="54">[54] :D. Maturana and s. Scherer. VoxNet:A 3d convolutional neural network for real-time object recognition. In 2015 IEEE/RSJ International Conference on Intelligent Robots and Systems （IROS）， pages 922-928. IEEE 2015</p>
+<p><span id="55">[55] :D. Meagher. Geometric modeling using octree encoding. Computer graphics and image processing，19（2）：129147,1982</p>
+<p><span id="55">[55] :E. Mehr, A. Jourdan, N. Thome, M. Cord, and V. Guitteny. DiscoNet:Shapes learning on disconnected manifolds for 3d editin In Proceedings of the IEEE International C inference on Computer vision, pages 34743483.2019.</p>
+<p><span id="57">[57] :L. Mescheder, M. Oechsle, M. Niemeyer S. Nowozin, and A. Geiger. Occupancy networks earning 3D reconstruction in function space. In Proceedings of the IEEE Conference on Computer Vision and Pattern recognition, pages 4460-4470， 2019</p>
+<p><span id="58">[58] :K. Mo. P. Guerrero. L. Yi.H. Su. P. Wonka N.. Mitra. and L.. Guibas. StructureNet hierarchical graph networks for 3D shape generation. ACM Transactions on Graphics（OG，38（6）：242,2019</p>
+<p><span id="62">[62] :J.J. Park. P Florence.J. Straub.R. Newcombe and S. Lovegrove. DeepSDF:Learning continuous signed distance functions for shape representation. In Proceedings of the Ieee Conference on Computer vision and Pattern Recognition, 2019</p>
+<p><span id="63">[63] : C. R. Qi, H. Su, K. Mo, and L.J. Guibas PointNet:Deep learning on point sets for 3D classification and segmentation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 652-660，2017</p>
+<p><span id="64">[64]:C. R. Qi, H. Su, M. NieBner, A. Dai, M. Yan and L.. Guibas. Volumetric and multi-view CNNS for object classification on 3D data. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 5648-56562016.</p>
+<p><span id="65">[65]:C. R. Qi, L. Yi, H. Su, and Guibas PointNet++：Deep hierarchical feature learning on point sets in a metric space. In Advances in neural information processing systems, pages 5099-5108.2017</p>
+<p><span id="66">[66] :G. Riegler, A. Osman Ulusoy, and A. Geiger OctNet:Learning deep 3D representations at high resolutions. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 3577-3586， 2017.</p>
+<p><span id="68">[68] :N. Sedaghat, m. Zolfaghari, E. Amiri, and T. Brox. Orientation-boosted voxel nets for 3D object recognition. In british Machine vision Conference, 2017</p>
+<p><span id="69">[69] :A. Sharma. O. Grau and m. fritz. VconV-DAE Deep volumetric shape learning without object labels. In European Conference on Computer Vision, pages 236-250. Springer, 2016</p>
+<p><span id="70">[70] :N. Silberman and R. Fergus. Indoor scene segmentation using a structured light sensor In Proceedings of the International Conference on Computer Vision Workshop on D Representation and recognition, 2011</p>
+<p><span id="71">[71] :N. Silberman. D. Hoiem. P. Kohli. and R. Fergus. Indoor segmentation and support inference from RGBD images. In European Conference on Computer vision, pages 746760. Springer, 2012</p>
+<p><span id="72">[72] :A. Sinha.. Bai. and K. Ra amanI Deep learning 3d shape surfaces using geometry images. In European conference on computer Vision, pages 223-240. Springer, 2016</p>
+<p><span id="73">[73] :R. Socher, B. Huval, B. Bath, C.D. Manning and A.Y. Ng. Convolutional-recursive deep learning for 3d object classification. In Advances in neural information processing systems, pages 656664.2012.</p>
+<p><span id="74">[74] :R. Socher, C. C. Lin, C. Manning, and A. Y Ng Parsing natural scenes and natural language with recursive neural networks. In Proceedings of the 28th international conference on machine learning（ICML-11）， pages 129-136， 2011</p>
+<p><span id="75">[75] :Song d J. Xiao. Deep sliding shapes for amodal 3D object detection in RGB-D images. In Proceedings of the IEEE Conference on Computer vision and Pattern Recognition pages808816,2016.</p>
+<p><span id="76">[76] :H Su, S. Maji, E Kalogerakis, and E Learned Miller Multi-view convolutional neural networks for 3D shape recognition. I Proceedings of the Ieee international conference on computer vision, pages 945-953.2015.</p>
+<p><span id="77">[77] :Q. Tan, L. Gao, Y.K. Lai, and s. Xia Variational autoencoders for deforming 3d mesh models. In Proceedings of the IEEE Conference on Computer vision and Pattern Recognition pages5841-5850,2018.</p>
+<p><span id="78">[78] :Q. Tan, L. Gao, Y.-K. Lai, J. Yang and s. Xia. Mesh-based autoencoders for localized deformation component analysis. In Thirty-Second AAAl Conference on Artificial Intelligence, 2018</p>
+<p><span id="79">[79] :M. Tatarchenko, A. Dosovitskiy and T. brox Octree generating networks Efficient convolutional architectures for high-resolution 3D outputs In Proceedings of the IEEE International Conference on Computer vision pages20882096,2017.</p>
+<p><span id="80">[80] :N. Verma, E. boyer, and J. Verbeek. Feast Net:Feature-steered graph convolutions for 3D shape analysis. In Proceedings of the IEEE Conference on Computer Vision and Pattern recognition pages25982606,2018.</p>
+<p><span id="81">[81] :P. Vincent, H. Larochelle, Y. Bengio, and P.-A. Manzagol Extracting and composing robust features with denoising autoencoders. In Proceedings of the 25th international conference on Machine learning, pages 1096-1103. ACM 2008.</p>
+<p><span id="82">[82] :P. Vincent, H. Larochelle, I. Lajoie, Y. Bengio, and P -A. Manzagol Stacked denoising S autoencoders:Learning useful representations in a deep network with a local denoising criterion. Journal of machine learning research，11（Dec）：3371-3408,2010</p>
+<p><span id="83">[83] :H. Wang, N Schor, R. Hu, H. huang, D. Cohen Or, and H. Huang. Global-to-local generative model for 3d shapes In SIGGRaPH Asia 2018 Technical Papers, page 214. ACM, 2018</p>
+<p><span id="84">[84] :N. Wang, Y. Zhang, Z. Li, Y. Fu, W. Liu and Y.-G. Jiang. Pixel2Mesh:Generating 3D mesh models from single RGB images In Proceedings of the european Conference on Computer Vision（eccv）， pages 52-67， 2018</p>
+<p><span id="85">[85] :P -S. Wang, Y. Liu, Y.-X. Guo, C.-Y. Sun, and X. Tong. O-CNN:Octree-based convolutional neural networks for 3d shape analysis. ACM Transactions on Graphics （TOG）， 36（4）：72，2017.</p>
+<p><span id="87">[87] :C. Wen, Y. Zhang. Z. Li. and Y. Fi Pixel2Mesh-++：Multi-view 3D mesh generation via deformation. In Proceedings of the IEEE International Conference on Computer vision pages1042-1051,2019.</p>
+<p><span id="89">[89] :R. Wu, Y. Zhuang, K. Xu, H. Zhang and B. Chen. PQ-NET:A generative part seq2seq network for 3D shapes. arXiv preprint arXiv：1911.10949,2019</p>
+<p><span id="90">[90] :Z. Wu, S. Song, A. Khosla, F. Yu, L. Zh nang X. Tang, and J. Xiao. 3D ShapeNets:A deep representation for volumetric shapes. In Proceedings of the IEEE conference on computer vision and pattern recognition, pages 1912-19202015.</p>
+<p><span id="91">[91] :Z. Wu, X. Wang. D. Lin, D. Lischinsk D. Cohen-Or, and H. Huang. SAGNet structure-aware generative network for 3D shape modeling a cm Transactions on Graphics（TOG）， 38 （4 91， 2019</p>
+<p><span id="93">[93] :Q. Xu, W. Wang, D. Ceylan, R. Mech and U. Neumann. DISN:Deep implicit surface network for high-quality single-view 3D reconstruction. In Neurlps. 2019</p>
+<p><span id="94">[94] :Y. Yang, C. Feng, Y. Shen, and D. Tian FoldingNet:Point cloud auto-encoder via deep grid deformation. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pages 206-215， 2018</p>
+<p><span id="95">[95] :W. Yifan, S. Wu, H. Huang, D. Cohen-Or, and O. Sorkine-Hornung. Patch-based progressive 3D point set upsampling. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recogmition, pages 5958-5967， 2019</p>
+<p><span id="96">[96] :L. Yu. X. Li. C -W. Fu. D. Cohen-Or. and P -A. Heng. PU-Net:Point cloud upsampling network. In Proceedings of the IEEE Conference on Computer vision and Pattern Recognition pages2790-2799,2018.</p>
+<p><span id="98">[98] :C. Zou, E. Yumer, J. Yang, D. Ceylan and D. Hoiem. 3D-PRNN:Generating shape primitives with recurrent neural networks. In Proceedings of the Ieee International Conference on Computer Vision, pages 900909.2017.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/paper/" rel="tag"># paper</a>
+          
+            <a href="/tags/3D-shape-representation/" rel="tag"># 3D shape representation</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/01/10/binary-tree/" rel="next" title="binary-tree">
+                <i class="fa fa-chevron-left"></i> binary-tree
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">知心大姐姐的臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective"><span class="nav-number">1.</span> <span class="nav-text">A survey on Deep Geometry Learning-From a Representation Perspective</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-image-based-methods"><span class="nav-number">1.3.</span> <span class="nav-text">2. image-based methods</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Voxel-based-representation"><span class="nav-number">1.4.</span> <span class="nav-text">3. Voxel-based representation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Dense-Voxel-representation"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1 Dense Voxel representation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Sparse-Voxel-Representation（Octree）"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2 Sparse Voxel Representation（Octree）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Surface-based-representation"><span class="nav-number">1.5.</span> <span class="nav-text">4. Surface-based representation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Point-based-Representation"><span class="nav-number">1.5.1.</span> <span class="nav-text">4.1 Point-based Representation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Mesh-based-Representation"><span class="nav-number">1.5.2.</span> <span class="nav-text">4.2 Mesh-based Representation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Implicit-Representation"><span class="nav-number">1.6.</span> <span class="nav-text">5. Implicit Representation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Structure-based-representation"><span class="nav-number">1.7.</span> <span class="nav-text">6. Structure-based representation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-Deformation-based-representation"><span class="nav-number">1.8.</span> <span class="nav-text">7. Deformation-based representation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-Datasets"><span class="nav-number">1.9.</span> <span class="nav-text">8. Datasets</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-Shape-Analysis-and-Reconstruction"><span class="nav-number">1.10.</span> <span class="nav-text">9. Shape Analysis and Reconstruction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#9-1-Shape-Analysis"><span class="nav-number">1.10.1.</span> <span class="nav-text">9.1 Shape Analysis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Shape-Reconstruction"><span class="nav-number">1.10.2.</span> <span class="nav-text">Shape Reconstruction</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-Summary"><span class="nav-number">1.11.</span> <span class="nav-text">10. Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">1.12.</span> <span class="nav-text">Reference</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
