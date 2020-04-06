@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,深度图补全," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Sparse and noisy LiDAR completion with RGB guidance and uncertaintyAbstract（全局和局部融合，早期和后期融合，置信图预测） 这项工作提出了一种新的方法来精确完成由rgB图像引导的稀疏LidaR映射。 对于自动驾驶汽车和机器人，必须使用LiDaR才能实现精确的深度预测。 大量的应用取决于对周围环境的了解，并使用深度提示进行推理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RGB-Guidence&amp;Uncertainty">
+<meta property="og:url" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="Sparse and noisy LiDAR completion with RGB guidance and uncertaintyAbstract（全局和局部融合，早期和后期融合，置信图预测） 这项工作提出了一种新的方法来精确完成由rgB图像引导的稀疏LidaR映射。 对于自动驾驶汽车和机器人，必须使用LiDaR才能实现精确的深度预测。 大量的应用取决于对周围环境的了解，并使用深度提示进行推理">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/Table1.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/RGB-Guidence&Uncertainty/Table1.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/RGB-Guidence&Uncertainty/pipeline.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/RGB-Guidence&Uncertainty/Table2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/Table3.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/RGB-Guidence&Uncertainty/Table3.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/Figure2-1.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/Figure2-2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/Figure3.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/RGB-Guidence&Uncertainty/Figure2-1.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/RGB-Guidence&Uncertainty/Figure2-2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/RGB-Guidence&Uncertainty/Figure3.png">
+<meta property="article:published_time" content="2020-04-06T14:34:55.000Z">
+<meta property="article:modified_time" content="2020-04-06T14:45:37.931Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="深度图补全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/Table1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/"/>
+
+
+
+
+
+  <title>RGB-Guidence&Uncertainty | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/06/RGB-Guidence-Uncertainty/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RGB-Guidence&Uncertainty</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-06T22:34:55+08:00">
+                2020-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B2%BE%E8%AF%BB%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">精读论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/04/06/RGB-Guidence-Uncertainty/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/04/06/RGB-Guidence-Uncertainty/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/04/06/RGB-Guidence-Uncertainty/" class="leancloud_visitors" data-flag-title="RGB-Guidence&Uncertainty">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Sparse-and-noisy-LiDAR-completion-with-RGB-guidance-and-uncertainty"><a href="#Sparse-and-noisy-LiDAR-completion-with-RGB-guidance-and-uncertainty" class="headerlink" title="Sparse and noisy LiDAR completion with RGB guidance and uncertainty"></a>Sparse and noisy LiDAR completion with RGB guidance and uncertainty</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>（全局和局部融合，早期和后期融合，置信图预测）</p>
+<p>这项工作提出了一种新的方法来精确完成由rgB图像引导的稀疏LidaR映射。 对于自动驾驶汽车和机器人，必须使用LiDaR才能实现精确的深度预测。 大量的应用取决于对周围环境的了解，并使用深度提示进行推理和做出相应的反应。一方面，单目深度预测方法无法生成绝对的和精确的深度图。 另一方面，基于立体匹配的方法仍然远远优于基于激光雷达的方法。 深度补全任务的目标是从稀疏点和不规则点云生成密集的深度预测，这些点云被映射到2D平面。我们提出了一个新的框架，该框架提取全局和本地信息，以便生成适当的深度图。 我们认为简单的深度补全不需要深度网络。我们还提出了一种融合了单目相机RGB指导的融合方法，以利用对象信息并纠正稀疏输入中的错误。这大大提高了准确性。此外，利用置信掩码来考虑来自每个模态的深度预测中的不确定性。 这种融合方法的性能优于现有技术，在kITTI深度完成基准测试中排名第一。</p>
+<a id="more"></a>
+
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>深度补全预测稀疏点云中的密集深度图。 在许多计算机视觉应用中，精确的深度值至关重要。 近年来，由于工业需求，该任务已引起关注。其他计算机视觉任务（其中包括3D对象检测和2D或3D语义分割以及slam跟踪）可以利用这些准确的深度线索，从而在这些领域中获得更好的准确性。 这项工作将集中在使用稀疏LiDAR和单目RGB图像的自动驾驶汽车上。在这里，需要准确地检测和区分近处和远处的物体。LiDAR会生成周围的点云，但是扫描线数量有限会导致高度稀疏。 具有64条扫描线的LiDAR很常见，但仍然很昂贵。稀疏且不规则的输入点间距使该任务在其他应用中脱颖而出。由于大量应用程序使用的LiDaR扫描线数量有限，因此产业相关性是无可争辩的，目前已成为一个非常活跃的研究领域。这项任务具有挑战性的原因有三点。 首先，输入是随机间隔的，这使得难以使用正向卷积。 其次，由于传感器融合的多种组合是可能的，即早期和晚期融合，多种形式的组合仍然是研究的活跃领域。本文将重点介绍RGB信息和LidaR点之间的融合。 第三，使用的标注信息仅部分被准确标注。 毕竟，逐像素地标注的构造是昂贵的。 我们的方法需要解决这个限制。本文的贡献是：</p>
+<ul>
+<li>全局信息和局部信息组合在一起，以准确地完成和纠正稀疏输入。 单目RGB图像可用作此深度完成任务的指导。</li>
+<li>全局和局部分支的置信图都以无监督的方式学习。预测的深度图由它们各自的置信图加权。这种后期融合方法是框架的基本组成部分。</li>
+<li>在使用和不使用RGB图像的情况下，该方法在kitti深度完成基准上均排名第一。 此外，它不需要任何其他数据或后处理。</li>
+</ul>
+<p>论文的结构如下：第2节提到了有关深度补全的类似先前工作，并着重介绍了现有挑战。接下来是第3节中对我们方法的详细描述。第4节中，我们将在流行的KITTI数据集上进一步评估该方法。 第5节将总结我们的论文。</p>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h2><p>讨论与深度补全任务有关的相关工作。关注稀疏数据的处理以及其他形式的liDAR的引导，特别是RGB图像。</p>
+<h3 id="2-1-Handling-sparse-data"><a href="#2-1-Handling-sparse-data" class="headerlink" title="2.1 Handling sparse data"></a>2.1 Handling sparse data</h3><p>补全丢失的信息，同时也更正输入，具有广泛的应用范围。 修复，去噪和超分辨率都可以视为深度补全任务的一部分，从而使深度补全与那些特定的子任务相关。</p>
+<p>较旧的方法使用手工制作的方法，以便对复杂插值技术的稀疏输入进行局部上采样。 甚至最近<a href="#9">[9]</a>在不使用卷积神经网络（CNN）的情况下也取得了令人印象深刻的结果。他们通过形态学图像处理技术人为地使输入更密集，并从该中间状态预测最终深度。但是，这些方法在LiDAR框架中也容易出错，从而使CNN成为完成深度任务的更强大工具。重要的是要知道3D LiDAR点已映射到2D平面，从而使标准2D卷积成为可行的选择。 尽管输入的密度更高，但卷积运算并未设计为对该数据进行运算，因为网络只应考虑有效点。事实上。 最近的工作还表明，卷积神经网络可以为该任务取得令人兴奋的结果。<a href="#7">[7]</a>和<a href="#13">[13]</a>都使用深度神经网络，同时用零编码稀疏值。他们认为，这项工作需要深入的网络。我们认为，将本地和全局网络相结合是一种更优雅，更直观的解决方案，而且还会产生更好的结果。</p>
+<p><a href="#18">[18]</a>提出稀疏不变卷积，以考虑稀疏输入。 他们通过使用maxpooling在网络的每一层传播有效性掩码来执行规范化卷积操作。 现在，网络可以保持稀疏程度不变。<a href="#1">[1]</a>考虑到稀疏性，提出了类似的解决方案。 在此，传播置信度掩模，该置信度掩模对于每一层都需要第二次卷积，以便执行归一化并为下一层生成置信度掩模。 为了有效地组合由全球和本地网络提取的特征图，我们还在更高水平上进行了不确定性试验。HMS-Net<a href="#5">[5]</a>通过采用多尺度网络并提出用于级联，双线性上采样和添加稀疏输入图的新操作而实现更好的效果。我们发现如果稀疏度在每个帧中都是恒定的，则这些操作是不必要的，因为在包含这些修改的操作时，我们注意到准确性没有提高。因此，在我们的方法中坚持传统的卷积运算，并表明我们的框架可以处理稀疏的LiDAR数据。此外，为稀疏输入添加有效性掩码不会对输出精度产生影响，这与Maritz等人的发现是一致的。<a href="#7">[7]</a></p>
+<h3 id="2-2-Guided-depth-completion"><a href="#2-2-Guided-depth-completion" class="headerlink" title="2.2 Guided depth completion"></a>2.2 Guided depth completion</h3><p>到目前为止，为了产生更好的结果，已经有多种方法包括RGB数据。如何组合不同的传感器仍然是一个尚待研究的问题。最近的工作包括融合技术，以便生成更丰富的功能，并为深度补全任务提供更好的先验。 RGB数据将用于引导我们的局部网络。现在我们讨论最新的引导和融合技术。</p>
+<h4 id="2-2-1-Guidance"><a href="#2-2-1-Guidance" class="headerlink" title="2.2.1 Guidance"></a>2.2.1 Guidance</h4><p>在一项工作中，Schneider等人<a href="#17">[17]</a>包含了RGB信息，以便为深度预测生成锋利的边缘。 他们使用逐像素的语义注释来区分多个对象，并使用测地线距离度量来增强尖锐的边界边缘。<a href="#13">[13，14]</a>利用基于ResNet的深度神经网络，以4D，RGB-D作为输入。此外，<a href="#14">[14]</a>采用了需要时间数据的自我监督方法。他们利用两个流，以在同一特征空间中组合激光雷达数据和rgb图像，从而获得更好的结果。<a href="#20">[20]</a>通过利用RGB数据和预测表面法线来更好地预测深度。他们最终将这些预测与稀疏深度输入相结合，以生成完整的深度图。像我们一样，他们发现从独立的稀疏深度样本中完成稀疏数据是一项艰巨的任务，证明了RGB引导的重要性</p>
+<h4 id="2-2-2-Fusion"><a href="#2-2-2-Fusion" class="headerlink" title="2.2.2 Fusion"></a>2.2.2 Fusion</h4><p>多模态传感器数据不能够直接融合。 例如<a href="#11">[11]</a>在rgB图像的引导下对低分辨率深度图进行升采样，并采用后期融合方法。 实际上，可以考虑不同的融合技术：早期融合，晚期融合多层次融合。<a href="#19">[19]</a>则采用多层次融合，其从多个输入流中提取并组合编码器中不同阶段的特征图。通常，大多数工作（例如<a href="#2">[7，2]</a>）表明后期融合可以实现更好的性能。 我们建议将早期融合和晚期融合相结合，在KITTI benchmark上显示出良好的效果。在我们的工作中，早期融合采取从全局信息中提取的本地网络引导图的形式。深度预测采用不确定性来完成后期融合。 此外，还使用了传统的融合技术，例如添加，连接或相乘特征图。</p>
+<h2 id="3-Method"><a href="#3-Method" class="headerlink" title="3. Method"></a>3. Method</h2><p>我们的方法作用于3d点云到2D平面的投影。 在此，将深度补全问题作为回归问题来处理。我们的方法需要通过使用ground truth训练Cnn并使用零对缺失的LiDAR输入值进行编码来进行监督。 通过使用半全局匹配（SGM）和时间信息<a href="#18">[18]</a>可靠地组成了目标，但它们仍然是半稀疏的（约占30％）。通过使用稀疏输入和半稀疏地面实况，卷积框架利用全局指导信息来校正伪像并正确地对输入进行升采样。人工的这种校正在以前的工作中并未明确解决。</p>
+<p>因此，我们的方法利用全局和局部形式来完成输入。 由于LiDAR的误差是由于运动物体和运动的LiDAR本身造成的错误，因此两个部分都是必需的，以便获得准确的预测。局部网络将解释局部信息，而全局网络则基于LiDAR和RGB信息提取全局信息。两个网络之间的融合产生了最终的深度图。我们稍后将说明深度补全不需要深度网络。首先，将更详细地说明框架的两个部分。</p>
+<h3 id="3-1-Extracting-local-and-global-information"><a href="#3-1-Extracting-local-and-global-information" class="headerlink" title="3.1 Extracting local and global information"></a>3.1 Extracting local and global information</h3><p>全局分支可以被认为是先验的，即纠正由局部分支提取的特征。由于LiDAR输入帧中有错误，因此全局信息可帮助局部网络检测这些伪像并更准确地重建稀疏输入。我们推测全局信息是相关的。首先，全局网络能够检测（移动）物体，并能够检测框架中可能具有相同深度的结构。其次，我们期望从LiDAR输入中计算出更渐进的深度图，以防止深度和误差的突然变化。通过检查RGB输入，可以确定此信息，因为由于其颜色信息，可以更轻松地提取对象的边界。 因此，可以提取语义上有意义的信息。</p>
+<p>局部网络检查输入的LiDAR帧并执行局部上采样。为了修复有噪声的LiDAR数据，我们将LiDAR图与全局引导图融合在一起。 一方面，这种引导技术背后的原因是局部网络可以进一步关注正确和确信的LiDAR点。另一方面，全局网络可以推断对象，其边缘和框架中的较大结构。最后，为了保持不断改进的预测，使用了一种残差学习方法，该方法通过跳过小型局部网络上的连接来实现。</p>
+<h3 id="3-2-Exploiting-uncertainty"><a href="#3-2-Exploiting-uncertainty" class="headerlink" title="3.2 Exploiting uncertainty"></a>3.2 Exploiting uncertainty</h3><p>我们利用了全局和局部网络中的不确定性。框架的两个部分都预测了置信度图。 这样，置信度图就像权重图一样，用于两种输入类型之间的最终融合。 因此，按像素执行加权，并且网络以无监督的方式学习权重。使用这种技术，可以根据学习到的置信度权重，利用不同网络路径中的不确定性来更加关注某种输入类型。 网络学会了在某些区域优先选择全局信息而不是局部信息。事实上，在激光雷达点准确且足够的位置，局部网络将以较高的置信度进行深度预测，而在激光雷达数据不正确或稀缺时（例如在对象边界处）将使用全局信息。这种融合方法是组合多个传感器的有效方法，这在第4节的结果中得到了支持。</p>
+<h3 id="3-3-Network"><a href="#3-3-Network" class="headerlink" title="3.3 Network"></a>3.3 Network</h3><p>全局网络是基于ERFNet 16的编码器/解码器网络，而局部网络是堆叠的沙漏网络。后者由两个沙漏模块组成，目的是学习原始深度预测的残差，该模块受ResNet<a href="#4">[4]</a>和人体姿势估计架构<a href="#15">[15]</a>的启发，总共只有350k参数。 每层由六层组成，具有一个小的接收域，并且使用stride卷积仅进行两次下采样。在第一层卷积和第一个沙漏模块的编码器中不存在批量归一化<a href="#6">[6]</a>，因为零的数量会使该层参数倾斜，尤其是在输入稀疏度不恒定的情况下。沙漏模块的结构可以在表1中找到。选择基于ERFNet的全局网络，是因为它在达到cityscapes benchmark<a href="#22">[22]</a>的同时仍保持实时性，因此具有很高的精度。</p>
+<img src="/2020/04/06/RGB-Guidence-Uncertainty/Table1.png" class="">
+<!-- <img src="./RGB-Guidence&Uncertainty/Table1.png"   /> -->
+
+全局引导图像与稀疏的LiDAR帧融合在一起，以利用全局信息。这类似于早期融合作为局部网络的引导。 一方面，全局网络提供了三个输出图：具有全局信息的引导图，深度图和置信度图。 另一方面，局部网络提供深度图和置信度图。 通过将置信度图与其深度图相乘并将来自两个网络的预测相加，可以得出最终预测。使用softmax函数来计算置信度图的概率值。此选择过程允许框架从全局深度图中选择像素，或从堆叠的沙漏模块中选择调整后的深度值。 因此，最终深度预测$\widehat d$利用置信度图X和Y，等式(1)是最终深度值$\widehat d$的数学表达。图1是整个框架的可视化效果。
+$${\widehat d}_{out}(i,j)=\frac{e^{X(i,j)}\cdot{\displaystyle\widehat d}_{global}(i,j)+e^{Y(i,j)}\cdot{\widehat d}_{local}(i,j)}{e^{X(i,j)}+e^{Y(i,j)}}\tag{1}$$
+
+
+
+{% asset_img pipeline.png %}
+<!-- <img src="./RGB-Guidence&Uncertainty/pipeline.png"   /> -->
+
+## 4. Experiments
+我们的实验使用了Tesla V100 GPU，并且代码使用Pytorch实现。 我们通过计算ground truth的所有像素上的loss来评估我们的框架，因为并非LiDAR的所有输入像素都是正确的。KITTI深度补全benchmark是我们的主要重点，因为它准确地模拟了现实生活中的情况。KITTI数据集提供用于训练的85898帧，用于评估的1000帧和用于测试的1000帧。首先是消融研究，然后与SOTA的方法进行了比较。
+
+### 4.1 Ablation study and analysis
+在所有情况下，我们都通过垂直翻转图像来执行数据增强。 由于KITTI数据集的大小，在调整RGB输入大小的同时旋转和缩放LiDAR输入对最终结果没有影响。 此外，由于LidaR框架的顶部没有提供任何信息，因此我们将输入裁剪为1216x256的宽高比。我们首先分别训练框架的两个部分，并在Cityscapes 22上使用经过预训练的ERFNet作为我们的全局网络。 之后，添加了有关局部网络的引导。 因此。 该框架经过了端到端的训练，并将这两个网络基于其确定性的预测与这种最新的融合方法相结合。 我们采用Adam优化器，学习率为$10^{-3}$。
+
+{% asset_img Table2.png %}
+<!-- <img src="./RGB-Guidence&Uncertainty/Table2.png"   /> -->
+
+实现了多种损失函数。 在[[12]](#12)的启发下，我们提出的Focus-MSE损失在深度预测任务上比vanilla-MSE损失要好，也比流行的BerHu损失[[10]](#10)要好。如公式（2）所示，增加了Focus项以使训练过程中错误预测的点在损失函数中的权重稍高。 此外，这种回归损失值得在其他领域尝试。损失函数测量了最终深度图，全局深度图和局部深度图的正确性，如公式3所示。权重$w_1$，$w_2$都等于0.1，而$w_3$等于1。
+$$\lambda(\widehat y,y)=\frac1n\sum_{i=1}^n(1+0.05\cdot epoch\cdot\left|y_i-{\widehat y}_i\right|)\cdot(y_i-{\widehat y}_i)^2 \tag{2}$$
+$$\Lambda=w_1\cdot\lambda({\widehat y}_{global},y)+w_2\cdot\lambda({\widehat y}_{local},y)+w_3\cdot\lambda({\widehat y}_{out},y) \tag{3}$$
+
+
+
+<p>RMSE（均方根误差）和MAE（均值绝对误差）均用于评估KITTI benchmark，但我们主要关注RMSE，因为它是benchmark的主要指标。表2中的消融研究表明，全局网络和局部网络的结合可带来非常耗的结果。实际上，我们基于不确定性的后期融合方法有助于获得较大的精度。 通过利用引导图，我们最终在结果上优于先前的工作。我们还坚持使用2个沙漏模块，以免推理时间不必要地增加。由于稀疏度高，将批量归一化（BatchNormalization）添加到局部网络中的所有卷积中，会使MAE稍微增加。 我们得出的结论是，仅350k个参数，局部网络就已经可以达到良好的效果。 但是，为了纠正错误，我们利用全局网络预测不确定性图和引导图。</p>
+<p>表3显示了KITTI测试集的结果。 我们的表现优于<a href="#14">[14]</a>（目前在KITTI深度补全benchmark中排名第一）在所有指标上均显着提高，而帧速率则高4倍。 此外，当我们在表3中仅在框架中使用LiDAR信息（不使用RGB图像）时，我们在benchmark中也排名第一。从该测试集数据中，我们得出结论，该框架可以提取语义上有意义的信息以指导局部网络。</p>
+<img src="/2020/04/06/RGB-Guidence-Uncertainty/Table3.png" class="">
+<!-- <img src="./RGB-Guidence&Uncertainty/Table3.png"   /> -->
+<p>图2显示了验证集中的示例。 在这里，置信度图清楚地表明，在LiDAR传感器不正确的边缘和位置周围，全局网络更加确定（绿色框证明了该框架的有效性）。 图3展示了我们的方法与其他最新方法之间的区别。 它表明我们可以预测附近和远处物体更精确的深度值。</p>
+<img src="/2020/04/06/RGB-Guidence-Uncertainty/Figure2-1.png" class="">
+<img src="/2020/04/06/RGB-Guidence-Uncertainty/Figure2-2.png" class="">
+<img src="/2020/04/06/RGB-Guidence-Uncertainty/Figure3.png" class="">
+
+<!-- <img src="./RGB-Guidence&Uncertainty/Figure2-1.png"   />
+<img src="./RGB-Guidence&Uncertainty/Figure2-2.png"   />
+<img src="./RGB-Guidence&Uncertainty/Figure3.png"   /> -->
+
+<h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5. Conclusion"></a>5. Conclusion</h2><p>我们提出了一个以RGB图像为指导的框架，以完成和校正稀疏的LiDAR帧。该思想的核心是通过使用全局网络来利用全局信息。 此外，我们利用置信度图，以便根据后期融合方法中的不确定性来合并两个输入。我们使用Focus损失成功地回归到半稀疏的ground truth标注。这种方法需要20毫秒的推理时间，因此可以满足自动驾驶汽车的实时性要求。最后，我们在KITTI数据集上评估我们的方法，在深度补全benchmark中我们排名第一。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%9B%BE%E8%A1%A5%E5%85%A8/" rel="tag"># 深度图补全</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/06/DeepLidar/" rel="next" title="DeepLidar">
+                <i class="fa fa-chevron-left"></i> DeepLidar
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/06/MSG-CHN/" rel="prev" title="MSG-CHN">
+                MSG-CHN <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">知心大姐姐的臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Sparse-and-noisy-LiDAR-completion-with-RGB-guidance-and-uncertainty"><span class="nav-number">1.</span> <span class="nav-text">Sparse and noisy LiDAR completion with RGB guidance and uncertainty</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.3.</span> <span class="nav-text">2. Related Work</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Handling-sparse-data"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1 Handling sparse data</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Guided-depth-completion"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.2 Guided depth completion</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-Guidance"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">2.2.1 Guidance</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-Fusion"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">2.2.2 Fusion</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Method"><span class="nav-number">1.4.</span> <span class="nav-text">3. Method</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Extracting-local-and-global-information"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1 Extracting local and global information</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Exploiting-uncertainty"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2 Exploiting uncertainty</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Network"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.3 Network</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Conclusion"><span class="nav-number">1.5.</span> <span class="nav-text">5. Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

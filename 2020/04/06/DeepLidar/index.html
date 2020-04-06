@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,深度图补全," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="DeepLiDAR:Deep Surface Normal Guided Depth Prediction for Outdoor Scene from Sparse LiDAR Data and Single ColorImageabstract（表面法线，注意力遮罩图） 在本文中，我们提出了一种深度学习架构，该架构可根据单色图像和稀疏深度为室外场景生成准确的密集深度。受室内深度完成的启发，我们">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DeepLidar">
+<meta property="og:url" content="http://yoursite.com/2020/04/06/DeepLidar/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="DeepLiDAR:Deep Surface Normal Guided Depth Prediction for Outdoor Scene from Sparse LiDAR Data and Single ColorImageabstract（表面法线，注意力遮罩图） 在本文中，我们提出了一种深度学习架构，该架构可根据单色图像和稀疏深度为室外场景生成准确的密集深度。受室内深度完成的启发，我们">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/surfaceNormal.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/surfaceNormal.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/NetStructure.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/NetStructure.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/DCU.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/Tabel3.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/Tabel3.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/Figure7-1.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/Figure7-2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/Figure7-3.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/Figure7-1.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/Figure7-2.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/Figure7-3.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/Figure8.png">
+<meta property="og:image" content="http://yoursite.com/2020/04/06/DeepLidar/DCU/Figure8.png">
+<meta property="article:published_time" content="2020-04-06T14:20:40.000Z">
+<meta property="article:modified_time" content="2020-04-06T14:33:35.982Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="深度图补全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/04/06/DeepLidar/surfaceNormal.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/04/06/DeepLidar/"/>
+
+
+
+
+
+  <title>DeepLidar | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/06/DeepLidar/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DeepLidar</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-04-06T22:20:40+08:00">
+                2020-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B2%BE%E8%AF%BB%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">精读论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/04/06/DeepLidar/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/04/06/DeepLidar/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/04/06/DeepLidar/" class="leancloud_visitors" data-flag-title="DeepLidar">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="DeepLiDAR-Deep-Surface-Normal-Guided-Depth-Prediction-for-Outdoor-Scene-from-Sparse-LiDAR-Data-and-Single-ColorImage"><a href="#DeepLiDAR-Deep-Surface-Normal-Guided-Depth-Prediction-for-Outdoor-Scene-from-Sparse-LiDAR-Data-and-Single-ColorImage" class="headerlink" title="DeepLiDAR:Deep Surface Normal Guided Depth Prediction for Outdoor Scene from Sparse LiDAR Data and Single ColorImage"></a>DeepLiDAR:Deep Surface Normal Guided Depth Prediction for Outdoor Scene from Sparse LiDAR Data and Single ColorImage</h1><h2 id="abstract"><a href="#abstract" class="headerlink" title="abstract"></a>abstract</h2><p>（表面法线，注意力遮罩图）</p>
+<p>在本文中，我们提出了一种深度学习架构，该架构可根据单色图像和稀疏深度为室外场景生成准确的密集深度。受室内深度完成的启发，我们的网络将表面法线估计为产生密集深度的中间表示，并且可以端到端进行训练。带有改进的编码器-解码器<br>结构上，我们的网络有效地融合了密集的彩色图像和稀疏的LiDAR深度。为了解决室外特定的挑战，我们的网络预测了一个遮罩，以处理由于遮挡而在前景边界附近产生的混合LiDAR信号，并将彩色图像和表面法线的估计值与学习到的注意力图相结合，以提高深度精度，尤其是在远距离区域。大量的实验表明，我们的模型改进了KITTI深度图补全的benchmark。消融研究显示了每个模型组件对最终性能的积极影响，而综合分析表明，我们的模型可以很好地推广到稀疏度较高的输入或室内场景。</p>
+<a id="more"></a>
+<h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>在室外环境中测量密集而准确的深度对于自动驾驶和无人驾驶飞机等各种应用至关重要。 而大多数用于室内环境的主动深度感应解决方案由于光照条件的强烈干扰而失效，并且立体视觉在远距离处不稳定。 LiDAR是户外环境的主要可靠解决方案。 然而，高端激光雷达价格昂贵得令人望而却步，并且商品级设备也有低分辨率的困扰，这在中远距离区域造成了感知困难。 空间和时间融合提供了更密集的深度，但要么需要多个设备，要么需要从目标的运动中恢复三维信息，这会产生延迟的问题。 尚不存在实时而且具有精确深度的解决方案。</p>
+<p>一种可能的方法是从低成本的LiDAR中获取稀疏但准确的深度，并借助对齐的彩色图像使其变得密集。 随着深度学习的巨大成功，一种显而易见的方法是将稀疏深度和彩色图像直接输入到神经网络中，并回归到稠密深度。不幸的是，这种黑匣子与可解释模型相比效果不佳。 从彩色图像中学习局部深度值以内插稀疏信号。对于室内场景，Zhang等人估计表面法线作为中间表示，并通过单独的优化解决深度问题，从而获得了出色的结果。 但是，对于表面法线是否可以合理表示室外场景以及该系统如何执行，尚无很好的研究。</p>
+<img src="/2020/04/06/DeepLidar/surfaceNormal.png" class="">
+
+<!-- <img src="./DCU/surfaceNormal.png" style="zoom:80%"  /> -->
+<p>图2.对噪声的敏感性。当距离增加时，从法线重构的深度值对估计法线中的噪声/错误变得更加敏感。 我们展示了两种情况，可以通过正确的（绿色）和嘈杂的（黄色）法线来估计相邻像素的深度。 即使两种情况下表面法向误差相同（15°），与较近的误差相比，另一种情况也会导致较大的误差（红色）</p>
+<p>在这项工作中，我们提出了一种端到端深度学习系统，该系统可以从稀疏的激光雷达数据和利用表面法线作为中间表示的室外道路场景中获取的彩色图像中产生密集的深度，我们发现要使得这种方法取得与室内环境同样好的效果是很难的。通常是由于以下三个挑战</p>
+<ul>
+<li>数据融合。如何结合给定的稀疏深度和浓密彩色图像仍然是一个悬而未决的问题。一种常见的方式是将它们串联起来（通常使用二进制掩码，表示LiDAr深度的像素级可用性）直接作为网络输入（即早期融合），其中网络可以得到从编码器开始的所有输入数据。但是，结果可能会在缺失值的边界附近产生伪像，或者仅从可用的地方复制深度，否则会失败。受到利用中间亲和力的想法的启发，我们设计了一种编码器-解码器体系结构，即深度完成单元（DCU），其中分离的编码器分别从彩色图像中学习亲和性和稀疏深度中的特征，而解码器则学习产生密集的输出。 DCU属于后期融合架构的风格，但是不同之处在于，来自稀疏深度的特征被加到解码器中，而不是普通的级联中。求和有利于同一域中双方的特征，因此鼓励我们的解码器学习与深度更相关的特征，以便与稀疏深度的特征保持一致。这也可以保存网络参数以及推理存储器。根据经验，我们发现DCU既有利于中间表面法线又有利于最终深度估算</li>
+<li>对噪声的敏感性。张等人，证明室内场景的表面法线比绝对深度更容易估计，并且在不完整信号的情况下足以完成深度估计。 但是，在室外场景中，主要由于透视图几何形状，尤其是对于较远的区域，从法线求解深度并不能很好地起作用。 如图2所示，与近距离区域相比，相同的表面法线误差会导致较远区域的水平路面的距离误差大得多。 由于很难从表面法线中以几何方式求解这些区域，因此我们建议直接从原始输入中学习它们。 因此，我们的模型包含两个途径，分别从估计的表面法线和彩色图像估计密集的深度图，然后通过自动学习的注意力图将其整合。 换句话说，注意力图能学会从可能表现更好的途径中为每个区域收集更好的解决方案</li>
+<li>遮挡。 由于在将激光雷达数据转换到彩色相机坐标时，尤其是对于靠近相机的区域，由于遮挡，rgb相机和激光雷达传感器之间几乎不可避免地会产生很小的位移，因此不同的深度值通常会沿着边界彼此混合。 如图5（b）。这种深度混合会使模型学习到错误的信息并导致边界模糊。理想情况下，模型应降低这些混合区域中稀疏深度的置信度，并学会使用更可靠的环境进行填充。 我们提出自动学习这种置信度掩膜，它代替二进制可用性掩膜送入表面法线学习的网络。 即使没有grounding truth，我们的模型也会使用自我监督学习的方法学习包含重叠稀疏深度遮挡区域的深度值。</li>
+</ul>
+<h2 id="method"><a href="#method" class="headerlink" title="method"></a>method</h2><p>我们的模型是一个端到端的深度学习框架，该框架将RGB图像和从LiDAR投影的稀疏深度图像作为输入，并产生密集的深度图像。 如图3所示，整个网络主要由两个路径组成：颜色路径和表面法线路径。 颜色路径将彩色图像和稀疏深度作为输入，以输出完整深度，表面法线首先从输入的彩色图像和稀疏深度预测表面法线图像，然后将其与稀疏深度和置信度遮罩组合在一起 从色彩途径中学到了完整的深度。 这两个路径中的每一个都通过一堆深度补全单元DCU来实现，然后将两个路径的深度与学习的加权和进行积分，以生成最终的完整深度</p>
+<img src="/2020/04/06/DeepLidar/NetStructure.png" class="">
+<!-- <img src="./DCU/NetStructure.png" style="zoom:80%"  /> -->
+<p>图3.我们模型的管道。 我们的模型包括两个途径。 表面法线路径（下半部分）均从RGB图像，稀疏深度和二进制蒙版作为输入开始，生成场景的像素级表面法线，并进一步与稀疏输入深度和置信度相结合 从颜色路径估计的蒙版产生密集的深度。 色彩通道也产生密集的深度。 最终的密集深度输出是使用估计的注意力图来自两个路径的深度的加权总和</p>
+<h3 id="3-1-Deep-Completion-Unit"><a href="#3-1-Deep-Completion-Unit" class="headerlink" title="3.1. Deep Completion Unit"></a>3.1. Deep Completion Unit</h3><p>Zhang等人建议在预测深度或表面法线时从输入中除去不完整的深度，以摆脱局部最优值。 但是，由于稀疏深度与密集深度和表面法线密切相关，因此如果网络没有机会向其学习，则肯定不是最佳选择。 受传统彩色图像引导式修补的启发，我们提出了一种网络架构，使编码器从彩色图像或表面法线中学习局部信息，然后解码器利用该编码器通过另一个编码器对输入的稀疏深度生成的特征进行插值</p>
+<p>DCU单元的详细信息如图4所示。用于RGB/表面法线和稀疏深度的两种编码器均由一系列ResNet块组成，然后进行大步卷积以最终将特征分辨率减小至输入的1/32。解码器由五个向上投影单元组成，它们被引入以逐渐提高特征分辨率，并整合两个编码器的特征以产生密集的输出。由于输入的稀疏深度与解码器的输出密切相关，例如表面法线或深度，因此稀疏深度的特征应在解码器中贡献更大，因此，我们将rgb/表面法线的特征串联起来，但将稀疏的特征求和加入解码器中。由于求和有利于同一域中两侧的特征，因此鼓励解码器学习与深度更相关的特征，以便与稀疏深度中的特征保持一致。如图3所示，我们使用dCU预测具有相同输入但是使用grounding truth训练表面法线或深度</p>
+<img src="/2020/04/06/DeepLidar/DCU.png" class="">
+
+<!-- <img src="./DCU/DCU.png" style="zoom:80%"  /> -->
+<p>图4.DCU单元的详细架构。 我们的深度完成单元采用后期融合策略，其中RGB/表面法线和稀疏深度的特征仅在解码器中组合。 与文献[19]不同，我们在整个解码器中，每一种分辨率都融合了双方的特征。</p>
+<h3 id="3-2-Attention-Based-Integration"><a href="#3-2-Attention-Based-Integration" class="headerlink" title="3.2. Attention Based Integration"></a>3.2. Attention Based Integration</h3><p>从表面法线恢复深度并不是一直都work，并且某些区域可能对法线噪声敏感。 我们建议利用彩色图像的先验值而不是估计的表面法线的几何形状为这些区域生成深度。 因此，我们的模型由两条平行的路径组成，分别根据输入的彩色图像和估计的表面法线来预测密集深度。 两条路径都将稀疏深度作为输入。 最终的密集深度应该是这两个估计深度的综合，其中从正确的一个中选择相对更准确的深度测量。</p>
+<p>我们使用一种注意力机制来整合从两个路径恢复的深度，其中两个深度的组合不是固定的，而是取决于当前上下文。特别是，我们首先使用输出之前的最后一个特征图为每个路径预测得分图，其是通过三个带有RElU的卷积层。然后，将来自两个路径的两个得分图馈入softmax层并转换为组合权重。然后将最终的密集深度输出计算为<br>$$\widehat D=\omega_c\cdot{\widehat D}_c+\omega_n\cdot{\widehat D}_n \tag{1}$$<br>其中$\widehat D_c$和$\widehat D_n$分别是从彩色图像和表面法线路径预测的深度图。$\omega_c$和$\omega_n$分别是学习到的权重。从图7中可以看出$\omega_c$和$\omega_n$有效的对应了最后的输出。</p>
+<h3 id="3-3-Conﬁdence-Prediction"><a href="#3-3-Conﬁdence-Prediction" class="headerlink" title="3.3. Conﬁdence Prediction"></a>3.3. Conﬁdence Prediction</h3><p>如前所述，如图5所示。由于LiDAR传感器和彩色摄像机之间的位移，存在前景和背景深度信号混合的不明确区域。 这通常是由y闭塞引起的，它在近距离内沿对象边界发生的频率更高。 理想情况下，我们应该找到这些令人困惑的区域并解决歧义，但是这更加具有挑战性，因为这需要在深度不连续附近进行准确的3D测量估算。相反，我们要求网络自动学习置信度掩码以指示输入稀疏深度的可靠性。我们用从色彩途径学到的置信度掩码$m_d$替换了简单的二进制掩码，该二进制掩码是输入的置信度。如图5所示，即使没有这种遮罩的ground truth。 该模型可以成功地学习重叠的稀疏深度值（例如，树干权重低）</p>
+<h3 id="3-4-Loss-Function"><a href="#3-4-Loss-Function" class="headerlink" title="3.4. Loss Function"></a>3.4. Loss Function</h3><p>整个网络的损失函数可以定义为：<br>$$L=\lambda_1L_d({\widehat D}_n)+\lambda_2L_d({\widehat D}_c)+\lambda_3L_d(\widehat D)+\lambda_4L_n(N) \tag{2}$$<br>其中$L_d$定义了估计的深度图的损失，$L_n$定义了估计的法向量图的损失。对于$L_n$我们使用<a href="#56">[56]</a>中的cosine损失，对于$L_d$，在估计的深度图上使用$L_2$损失，从深度图转换的法向量图使用cosine损失。$\lambda_1$，$\lambda_2$，$\lambda_3$和$\lambda_4$调整损失函数想项之间的权重。为了达到稳定的收敛，我们采取多阶段的训练策略。首先$\lambda_4=1$其他权重项等于0来仅仅训练表面法向量估计。然后使得$\lambda_1=\lambda_2=0.3$，$\lambda_3=0$，$\lambda_4=0.1$来进一步训练彩色图像路径和法线路径。最终使得$\lambda_1=\lambda_2=0.3$，$\lambda_3=0.5$，$\lambda_4=0.1$来对整个网络进行端到端的训练。在训练参数方面，使用Adam优化方法，起始学习率为0.001，$\beta_1=0.9$，$\beta_2=0.9990$。学习率每5个epoch减半。</p>
+<h3 id="3-5-Training-Data"><a href="#3-5-Training-Data" class="headerlink" title="3.5. Training Data"></a>3.5. Training Data</h3><p>由于实际数据集中缺乏真实的地面法线，我们使用开放的城市驾驶模拟器Carla<a href="#7">[7]</a>生成了一个综合数据集。 我们渲染了5万个训练样本，包括RGB图像，稀疏深度图，密集深度图和表面法线图像，这些示例在补充材料中显示。对于ground truth，我们使用kitti深度补全基准数据集进行微调和评估。kitti数据集的完整表面法线ground truth是通过局部平面拟合从密集深度图的ground truth计算得出的<a href="#44">[44]</a>。</p>
+<h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4. Experiments"></a>4. Experiments</h2><p>我们进行了广泛的实验以验证我们模型的有效性，包括与相关工作进行比较和消融研究。由于我们模型的主要应用之一是在车载激光雷达设备上，大多数实验都是在KITTI深度补全基准上进行的。尽管如此，我们还在室内环境中运行我们的模型以验证泛化能力。</p>
+<h3 id="4-1-Comparison-to-State-of-the-art"><a href="#4-1-Comparison-to-State-of-the-art" class="headerlink" title="4.1. Comparison to State-of-the-art"></a>4.1. Comparison to State-of-the-art</h3><p>我们首先在kitti深度完成基准的测试集上评估我们的方法。该测试集包含1000个数据，包括彩色图像，稀疏激光雷达深度图以及彩色相机和lidaR之间的转换。评价标准计算四个度量：均方根误差（RMSE mm），平均绝对误差（MAE mm），反深度的均方根误差（iRMSE 1/km）和反深度均方根误差（iMAE 1/km）中，RMSE是最重要的指标，并被选择在排行榜上排名提交，因为它直接在深度上测量误差，并且在远距离的惩罚更多，而远距离的测量更具挑战性。</p>
+<p>我们的方法成功解决了这些问题，原因有两个。 首先，我们将离线线性优化集成到网络中，从而可以进行端到端训练，以提供可能更好的解决方案。 从表3（注意力图），我们可以看到，正常路径的深度预测已经比Zhang等人的预测好得多。<a href="#55">[55]</a>。 其次，我们进一步学习置信度蒙版来处理遮挡，并使用基于注意力的整合来改善正常路径预测失败的区域。</p>
+<h3 id="4-2-Ablation-Study"><a href="#4-2-Ablation-Study" class="headerlink" title="4.2. Ablation Study"></a>4.2. Ablation Study</h3><p>为了了解每个模型组件对最终性能的影响，我们通过分别禁用每个组件并显示结果如何变化进行了全面的消融研究。定量结果显示在表3中。在禁用每个组件的情况下性能会合理下降，并且完整模型的效果最佳。</p>
+<img src="/2020/04/06/DeepLidar/Tabel3.png" class="">
+<!-- <img src="./DCU/Tabel3.png" style="zoom:80%"  /> -->
+
+<h4 id="Effect-of-Surface-Normal-Pathway"><a href="#Effect-of-Surface-Normal-Pathway" class="headerlink" title="Effect of Surface Normal Pathway"></a>Effect of Surface Normal Pathway</h4><p>验证表面法线对于室外场景是否类似于室内情况是合理的中间深度表示。 我们训练模型时不估计法线，而是直接输出完整深度。在这种设置下，由于只有一条路径可用，因此也没有注意力整合。 该性能在表3中显示为“-Normal Pathway”。性能显着下降。与我们的完整型号相比，RMSE增加了约87mm。 这表明表面法线还有助于室外深度补全。</p>
+<h4 id="Effect-of-Attention-Based-Integration"><a href="#Effect-of-Attention-Based-Integration" class="headerlink" title="Effect of Attention Based Integration"></a>Effect of Attention Based Integration</h4><p>然后，我们禁用基于注意力的集成以验证两种途径组合的必要性，即仅考虑从正常路径生成的深度图。与完整的模型相比，没有这种集成所有评估指标都会下降。（表3-Attention Integration）。图7（行$\omega_c$，$\omega_n$）显示了从颜色路径和表面法线路径自动学习的的注意力图。可以看出，表面法线路径的效果更好（即权重较大），但距离越远，质量越差，这与我们的分析一致。相比之下，与表面法线路径相比，颜色路径无法在近距离捕获准确的细节，但在远距离处更好。 尽管与表面法线路径相比，颜色通道在较少的区域上效果更好，但是在较远的区域获得良好的性能至关重要，因为在较远的区域更可能发生较大的错误。</p>
+<h4 id="Effect-of-Deep-Completion-Unit"><a href="#Effect-of-Deep-Completion-Unit" class="headerlink" title="Effect of Deep Completion Unit"></a>Effect of Deep Completion Unit</h4><p>我们还将深度补全单元替换为具有早期融合功能的传统编码器-解码器体系结构，该结构在开始时将输入彩色图像，稀疏深度和二进制掩码连接起来，并作为输入输入到网络。 即使启用了模型的所有其他组件，此修改也会导致性能显着下降。（表3-DCU）我们将稀疏深度编码器的特征与解码器的特征相加，而不是普通的串联，我们也尝试了串联选项，但是这会占用更多的内存，并产生稍差的性能。</p>
+<h4 id="Effect-of-Conﬁdence-Mask"><a href="#Effect-of-Conﬁdence-Mask" class="headerlink" title="Effect of Conﬁdence Mask"></a>Effect of Conﬁdence Mask</h4><p>我们通过将表示每个像素稀疏深度的典型二进制掩码替换学习到的掩码来禁用置信掩码。与完整模型相比，RMSE显着增加了69mm。 相比之下，我们的完整模型将根据输入学习置信掩码，从而为表面法线路径提供有关输入稀疏深度可靠性的非常有用的信息，如图5（d）和图7（Confidence）所示。 可以看出，从前景到背景深度重叠的区域通常用低置信度标记，这些区域通常发生在发生遮挡的前景边界上。</p>
+<img src="/2020/04/06/DeepLidar/Figure7-1.png" class="">
+<img src="/2020/04/06/DeepLidar/Figure7-2.png" class="">
+<img src="/2020/04/06/DeepLidar/Figure7-3.png" class="">
+<!-- 
+<img src="./DCU/Figure7-1.png">
+<img src="./DCU/Figure7-2.png">
+<img src="./DCU/Figure7-3.png"> -->
+
+<h3 id="4-3-Generalization-Capability"><a href="#4-3-Generalization-Capability" class="headerlink" title="4.3. Generalization Capability"></a>4.3. Generalization Capability</h3><p>即使在本文中我们特别着重于为车载激光雷达设备生产密集深度，我们的模型也可以视为通用的深度完成方法。因此，我们研究了模型在不同情况下（特别是在不同输入深度下）的泛化能力，特别是稀疏性和室内环境。</p>
+<h4 id="Robustness-Against-Depth-Sparsity"><a href="#Robustness-Against-Depth-Sparsity" class="headerlink" title="Robustness Against Depth Sparsity"></a>Robustness Against Depth Sparsity</h4><p>有趣的是，我们的模型是否仍然可以在输入深度更稀疏的更具挑战性的情况下工作。基准提供的原始激光雷达深度大约是每个深度图像的18400个样本，分辨率为352×1216。即4.3％的像素具有深度。 我们分别以1 / 4、1 / 16、1 / 64和1/256的比率对原始LiDar深度进行二次采样，分别对应于具有深度的像素的1.075％，0.269％，0.0672％和0.0168％。 值得注意的是，0.0168％对应于每个深度图像72个像素。 这是极端困难的情况，其中输入稀疏深度几乎不包含场景结构。</p>
+<p>我们的模型和其他方法在稀疏度不同的LiDaR上的性能如图8所示。我们可以看到性能更好（即较低的RMSE）。随着输入稀疏深度的增加。 即使在最具挑战性的情况下，我们的方法仍然表现良好（例如 0.0168％）。</p>
+<img src="/2020/04/06/DeepLidar/Figure8.png" class="">
+<!-- <img src="./DCU/Figure8.png"> -->
+
+<h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5. Conclusion"></a>5. Conclusion</h2><p>在本文中，我们提出了一种从稀疏激光雷达数据和单色图像进行深度预测的端到端神经网络。 我们直接在网络中使用表面法线作为中间表示，并证明它对于类似于室内场景的室外场景仍然有效。 我们建议使用深度补全单元，以更好地融合彩色图像和稀疏输入深度。 我们还分析了户外场景的特定挑战，并在网络体系结构内提供了解决方案，例如基于注意力的集成以提高远距离性能并估计遮挡处理的置信度。大量实验表明，我们的方法达到了最先进的性能，并能很好地推广到稀疏输入和室内场景。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%9B%BE%E8%A1%A5%E5%85%A8/" rel="tag"># 深度图补全</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/09/PointNet/" rel="next" title="PointNet">
+                <i class="fa fa-chevron-left"></i> PointNet
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/06/RGB-Guidence-Uncertainty/" rel="prev" title="RGB-Guidence&Uncertainty">
+                RGB-Guidence&Uncertainty <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">知心大姐姐的臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#DeepLiDAR-Deep-Surface-Normal-Guided-Depth-Prediction-for-Outdoor-Scene-from-Sparse-LiDAR-Data-and-Single-ColorImage"><span class="nav-number">1.</span> <span class="nav-text">DeepLiDAR:Deep Surface Normal Guided Depth Prediction for Outdoor Scene from Sparse LiDAR Data and Single ColorImage</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#abstract"><span class="nav-number">1.1.</span> <span class="nav-text">abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.2.</span> <span class="nav-text">introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#method"><span class="nav-number">1.3.</span> <span class="nav-text">method</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Deep-Completion-Unit"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1. Deep Completion Unit</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Attention-Based-Integration"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2. Attention Based Integration</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Conﬁdence-Prediction"><span class="nav-number">1.3.3.</span> <span class="nav-text">3.3. Conﬁdence Prediction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Loss-Function"><span class="nav-number">1.3.4.</span> <span class="nav-text">3.4. Loss Function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-Training-Data"><span class="nav-number">1.3.5.</span> <span class="nav-text">3.5. Training Data</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Experiments"><span class="nav-number">1.4.</span> <span class="nav-text">4. Experiments</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Comparison-to-State-of-the-art"><span class="nav-number">1.4.1.</span> <span class="nav-text">4.1. Comparison to State-of-the-art</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Ablation-Study"><span class="nav-number">1.4.2.</span> <span class="nav-text">4.2. Ablation Study</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Effect-of-Surface-Normal-Pathway"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">Effect of Surface Normal Pathway</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Effect-of-Attention-Based-Integration"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">Effect of Attention Based Integration</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Effect-of-Deep-Completion-Unit"><span class="nav-number">1.4.2.3.</span> <span class="nav-text">Effect of Deep Completion Unit</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Effect-of-Conﬁdence-Mask"><span class="nav-number">1.4.2.4.</span> <span class="nav-text">Effect of Conﬁdence Mask</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Generalization-Capability"><span class="nav-number">1.4.3.</span> <span class="nav-text">4.3. Generalization Capability</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Robustness-Against-Depth-Sparsity"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">Robustness Against Depth Sparsity</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Conclusion"><span class="nav-number">1.5.</span> <span class="nav-text">5. Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
