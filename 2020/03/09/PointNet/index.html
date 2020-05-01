@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="计算机视觉,论文阅读,三维重建," />
+  <meta name="keywords" content="论文阅读,计算机视觉,三维重建," />
 
 
 
@@ -110,8 +110,8 @@
 <meta property="article:published_time" content="2020-03-09T10:00:49.000Z">
 <meta property="article:modified_time" content="2020-03-09T11:02:46.126Z">
 <meta property="article:author" content="kaixiang Liu">
-<meta property="article:tag" content="计算机视觉">
 <meta property="article:tag" content="论文阅读">
+<meta property="article:tag" content="计算机视觉">
 <meta property="article:tag" content="三维重建">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/03/09/PointNet/Applications-of-PointNet.png">
@@ -388,12 +388,10 @@
 
       
         <h1 id="PointNet-Deep-Learning-on-Point-Sets-for-3D-Classification-and-Segmentation"><a href="#PointNet-Deep-Learning-on-Point-Sets-for-3D-Classification-and-Segmentation" class="headerlink" title="PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation"></a>PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation</h1>在开始论文之前记录一下网页渲染引擎Nunjucks的坑，由于Hexo框架使用了Nunjucks引擎，而Nunjucks会将两个花括号“{{”当作标签信息，会与latex公式中的"{{"冲突，因此要在文章首尾加上“{% raw %}和{% endraw %}”。
-<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>点云是三维数据中重要的一种数据形式，但是由于其无序性，许多研究者将其转换为有序的体素结构或者从图像中收集信息。在这篇文章中我们设计了神经网络的一种新形式能够直接处理点云数据，而且能够很好的处理输入点云中的顺序无关性（指打乱点云的顺序后对结果不产生影响）。我们的PointNet为分类和分割任务提供了一个统一的网络结构。虽然简单，但是其高效且有用。它相比state of the art效果相当甚至更好。在理论方面，我们对于理解这个网络学习到的东西以及为什么这个网络很好的鲁棒性提供了分析。</p>
-<a id="more"></a>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>点云是三维数据中重要的一种数据形式，但是由于其无序性，许多研究者将其转换为有序的体素结构或者从图像中收集信息。在这篇文章中我们设计了神经网络的一种新形式能够直接处理点云数据，而且能够很好的处理输入点云中的顺序无关性（指打乱点云的顺序后对结果不产生影响）。我们的PointNet为分类和分割任务提供了一个统一的网络结构。虽然简单，但是其高效且有用。它相比state of the art效果相当甚至更好。在理论方面，我们对于理解这个网络学习到的东西以及为什么这个网络很好的鲁棒性提供了分析。<br><a id="more"></a></p>
 <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>在这篇文章中我们探讨了深度学习网络结构应用于3D数据的可行性例如点云和Mesh。典型的卷积操作需要输入数据有极强的位置关系来实现权重共享或者卷积核运算，例如2D图像的像素和3D体素。由于点云数据和Mesh网格不具有极强的位置关系，因此大多数研究者们将这些数据送入深度网络结构之前将其转换为3D体素或者从图像中获得深度信息。但是这些转换方式会使得生成的数据量非常巨大，但这并不是必要的。</p>
 <p>基于这个原因，我们对于输入的3D数据使用简单的点云，将这个网络结构命名为PointNet。点云是简单统一的结构，避免了网格的组合不规则性和复杂性。因此更容易学习。但是点云只是一系列点的集合，其中元素的排列顺序的无关的，因此在网络结构中需要对称的结构。进一步还需要考虑刚性运动的其他不变性。</p>
 <img src="/2020/03/09/PointNet/Applications-of-PointNet.png" class="">
-
 <!-- <img src="./PointNet/Applications-of-PointNet.png" style="zoom:80%"  /> -->
 <p>图1：PointNet的应用场景。我们提出了一个新颖的网络结构将原始点云作为输入不需要体素化或排序。他是一个统一的网络结构可以学习到局部和全局的特征，对于3D认知任务是一个简单的，高效的，有效果的方法。</p>
 <p>我们的PointNet是一个统一的网络结构，输入为点云，输出为每一个输入的类别标签或者每个点的分割标签。我们的网络结构非常简单，在初始阶段每个点都是相同且独立的处理。在初始设置中每个点仅有其$x,y,z$三个坐标构成。其他的维度也可以加入，比如计算法向，局部或者全局的特征。</p>
@@ -413,7 +411,6 @@
 <p>Deep Learning On 3D Data：3D data有很多种表示方式，因此应用深度学习也产生了很多种方法。Volumetric CNNs<a href="#28">[28]</a>,<a href="#17">[17]</a>,<a href="#18">[18]</a>是将3D卷积神经网络用于体素结构的先锋。然而，体素结构受分辨率的限制，这些限制是由于数据稀疏性以及3D卷积操作的计算力而导致。FPNN<a href="#13">[13]</a>和Vote3D<a href="#26">[26]</a>对于数据稀疏的问题提出了特别的方法，但是他们仍然是在稀疏的体素上操作。对于他们，处理大量的点云数据是一个挑战。MultiViewCNNs<a href="#23">[23]</a>,<a href="#18">[18]</a>尝试将3D点云排序或者投影至2D图像然后应用2D卷积操作来分类。借助精心设计的图像CNN，这一系列方法在形状分类和检索任务上均取得了卓越的性能。但是，将它们扩展到场景理解或其他3D任务（例如点分类和3D形状补全）并非易事。Spectral CNNs：一些后来的工作<a href="#4">[4]</a>,<a href="#16">[16]</a> 在Mesh上应用频域卷积。但是，这些方法目前仅限于流形物体（例如有机物体）上，如何将其扩展到非等距形状（例如家具）尚不清楚。Feature-based DNNs：<a href="#6">[6]</a>,<a href="#8">[8]</a>首次通过提取传统形状特征将3D数据转换为矢量，然后使用全连接的网络对形状进行分类。我们认为它们受到提取特征的表示能力的限制。</p>
 <p>Deep Learning on Unordered Sets：从数据结构的角度，点云是一组无序的向量。虽然大多数深度学习工作都集中在常规输入表示形式上，例如序列（语音和语言处理），图像和体积（视频或3D数据），但在深度学习上对点集的工作却很少。Oriol Vinyals等<a href="#25">[25]</a>的最新著作探讨了这个问题。他们使用具有注意力机制的read-process-write网络来处理无序输入集，并表明他们的网络具有对数字进行排序的能力。 但是，由于他们的工作集中在通用集合和NLP应用程序上，因此在集合中缺少几何的作用。</p>
 <h2 id="Problem-Statement"><a href="#Problem-Statement" class="headerlink" title="Problem Statement"></a>Problem Statement</h2>我们设计了一个深度学习框架，该框架直接使用无序点集作为输入。点云有一个3D点的集合${\rm{\{ }}{{\rm{P}}_i}{\rm{|i = 1,}}...{\rm{,n\} }}$，每个点${{\rm{P}}_i}$由其$x,y,z$坐标和额外的特征通道如颜色，法向量等组成。简便起见，我们只用坐标来表示点。对于对象分类任务，可以直接从形状中采样输入点云，也可以从场景中预先分割输入点云。我们提出的网络对于$k$个类别会产生$k$个分数。对于语义分割，输入可以是用于部分区域分割的单个对象，也可以是3D场景中的子元素用于对象区域分割。我们的网络会产生$n \times m$个分数对应于$n$个点，每个点产生$m$个分数对应$m$个语义标签。
-
 <h2 id="Deep-Learning-on-Point-Sets"><a href="#Deep-Learning-on-Point-Sets" class="headerlink" title="Deep Learning on Point Sets"></a>Deep Learning on Point Sets</h2><p>我们的网络结构(4.2节)是受到在${R^n}$上点集的性质的启发（4.1节）。</p>
 <h3 id="4-1-Properties-of-Point-Sets-in-R-n"><a href="#4-1-Properties-of-Point-Sets-in-R-n" class="headerlink" title="4.1 Properties of Point Sets in ${R^n}$"></a>4.1 Properties of Point Sets in ${R^n}$</h3><p>我们的输入是欧几里得空间上点集的一个子集，其具有以下三条性质：</p>
 <ul>
@@ -423,7 +420,6 @@
 </ul>
 <h3 id="4-2-PointNet-Architecture"><a href="#4-2-PointNet-Architecture" class="headerlink" title="4.2 PointNet Architecture"></a>4.2 PointNet Architecture</h3><p>我们的完整网络架构如图2所示，其中分类网络和分割网络共享大部分结构。请阅读图2的标题以了解Pipeline。</p>
 <img src="/2020/03/09/PointNet/Pipeline.png" class="">
-
 <!-- <img src="./PointNet/Pipeline.png" style="zoom:80%"  /> -->
 <p> PointNet Architecture：分类网络将n点作为输入，应用输入和特征转换，然后通过最大池化聚合点特征。输出是k个类别的分数。分割网络是分类网络的拓展。其将全局以及局部特征级联，输出每个点的分数。“mlp”代表多层感知器，括号中的数字是每一层的尺寸。 所有层的Batchnorm都为ReLu。分类网络的最后一层mlp使用了DropOut层。</p>
 <p> 我们的网络有三个模块：最大池化层是一个对称函数，用于聚合来自所有点的信息，局部和全局信息的组合以及两个将输入点和特征点对齐的联合对齐网络。我们将会在下面的段落讨论网络这样设计以及选择的原因。</p>
@@ -433,7 +429,6 @@
  我们的想法是通过对点集中的变换元素应用对称函数来近似定义点集上的一般函数：
 $$f(\{ {x_1},...,{x_n}\} ) \approx g(h({x_1}),...,h({x_n}))\tag{1}$$
 其中$f:{2^{{R^N}}} \to R,h:{R^N} \to {R^K}$还有$g:\underbrace {{R^K} \times  \cdots  \times {R^K}}_n \to R$是对称函数。
-
 <p>从经验上讲，我们的基本模块非常简单：我们通过多层感知器网络估算h，通过单个变量函数和max pooling函数的组合估算g。通过实验发现这种方法效果很好。 通过收集$h$，我们可以学习一些$f’s$来捕获集合的不同属性。尽管我们的关键模块看起来很简单，但它具有一些有趣的属性（请参见5.3节），并且可以在一些不同的应用程序中实现出色的性能（请参见5.1节）。</p>
 <p>Local and Global Information Aggregation ：上一节的输出形成向量$[{f_1}, \cdots ,{f_K}]$，它是输入集的全局特征。我们可以轻松地在形状全局特征上训练SVM或多层感知器分类器。但是，点分割需要结合局部和全局信息。我们可以通过简单而高效的方式来实现这一目标。</p>
 <p>我们的方案如图2所示（Segmentation Network）。在计算了全局点云特征向量之后，我们通过将全局特征与每个点特征连接起来，将其反馈给每个点特征。然后我们基于已经结合的点特征，从中抽取出新的点特征，这时每个点的特征就具有了全局和局部信息。</p>
@@ -441,37 +436,34 @@ $$f(\{ {x_1},...,{x_n}\} ) \approx g(h({x_1}),...,h({x_n}))\tag{1}$$
 <p>Joint Alignment Network：如果点云经历了某些几何变换（例如刚性变换），则该点云的语义标记必须是不变的。因此，我们希望通过我们的点集获得的学习表示对于这些变换是不变的。</p>
 <p>一个自然的方案就是在特征提取之前将输入点集变换至标准空间（Canonical Space）。<a href="#9">[9]</a>介绍了空间变换器通过采样和插值来对齐2D图像的想法，这是通过在GPU上实现的特定定制层实现的。</p>
 <p>我们的输入是点云的形式，因此这允许我们使用相比<a href="#9">[9]</a>更简单的方法来实现。在处理图像的情况下我们不需要引入新的层或者别名。我们通过微型网络（图2中的T-net）预测仿射变换矩阵，并将该变换直接应用于输入点的坐标。小型网络本身类似于大型网络，由针对点的独立的特征提取，最大池化和完全连接层等基本模块组成。 有关T-net的更多详细信息，请参见补充资料。</p>
-<p>这种思想同样可以引申至特征空间的对齐。我们可以在特征点上插入另一个对齐网络，并预测一个特征转换矩阵以对齐来自不同输入点云的特征。然而，在特征空间上的转换矩阵相比空间转换矩阵有更高的维度，这极大的增加了优化的难度。因此，我们在softmax训练损失中添加了一个正规化项。 我们将特征变换矩阵约束为接近正交矩阵。<br>$${L_{reg}} = ||I - A{A^T}||_F^2 \tag{2}$$<br>其中$A$是由小型网络预测的特征对齐矩阵。正交变换将不会在输入中丢失信息，因此是需要的。 我们发现通过添加正则化项，优化变得更加稳定，并且我们的模型获得了更好的性能。</p>
+<p>这种思想同样可以引申至特征空间的对齐。我们可以在特征点上插入另一个对齐网络，并预测一个特征转换矩阵以对齐来自不同输入点云的特征。然而，在特征空间上的转换矩阵相比空间转换矩阵有更高的维度，这极大的增加了优化的难度。因此，我们在softmax训练损失中添加了一个正规化项。 我们将特征变换矩阵约束为接近正交矩阵。</p>
+<script type="math/tex; mode=display">{L_{reg}} = ||I - A{A^T}||_F^2 \tag{2}</script><p>其中$A$是由小型网络预测的特征对齐矩阵。正交变换将不会在输入中丢失信息，因此是需要的。 我们发现通过添加正则化项，优化变得更加稳定，并且我们的模型获得了更好的性能。</p>
 <h3 id="4-3-Theoretical-Analysis"><a href="#4-3-Theoretical-Analysis" class="headerlink" title="4.3 Theoretical Analysis"></a>4.3 Theoretical Analysis</h3><p>Universal approximation：我们首先展示了我们的神经网络对连续集合函数的通用逼近能力。通过集合函数的连续性，直观地讲，对输入点集的微小摄动不应大大改变函数值，例如分类或分段得分。</p>
-<p>令$\chi  = { S:S \subseteq {[0,1]^m}$and$|S| = n} ,f:\chi  \to R$是$\chi$上的连续集合函数，该集合函数遵循Hausdorff距离${d_H}( \cdot , \cdot )$，即$\forall \varepsilon  &gt; 0,\exists \delta  &gt; 0$,对于任意$S,S’ \in \chi$。如果${d_H}(S,S’) &lt; \delta$，那么$|f(S) - f(S’)| &lt; \varepsilon$。我们的理论证明如果在最大池化层有足够多的神经元那么我们的网络就可以任意的逼近$f$，即公式（1）中的$K$足够大。</p>
+<p>令$\chi  = \{ S:S \subseteq {[0,1]^m}$and$|S| = n\} ,f:\chi  \to R$是$\chi$上的连续集合函数，该集合函数遵循Hausdorff距离${d_H}( \cdot , \cdot )$，即$\forall \varepsilon  &gt; 0,\exists \delta  &gt; 0$,对于任意$S,S’ \in \chi$。如果${d_H}(S,S’) &lt; \delta$，那么$|f(S) - f(S’)| &lt; \varepsilon$。我们的理论证明如果在最大池化层有足够多的神经元那么我们的网络就可以任意的逼近$f$，即公式（1）中的$K$足够大。</p>
 
-<p><strong>Theorem 1.</strong> 假定$f:\chi  \to R$是一个连续的集合函数，其遵循Hausdorff距离${d_H}( \cdot , \cdot )$，对于任意$\varepsilon&gt;0$，存在一个连续的函数$h$和一个对称函数$g({x_1}, \cdots ,{x_n}) = \gamma  \circ MAX$，这样对于任意$S \in \chi$有<br>$$|f(S) - \gamma (\mathop {MAX}\limits_{{x_i} \in S} { h({x_i})} )| &lt; \varepsilon \tag{3}$$<br>其中${x_1}, \cdots ,{x_n}$是$S$中任意顺序的所有元素，$\gamma$是一个连续函数，$MAX$是一个向量最大化的操作，输入为n个向量，返回一个新的向量，这个新的向量是输入n个向量的逐元素最大值。</p>
+<p><strong>Theorem 1.</strong> 假定$f:\chi  \to R$是一个连续的集合函数，其遵循Hausdorff距离${d_H}( \cdot , \cdot )$，对于任意$\varepsilon&gt;0$，存在一个连续的函数$h$和一个对称函数$g({x_1}, \cdots ,{x_n}) = \gamma  \circ MAX$，这样对于任意$S \in \chi$有</p>
+<script type="math/tex; mode=display">|f(S) - \gamma (\mathop {MAX}\limits_{{x_i} \in S} \{ h({x_i})\} )| < \varepsilon \tag{3}</script><p>其中${x_1}, \cdots ,{x_n}$是$S$中任意顺序的所有元素，$\gamma$是一个连续函数，$MAX$是一个向量最大化的操作，输入为n个向量，返回一个新的向量，这个新的向量是输入n个向量的逐元素最大值。</p>
 <p>这个理论的证明可以在补充材料中找到。关键思想是，在最坏的情况下，网络可以通过将空间划分为大小相等的体素来学习将点云转换为volumetric representation。然而，实际上，网络学到了一种更智能的策略来探测空间，正如我们将在点函数可视化中看到的那样。</p>
 <p>Bottleneck dimension and stability：从理论上和实验上，我们发现网络的表现力受到最大池化层尺寸的强烈影响，即公式（1）中的$K$,这里我们提供一种分析，同样解释了我们模型的稳定性。</p>
-<p>我们定义$u = \mathop {{\mathop{\rm MAX}\nolimits} }\limits_{{x_i} \in S} { h({x_i})}$是$f$的一个子网络，其将${[0,1]^m}$中的点集映射为K维的向量，下面的理论是说输入集中很小的摄动或者额外的噪点不会改变网络的输出。</p>
-<p><strong>Theorem 2.</strong> 假定$u:\chi  \to {R^K}$这样$u = \mathop {MAX}\limits_{{x_i} \in S} { h({x_i})}$并且$f = \gamma  \circ u$,那么<br>$$(a)\quad \forall S,\exists {C_S},{N_S} \in \chi ,f(T) = f(S)if{C_S} \subseteq T \subseteq {N_S}$$<br>$$(b)\quad|{C_S}| \le K$$<br>我们解释了该定理的含义。公式（a）说如果${C_S}$中的点都被保留，那么$f(S)$不会被输入中的摄动所改变，同样也不会被噪点所改变。（b）说${C_S}$中仅包含了一定数量的点，取决于公式（1）中的$K$。换句话说，$f(S)$事实上取决于一个有限的子集${C_S} \subseteq S$或者少于或者等于$K$。我们因此将${C_S}$叫做$S$的临界点集，将$K$称为$f$的最大瓶颈。</p>
-<p>结合$h$的连续性，这说明了我们的模型在摄动和额外噪声点方面的鲁棒性。类似于机器学习模型中的稀疏原理，获得了鲁棒性。 直观地，我们的网络学习通过稀疏的关键点来总结形状。 在实验部分，我们看到关键点形成了对象的骨架。</p>
-{% raw %}
+<p>我们定义$u = \mathop {{\mathop{\rm MAX}\nolimits} }\limits_{{x_i} \in S} \{ h({x_i})\}$是$f$的一个子网络，其将${[0,1]^m}$中的点集映射为K维的向量，下面的理论是说输入集中很小的摄动或者额外的噪点不会改变网络的输出。</p>
+<p><strong>Theorem 2.</strong> 假定$u:\chi  \to {R^K}$这样$u = \mathop {MAX}\limits_{{x_i} \in S} \{ h({x_i})\}$并且$f = \gamma  \circ u$,那么</p>
+<script type="math/tex; mode=display">(a)\quad \forall S,\exists {C_S},{N_S} \in \chi ,f(T) = f(S)if{C_S} \subseteq T \subseteq {N_S}</script><script type="math/tex; mode=display">(b)\quad|{C_S}| \le K</script><p>我们解释了该定理的含义。公式（a）说如果${C_S}$中的点都被保留，那么$f(S)$不会被输入中的摄动所改变，同样也不会被噪点所改变。（b）说${C_S}$中仅包含了一定数量的点，取决于公式（1）中的$K$。换句话说，$f(S)$事实上取决于一个有限的子集${C_S} \subseteq S$或者少于或者等于$K$。我们因此将${C_S}$叫做$S$的临界点集，将$K$称为$f$的最大瓶颈。</p>
+<p>结合$h$的连续性，这说明了我们的模型在摄动和额外噪声点方面的鲁棒性。类似于机器学习模型中的稀疏原理，获得了鲁棒性。 直观地，我们的网络学习通过稀疏的关键点来总结形状。 在实验部分，我们看到关键点形成了对象的骨架。<br>{% raw %}</p>
 <h2 id="5-Experiment"><a href="#5-Experiment" class="headerlink" title="5. Experiment"></a>5. Experiment</h2><p>实验分为四个部分。首先我们展示了PointNets可以应用在多种3D识别任务上（5.1节）。第二，我们提供了具体的实验验证我们网络的设计（5.2节）。最后我们可视化了网络所学习到的东西（5.3节）并且分析了时间和空间复杂度。</p>
 <p><strong>3D Object Classiﬁcation</strong>我们的网络能够学习到点云的全局特征来对其进行分类。我们在ModelNet40<a href="#28">[28]</a>形状分类的benchmark上评估了我们的模型。这里面有40类人工制造的12311个CAD模型，其中9843用于训练，2468用来测试。前面的工作都聚焦于体素或者多视角的表示，我们是首个直接在点云上应用的模型。</p>
 <p>我们根据表面面积在Mesh表面统一采样了1024个点，并且将他们规则化。在训练过程中，我们通过沿上轴随机旋转对象并通过高斯噪声（均值为零且标准偏差为0.02）使每个点的位置摄动来增加点云数量。在表1中，我们将我们的模型与以前的工作进行了比较，并使用基于MLP的baseline对从点云中提取的传统特征（点密度，D2，形状轮廓等）进行了比较。我们的模型在基于3D输入（体积和点云）的方法中达到了SOTA。仅通过全连接层和最大池花层，我们的网络就可以在推理速度上取得领先优势，并且可以轻松地在CPU中并行化。但是我们的模型仍然与基于多视角的方法MVCNN<a href="#23">[23]</a>有微小的差距，我们认为应该是由于我们的方法丢失了渲染图像上精细的几何细节。</p>
 <!-- <img src="/2020/03/09/PointNet/Tabel1.png" class=""> -->
-
 <!-- <img src="./PointNet/Tabel1.png" style="zoom:80%"  /> -->
-
 <p><strong>3D Object Part Segmentation：</strong> Part segmentation是细粒度3D识别任务的一个挑战。给定一个3D场景或者Mesh模型，目的是给每一个点或者表面分配不同的标签（比如椅子的腿，茶杯的把手）。</p>
 <p>我们在ShapeNet数据集<a href="#29">[29]</a>上评估了我们的结果，ShapeNet包含16个类别的16881个形状，总共被标注为50个part。大部分的目标part种类是2-5个。Ground Truth标注在形状上采样的点云。</p>
 <p>我们将part的分割当作每个点的分类来处理。评估指标是点的mIOU。对于每个具有$C$个part类别的形状$S$，计算其该形状的mIOU为：对于$C$个类别中的每一种类别计算真值与预测值之间的IoU。如果真值和预测值的并集是空集，那么将这部分的IoU记为1.然后将所有$C$个类别的IoU平均得到整个形状的mIoU。</p>
 <p>在这一节，我们将模型对于分割任务的版本（图2中的修改版本 Segmentation Network）与两种传统的方法<a href="#27">[27]</a>，<a href="#29">[29]</a>以及我们自己的3D CNN baseline做对比，这两种方法都利用了逐点的几何特征和形状之间的联系。对于3D CNN的详细修改以及网络结构见补充材料。</p>
 <p>在表2中，我们展示了每个类别的分数和平均IoU（%）的分数。我们观察到我们的方法在大多数类别的分割任务中打败了baseline的方法，平均IoU提高了2.3%。</p>
 <img src="/2020/03/09/PointNet/Tabel2.png" class="">
-
 <!-- <img src="./PointNet/Tabel2.png" /> -->
 <p>我们还通过模拟Kinect扫描进行实验，以测试ShapeNet零件数据集中每个cad模型的这些方法的鲁棒性，我们使用Blensor Kinect Simulator<a href="#7">[7]</a>从六个随机视角生成不完整的点云。我们使用相同的网络体系结构和训练设置对pointNet进行完整形状和部分场景的训练。结果显示我们的平均IoU仅仅低了5.3%。在图3中，我们展示了完整数据和部分数据的定性结果。可以看出虽然部分数据很有挑战性，但是我们的预测同样合理。</p>
 <img src="/2020/03/09/PointNet/%E5%9B%BE3.png" class="">
-
 <!-- <img src="./PointNet/图3.png" /> -->
-
 <p><strong>Semantic Segmentation in Scenes：</strong> 我们的part分割网络可以轻松扩展到语义场景分割，其中点标签成为语义对象类，而不是对象part标签。</p>
 <p>我们在斯坦福3D语义解析数据集<a href="#1">[1]</a>上进行实验。该数据集包含 Matterport扫描仪在6个区域的271个房间的3D场景。场景中的每个点被标注为13个类别标签的其中之一（椅子，桌子，地板，墙等等）。</p>
 <p>为了准备训练数据，我们首先将点按room分割，然后将每个room的点采样为1米×1米的block。使用PointNet的分割版本来预测block中每个点的类别。每个点由一个9维的向量表示：XYZ坐标，RGB还有相对房间的归一化位置。在训练时，我们在每个block中随机采样4096个点。我们遵循与<a href="#1">[1]</a>相同的协议，使用k折策略进行训练和测试。</p>
@@ -479,36 +471,27 @@ $$f(\{ {x_1},...,{x_n}\} ) \approx g(h({x_1}),...,h({x_n}))\tag{1}$$
 <p>基于网络输出的语义分割，我们进一步构建了一个使用连接组件进行目标提议的3D目标检测系统（有关详细信息，请参见补充资料）。我们在表4中与先前的SOTA方法进行了比较。先前的方法基于滑动形状方法（使用CRF后处理），并且对体素网格中的局部几何特征和全局room上下文特征进行了SVMS训练。 在所报告的家具类别中，我们的方法大大优于该方法。</p>
 <img src="/2020/03/09/PointNet/Tabel3&Tabel4.png" class="">
 <!-- <img src="./PointNet/Tabel3&Tabel4.png" /> -->
-
-
 <h3 id="5-2-Architecture-Design-Analysis"><a href="#5-2-Architecture-Design-Analysis" class="headerlink" title="5.2 Architecture Design Analysis"></a>5.2 Architecture Design Analysis</h3><p>在本节中，我们通过控制实验来验证我们的设计选择。 我们还显示了网络超参数的影响。</p>
 <p><strong>Comparison with Alternative Order-invariant Methods：</strong>4.2节中提到，有至少3中方法可以对输入点集中的无序性保持鲁棒性。我们使用ModelNet40数据集作为对比实验的数据集。图5中我们比较的baseline包括在大小为$n \times 3$的排序和未排序的点集上应用多层感知机，将点集当作序列的RNN模型，基于对称函数的模型。我们实验所用的对称操作包括最大池化操作，平均池化操作和基于权重相加的注意力机制。注意力机制与<a href="#25">[25]</a>中相似，其中从每个点特征预测标量得分，然后通过计算softmax对得分进行标准化。然后根据归一化的分数和点特征计算加权和，如图5所示。max pooling操作实现了最佳性能，这验证了我们的选择。</p>
 <img src="/2020/03/09/PointNet/%E5%9B%BE5.png" class="">
 <!-- <img src="./PointNet/图5.png" /> -->
-
 <p><strong>Effectiveness of Input and Feature Transformations：</strong> 在表5中，我们演示了输入和特征转换（用于对齐）的效果。有趣的是，最基本的体系结构已经实现了相当合理的结果。 使用输入转换可将性能提高0.8％。正则化损失对于高维变换的工作是必不可少的，通过结合两个变换和正则化项，我们可以获得最佳性能。</p>
 <img src="/2020/03/09/PointNet/Tabel5.png" class="">
 <!-- <img src="./PointNet/Tabel5.png" /> -->
-
 <p><strong>Robustness Test：</strong> 我们展示了我们的PointNet，尽管简单有效，但对各种输入摄动具有鲁棒性。我们使用与图5的max pooling network中相同的体系结构。输入点归一化为标准空间。结果如图6所示。</p>
 <p>至于缺失点，相对于最远和随机的输入采样，当缺失50％的点时，准确率仅下降2. 4％和3. 8％。我们评估了两种模型：一种是只具有(X,Y,Z)坐标的点，另一种是(X,Y,Z)坐标加点密度。当有20%是异常点时，网络还能达到80%的准确率。图6显示了网络对于点摄动的鲁棒性。</p>
 <img src="/2020/03/09/PointNet/%E5%9B%BE6.png" class="">
 <!-- <img src="./PointNet/图6.png" /> -->
-
 <h3 id="5-3-Visualizing-PointNet"><a href="#5-3-Visualizing-PointNet" class="headerlink" title="5.3 Visualizing PointNet"></a>5.3 Visualizing PointNet</h3><p>在图7中，我们可视化了一些样本形状$S$的临界点集${C_S}$和上限点集${N_S}$（如Theorem 2.中所述）。 两个形状之间的点集将给出完全相同的全局形状特征$f(S)$。</p>
 <p>我们可以从图7中看到，临界点集${C_S}$，那些组成最大池化特征的点构成了整个形状的骨架。上限点集${N_S}$表示最大可能的点云，该点云具有与输入点云$S$相同的全局特征。${C_S}$和${N_S}$反映了PointNet的鲁棒性，这意味着丢失一些非关键点根本不会改变全局形状特征$f(S)$。</p>
 <p>${N_S}$是通过以边长为2的立方体前向传播网络中的所有点来构造的。并且选择不大于全局形状描述符的点集$p$，作用于该点集的函数值等于$({h_1}(p),{h_2}(p), \cdots ,{h_K}(p))$。</p>
 <img src="/2020/03/09/PointNet/%E5%9B%BE7.png" class="">
 <!-- <img src="./PointNet/图7.png" /> -->
-
 <h3 id="5-4-Time-and-Space-Complexity-Analysis"><a href="#5-4-Time-and-Space-Complexity-Analysis" class="headerlink" title="5.4 Time and Space Complexity Analysis"></a>5.4 Time and Space Complexity Analysis</h3><p>表6总结了我们PointNet分类网络的空间（网络中的参数数量）和时间（浮点运算/样本复杂度）复杂度。我们还将PointNet与之前的工作中一组具有代表性的基于体积和多视图的体系结构进行比较。</p>
 <p>尽管MVCNN<a href="#23">[23]</a>和Subvolume<a href="#18">[18]</a>（3D CNN）有更高的准确性，但是PointNet在计算开销上更高效（在FLOPs/sample上相比分别有141倍和8倍的差距）。除此之外就网络中的参数量来说（参数少了17倍），PointNet在空间复杂度上相比MVCNN也更高效。而且PointNet更加具有可扩展性，他的时间以及空间复杂度都是$O(N)$，随着输入点云的数量而线性增长。然而，由于卷积运算控制着计算时间，因此多视图方法的时间复杂度平方正比于图像分辨率，而基于体积卷积的方法则随着体积的大小而立方增长。</p>
 <p>根据实验，在TensorFlow上使用1080X GPU，PointNet每秒可以处理超过一百万个点以进行点云分类（大约1K个对象/秒）或语义分割（大约2个room/秒），在时间效率上显示出巨大的潜力。</p>
 <img src="/2020/03/09/PointNet/Tabel6.png" class="">
 <!-- <img src="./PointNet/Tabel6.png" /> -->
-
-
-
 <h2 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6. Conclusion"></a>6. Conclusion</h2><p>在这项工作中，我们提出了一种直接输入点云的新颖的深度神经网络PointNet。 我们的网络为许多3D识别任务提供了统一的方法，包括目标分类，目标part分割和语义分割，同时与baseline相比达到了SOTA。为了理解我们的网络，我们还提供理论分析和可视化。</p>
 <h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><p><span id="1"> [1]: Armeni, I., Sener, O., Zamir, A. R., Jiang, H., Brilakis, I., Fischer, M., &amp; Savarese, S. (2016). 3d semantic parsing of large-scale indoor spaces. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 1534-1543).</p>
 <p><span id="2"> [2]: Aubry, M., Schlickewei, U., &amp; Cremers, D. (2011, November). The wave kernel signature: A quantum mechanical approach to shape analysis. In 2011 IEEE international conference on computer vision workshops (ICCV workshops) (pp. 1626-1633). IEEE.</p>
@@ -554,9 +537,9 @@ $$f(\{ {x_1},...,{x_n}\} ) \approx g(h({x_1}),...,h({x_n}))\tag{1}$$
       
         <div class="post-tags">
           
-            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
-          
             <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
           
             <a href="/tags/%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/" rel="tag"># 三维重建</a>
           
@@ -667,7 +650,7 @@ $$f(\{ {x_1},...,{x_n}\} ) \approx g(h({x_1}),...,h({x_n}))\tag{1}$$
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -689,7 +672,7 @@ $$f(\{ {x_1},...,{x_n}\} ) \approx g(h({x_1}),...,h({x_n}))\tag{1}$$
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1106,7 +1089,24 @@ $$f(\{ {x_1},...,{x_n}\} ) \approx g(h({x_1}),...,h({x_n}))\tag{1}$$
         }
       });
     </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 

@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="计算机视觉,论文阅读,三维重建," />
+  <meta name="keywords" content="论文阅读,计算机视觉,三维重建," />
 
 
 
@@ -98,8 +98,8 @@
 <meta property="article:published_time" content="2020-03-03T07:05:15.000Z">
 <meta property="article:modified_time" content="2020-03-09T10:04:06.539Z">
 <meta property="article:author" content="kaixiang Liu">
-<meta property="article:tag" content="计算机视觉">
 <meta property="article:tag" content="论文阅读">
+<meta property="article:tag" content="计算机视觉">
 <meta property="article:tag" content="三维重建">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/timeline.png">
@@ -375,8 +375,7 @@
       
 
       
-        <h1 id="A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective"><a href="#A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective" class="headerlink" title="A survey on Deep Geometry Learning-From a Representation Perspective"></a>A survey on Deep Geometry Learning-From a Representation Perspective</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>深度学习在2D领域取得了巨大的成功，但是在3D领域由于多种多样的表示方法，没有一种通用的算法能够在所有的表示方法上取得很好的效果。本文从表示的角度对不同的算法归纳优点和缺点，并且介绍了在这些表示领域的数据集同时讨论了未来的研究方向。</p>
-<a id="more"></a>
+        <h1 id="A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective"><a href="#A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective" class="headerlink" title="A survey on Deep Geometry Learning-From a Representation Perspective"></a>A survey on Deep Geometry Learning-From a Representation Perspective</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>深度学习在2D领域取得了巨大的成功，但是在3D领域由于多种多样的表示方法，没有一种通用的算法能够在所有的表示方法上取得很好的效果。本文从表示的角度对不同的算法归纳优点和缺点，并且介绍了在这些表示领域的数据集同时讨论了未来的研究方向。<br><a id="more"></a></p>
 <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>3D形状的表示主要分为：深度图和多视角图像；体素；基于表面的表示；隐含表面的表示；基于结构的表示；基于形变的表示</p>
 <ul>
 <li><p>imaged-based representation</p>
@@ -413,19 +412,12 @@
 <p>一些方法通过将体素编码为八叉树<a href="#55">[55]</a>的方法来降低输入数据的维度。<a href="#32">[32]</a>提出一种以八叉树的形式提升体素精度的方法（HSP）。他们发现在高精度体素中只需要预测物体表面的体素即可。在HSP中八叉树的每个节点是一个体素块，同样这个体素块也有occupied、boundary和free三种状态。模型的解码器将特征向量作为输入来分层地预测对应体素块的特征。HSP定义八叉树由5层，每个体素块由$16^3$个体素，因此HSP可以生成$256^3$个体素。<a href="#79">[79]</a>提出了一个能够生成高分辨率体素表示的方法OGN。在OGN中，八叉树的每个节点被分为：empty、filled、mixed三种状态，八叉树就可以代表一个3D形状，其特征图存储在哈希表中，通过空间位置和八叉树的层数来索引。为了处理存储在哈希表中的特征图，他们设计了一种新的卷积操作OGN-Conv。将卷积操作转变为矩阵乘法，通过在特征图上进行卷积能够得到不同分辨率的体素，然后通过特点的标签来决定是否将这些特征传播至下一层（如果标签为boundary则传播，如果为mixed则跳过特征传播）。</p>
 <p>由于八叉树的结构，深度学习很难直接应用于八叉树。<a href="#66">[66]</a>提出了OctNet。这种八叉树相比普通八叉树具有更强的相关性和规律。<a href="#85">[85]</a>同样提出了八叉树上的卷积神经网络O-CNN。</p>
 <h2 id="4-Surface-based-representation"><a href="#4-Surface-based-representation" class="headerlink" title="4. Surface-based representation"></a>4. Surface-based representation</h2><h3 id="4-1-Point-based-Representation"><a href="#4-1-Point-based-Representation" class="headerlink" title="4.1 Point-based Representation"></a>4.1 Point-based Representation</h3><p>点云或点集通常可以由3D扫描设备直接得到，由于其无序性以及不规律的结构很难用传统的深度学习网络。<a href="#17">[17]</a>在2017年最早提出用深度学习方法处理点云。其神经网络学习一个在点云分布上的取样器，网络输入为一张图像和乱序点，输出$N\times3$的矩阵来代表预测的点集。其使用chamfer distance（CD）以及Earth Mover’s Distance（EMD）作为损失函数来训练网络。</p>
-<p>几乎在同一时刻，<a href="#63">[63]</a>提出了PointNet，其是第一个直接在点云上应用深度学习并且不用经过排序的方法。PointNet的网络结构如<a href="#图2">[图2]</a>所示，PointNet的结构主要包括三个部分：对于无序性，使用最大池化层作为对称功能来处理；级联局部和全局特征；共同对齐网络以实现变换不变性。基于PointNet<a href="#65">[65]</a>提出了PointNet++，其解决了PointNet因为度量空间点而不能捕捉和处理局部特征的问题。相比PointNet，PointNet++引入了分层的结构，因此模型可以捕捉不同层的特征。PointNet和PointNet++在形状分类和语义分割任务上表现SOTA。越来越多的深度学习模型被应用于点云表示方式。</p>
-<img src="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/PointNet.png" class="">
-<!-- <img src="./A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/PointNet.png" style="zoom:80%" id="图2" /> -->
-<p><a href="#39">[39]</a>将点云以kd-tree的方式组织，提出了Kd-Network。<a href="#94">[94]</a>提出了FoldingNet，是一种无监督学习的压缩点云信息的端到端的自编码器。点云可以通过folding操作变换为2d网格。<a href="#56">[56]</a>提出DiscoNet，其结合针对不同3D物体训练的自编码器来实现3D物体的editing。</p>
+<p>几乎在同一时刻，<a href="#63">[63]</a>提出了PointNet，其是第一个直接在点云上应用深度学习并且不用经过排序的方法。PointNet的网络结构如<a href="#图2">[图2]</a>所示，PointNet的结构主要包括三个部分：对于无序性，使用最大池化层作为对称功能来处理；级联局部和全局特征；共同对齐网络以实现变换不变性。基于PointNet<a href="#65">[65]</a>提出了PointNet++，其解决了PointNet因为度量空间点而不能捕捉和处理局部特征的问题。相比PointNet，PointNet++引入了分层的结构，因此模型可以捕捉不同层的特征。PointNet和PointNet++在形状分类和语义分割任务上表现SOTA。越来越多的深度学习模型被应用于点云表示方式。<br><img src="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/PointNet.png" class=""><br><!-- <img src="./A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/PointNet.png" style="zoom:80%" id="图2" /> --><br><a href="#39">[39]</a>将点云以kd-tree的方式组织，提出了Kd-Network。<a href="#94">[94]</a>提出了FoldingNet，是一种无监督学习的压缩点云信息的端到端的自编码器。点云可以通过folding操作变换为2d网格。<a href="#56">[56]</a>提出DiscoNet，其结合针对不同3D物体训练的自编码器来实现3D物体的editing。</p>
 <p>尽管点云数据可以方便的从3D扫描设备得到，但是其因为稀疏性以及噪声并不适合用来对3D物体分析。因此相比其他表示方式，上采样点云以获得更加细粒度的点云模型就显得很重要。比如PU-NET<a href="#96">[96]</a>，MPU<a href="#95">[95]</a>，PU-GAN<a href="#44">[44]</a>等等。<a href="#29">[29]</a>是在点云领域应用深度学习方法的综述，提供了更多这个领域的细节。</p>
 <h3 id="4-2-Mesh-based-Representation"><a href="#4-2-Mesh-based-Representation" class="headerlink" title="4.2 Mesh-based Representation"></a>4.2 Mesh-based Representation</h3><p>相比点云表示，网格表示还包括了点之间的连接信息，因此他们很适合描述在表面上的局部区域。作为一种典型的非欧几里得空间上的表示方法，网格表示可以在空域和频域上应用深度学习方法<a href="#7">[7]</a>。然而对无规律的数据结构直接应用CNNs是不简单的，因此少数方法如<a href="#51">[51]</a>，<a href="#72">[72]</a>将3D物体表面转换为2D几何图像在应用传统2D CNNs。然而这些方法没有利用网格方法的优点，在本小节我们将介绍直接将网格作为输入并且在网格上生成3D模型的深度学习方法。</p>
 <p>由于Mesh网格是由顶点与边组成的，那么就可以将其当成图来处理。许多方法基于图理论。<a href="#1">[1]</a>，<a href="#8">[8]</a>，<a href="#14">[14]</a>，<a href="#34">[34]</a>，<a href="#38">[38]</a>都是基于拉普拉斯矩阵的本征分解来对图进行CNN操作。<a href="#80">[80]</a>提出了另一个基于图的CNN，叫FeaStNet，它能够动态的计算卷积操作的感受野。其通过网络中获得特征来确定相邻边的分配。<a href="#33">[33]</a>同样提出了在三角网格上的卷积操作，池化和反池化操作，提出的网络结构叫MeshCNN。不同于其他基于图的方法，MeshCNN主要处理边的特征。同时提出了应用在边上固定邻边数量的卷积操作和基于边塌缩的池化操作。MeshCNN能够针对特定任务提取3D物体的特征，可以保留有用的特征，忽视不重要的特征。</p>
 <p>Mesh网格可以看作是2-manifolds的离散化。2-manifolds的许多工作使用一系列精制的CNN操作来适应非欧几里得空间。<a href="#52">[52]</a>对于manifolds提出了GCNNs（Geodesic Convolutional Neural Networks）…（不太理解流形学习，懒得写了…）</p>
-<p>从Mesh网格生成3D模型有很多方法。<a href="#84">[84]</a>提出了Pixel2Mesh用于从单目图像重建3D物体，通过变形椭圆球体模板的方法生成目标三角网格。如<a href="#图3">[图3]</a>所示，Pixel2Mesh通过GCNs（Graph-based Convolutional Networks）<a href="#7">[7]</a> 实现，由粗到精的生成Mesh网格。<a href="#87">[87]</a>改进了Pixel2Mesh，提出Pixel2Mesh++，将单目图像拓展至多视角图像。Pixel2Mesh++引进了Multi-View Deformation Network（MDN），MDN在生成Mesh网格的过程总融合了多视角图像的交叉信息。<a href="#28">[28]</a>提出了AtlasNet，能够通过multiple patches生成3D表面。AtlasNet学习将2D方块patches转换为2-manifolds，通过MLP（Multi-Layer Perception）来覆盖3D物体的表面。<a href="#2">[2]</a>提出了一个multi-chart生成模型，该方法使用multi-chart作为输入，在标准GAN<a href="#27">[27]</a>的基础上建立网络模型。3D物体表面和multi-chart的转换基于<a href="#51">[51]</a>。</p>
-<img src="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/Pixel2Mesh.png" class="">
-<!-- <img src="./A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/Pixel2Mesh.png" style="zoom:80%" id="图3" /> -->
-
-
+<p>从Mesh网格生成3D模型有很多方法。<a href="#84">[84]</a>提出了Pixel2Mesh用于从单目图像重建3D物体，通过变形椭圆球体模板的方法生成目标三角网格。如<a href="#图3">[图3]</a>所示，Pixel2Mesh通过GCNs（Graph-based Convolutional Networks）<a href="#7">[7]</a> 实现，由粗到精的生成Mesh网格。<a href="#87">[87]</a>改进了Pixel2Mesh，提出Pixel2Mesh++，将单目图像拓展至多视角图像。Pixel2Mesh++引进了Multi-View Deformation Network（MDN），MDN在生成Mesh网格的过程总融合了多视角图像的交叉信息。<a href="#28">[28]</a>提出了AtlasNet，能够通过multiple patches生成3D表面。AtlasNet学习将2D方块patches转换为2-manifolds，通过MLP（Multi-Layer Perception）来覆盖3D物体的表面。<a href="#2">[2]</a>提出了一个multi-chart生成模型，该方法使用multi-chart作为输入，在标准GAN<a href="#27">[27]</a>的基础上建立网络模型。3D物体表面和multi-chart的转换基于<a href="#51">[51]</a>。<br><img src="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/Pixel2Mesh.png" class=""><br><!-- <img src="./A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/Pixel2Mesh.png" style="zoom:80%" id="图3" /> --></p>
 <h2 id="5-Implicit-Representation"><a href="#5-Implicit-Representation" class="headerlink" title="5. Implicit Representation"></a>5. Implicit Representation</h2><p>近些年的研究中隐式的表示方法越来越流行。一个主要的原因是隐式的表示方法可以不受固定的拓补结构和分辨率的影响。Occupancy/Indicator Function就是一种隐式的3D表示方法。Occupancy Network由<a href="#57">[57]</a>提出，其通过神经网络学习一个连续的occupancy function作为3D物体的表示方法。occupancy function反映了3D物体表面点的状态，1代表在表面里面，0则反之。研究者们将这个问题当作一个二分类问题来处理，同时设计了一个occupancy network，输入为3D点位置和3D形状的observation，输出为occupancy的概率。生成的implicit field再经过一个多分辨率等值面抽取的方法MISE和marching cubes算法<a href="#50">[50]</a>来获得Mesh网格。另外，研究者们还介绍了一个编码器网络来获取latent embeddings。<a href="#11">[11]</a>设计了IMNET作为学习生成模型的解码器，它能够以indicator function的方式表示implicit function。</p>
 <p>Signed Distance Function（SDFs）同样是一种隐式的表示方式。Signed Distance Function将3D点映射为一个实际的值而不是概率，这个实际的值代表了3D点与3D表面的位置关系以及距离。假设3D点$x \in {R^3}$，那么$SDF(x)&gt;0$就表示点$x$在3D表面的外面，反之则在里面，$SDF(x)=0$表示点在面上。$SDF(x)$的绝对值代表了3D点与表面之间的距离。<a href="#62">[62]</a>提出了DeepSDF并且介绍了基于DeepSDF的自解码器作为一种新的3D表示方式。<a href="#93">[93]</a>提出了Deep Implicit Surface Networks（DISNs）实现基于SDFs的单目图像三维重建。基于SDF的优越性，DISN是第一种具有复杂的拓补结构和精细结构的单目图像三维重建方法。</p>
 <p>Function Sets：occupancy function和Signed Distance Function都是通过深度神经网络学习一个单一的函数来表示3D物体。<a href="#24">[24]</a>,<a href="#25">[25]</a>提出一种结合一个形状元素集合的方式来表示3D物体。在<a href="#25">[25]</a>中，研究者们提出Structured Implicit Functions（SIFs）,SIFs用a scaled axis-aligned anisotropic 3D Gaussian（缩放轴对齐的各向异性3D高斯函数）来表示集合中的每一个物体，这些物体的总和就代表了整个3D物体。高斯函数的参数通过CNN来学习。<a href="#24">[24]</a>改进了SIF并提出了Deep Structured Implicit Functions（DSIFs）,其添加了深度神经网络作为Deep Implicit Functions（DIFs）来提供局部的几何细节。总结一下，DSIF利用SIF来描述每个形状元素的粗信息，DIF用来提供局部形状细节。</p>
@@ -440,17 +432,12 @@
 <p>Implicit surface based approaches：随着implicit surface表示的发展，<a href="#37">[37]</a>提出Neural Articulated Shape Approximation（NASA）用位姿参数来表示铰接变形的物体。pose parameters记录了模型中定义的bones的变化。</p>
 <h2 id="8-Datasets"><a href="#8-Datasets" class="headerlink" title="8. Datasets"></a>8. Datasets</h2><p>RGB-D Image：RGB-D图像可以由深度传感器获得例如Microsoft Kinect。大多数RGB-D数据集可以被视作视频的序列。室内RGB-D数据集NYU Depth<a href="#70">[70]</a>，<a href="#71">[71]</a>是第一个为分割任务而产生的数据集。其第一个版本<a href="#70">[70]</a>收集了64个类别，而第二个版本<a href="#71">[71]</a>收集了464个类别。KITTI数据集<a href="#23">[23]</a>提供了用于自动驾驶的室外场景图像，包含5个类别：马路，城市，住宅，校园和行人。其深度图可以通过KITTI数据集提供的开发套件计算。并且KITTI数据集还包括了应用于3D物体检测的标记。</p>
 <p>Man-made 3D Object Datasets：ModelNet<a href="#90">[90]</a>是一个著名的CAD模型数据集，包含了662个类别的127915个3D CAD模型。ModelNet有两个子数据集ModelNet10和ModelNet40.ModelNet10包含ModelNet中的10个类别，并且是手动对齐的3D模型。同样的ModelNet包含了40个类别，其3D模型同样手动对齐。ShapeNet<a href="#9">[9]</a>提供了一个大批量的数据集包含超过4000个类别的300万个模型。ShapeNet同样有两个子数据集ShapeNetCore和ShapeNetSem。对于多样的几何应用，ShapeNet数据集为3D物体提供了丰富的标记，包含类别标签，part标签，对称信息等等。PartNet提供了一个更加详细的细粒度的分层地CAD模型数据集，为语义分割，shape编辑，shape生成等任务带来了大量应用和资源。</p>
-<p>Non-Rigid Model Datasets：TOSCA<a href="#6">[6]</a>是一个高分辨率3D非刚性物体的数据集，包含9个类别的80个目标。模型使用Mesh网格来表示，每一个类别中的物体都具有相同的分辨率。FAUST<a href="#3">[3]</a>是一个3D人身扫描的数据集，包含10个人的不同动作和对应的ground truth。因为FAUST是真实场景中的shape定位，数据集中扫描会有噪声和不完整，但是对应的ground truth是water-tight和对齐的。</p>
-<img src="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/3D-Model-Datasets.png" class="">
-<!-- <img src="./A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/3D Model Datasets.png" style="zoom:80%" /> -->
-
-
+<p>Non-Rigid Model Datasets：TOSCA<a href="#6">[6]</a>是一个高分辨率3D非刚性物体的数据集，包含9个类别的80个目标。模型使用Mesh网格来表示，每一个类别中的物体都具有相同的分辨率。FAUST<a href="#3">[3]</a>是一个3D人身扫描的数据集，包含10个人的不同动作和对应的ground truth。因为FAUST是真实场景中的shape定位，数据集中扫描会有噪声和不完整，但是对应的ground truth是water-tight和对齐的。<br><img src="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/3D-Model-Datasets.png" class=""><br><!-- <img src="./A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/3D Model Datasets.png" style="zoom:80%" /> --></p>
 <h2 id="9-Shape-Analysis-and-Reconstruction"><a href="#9-Shape-Analysis-and-Reconstruction" class="headerlink" title="9. Shape Analysis and Reconstruction"></a>9. Shape Analysis and Reconstruction</h2><p>上文中提到的shape表示是shape分析和shape重建的基础，在这一节我们总结了在这两个方向上的工作并且对比了实验效果。</p>
 <h3 id="9-1-Shape-Analysis"><a href="#9-1-Shape-Analysis" class="headerlink" title="9.1 Shape Analysis"></a>9.1 Shape Analysis</h3><p>Shape Analysis方法通过不同的网络结构从不同的3D shape表示中提取latent codes。这些latent codes会被用于特定的任务例如shape分类，shape恢复，shape分割等。不同的表示方式适用不同的应用。我们现在回顾一下不同表示的不同模型的表现，讨论对于特定的任务合适的表示。</p>
 <p>Shape Classification and Retrieval是shape分析的基本问题。这两个都依赖从分析网络中抽取的特征向量。对于shape分类，ModelNet10和ModelNet40用的较多。<a href="#表2">[表2]</a>展示了在ModelNet10和ModelNet40上不同方法的准确率。对于shape恢复，给定一个3D shape，目标是在数据集中找到最相似的shape。恢复方法通常要习得在latent space中一个紧凑的code来表示3D物体，然后基于欧几里得距离，Mahalanobis距离或者其他距离度量方法，查找最近的物体作为结果。不同于分类任务，shape恢复有很多评价指标，包括准确率，召回率，mAp（mean average precision）等等。</p>
 <img src="/2020/03/03/A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/shape-classification-accuracy.png" class="">
 <!-- <img src="./A-survey-on-Deep-Geometry-Learning-From-a-Representation-Perspective/shape classification accuracy.png" style="zoom:80%" id="表2" /> -->
-
 <p>Shape Segmentation致力于辨析3D shape的part的类别。这个任务在3D shape的理解中很重要。mIOU通常用于分割任务的准确性度量，对于分割任务，大多数研究者选择基于点云的表示方法<a href="#39">[39]</a>，<a href="#45">[45]</a>，<a href="#63">[63]</a>，<a href="#65">[65]</a>。</p>
 <h3 id="Shape-Reconstruction"><a href="#Shape-Reconstruction" class="headerlink" title="Shape Reconstruction"></a>Shape Reconstruction</h3><p>重建任务包括单目shape重建，shape生成，shape编辑等，对于体素表示，基于学习的方法预测网格中每个体素的occupancy概率。对于点云表示，基于学习的方法通过在space中采样3D点或者将2D网格折成3D目标。对于Mesh网格的表示，大多数选择将Mesh模板变形为最终的Mesh网格。在最近的研究中，越来越多的人选择用基于结构的表示生成由粗到精的3D shape。</p>
 <h2 id="10-Summary"><a href="#10-Summary" class="headerlink" title="10. Summary"></a>10. Summary</h2><p>在本篇综述中，我们回顾了深度学习方法应用在不同表示方法的3D物体中。首先回顾了不同的3D物体表示方法。学习几何信息的方法通常使用更少的计算力和更小的内存。然后我们介绍了广泛用于研究的3D数据集，这些数据集对于数据驱动的学习方法提供了丰富的资源和评价方法。最后我们讨论了基于不同表示方法3D shape的应用场景。对于特定的任务应该选用合适的表示方法。</p>
@@ -555,9 +542,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
-          
             <a href="/tags/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" rel="tag"># 论文阅读</a>
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
           
             <a href="/tags/%E4%B8%89%E7%BB%B4%E9%87%8D%E5%BB%BA/" rel="tag"># 三维重建</a>
           
@@ -668,7 +655,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -690,7 +677,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1107,7 +1094,24 @@
         }
       });
     </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 

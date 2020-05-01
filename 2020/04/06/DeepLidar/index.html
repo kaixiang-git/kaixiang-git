@@ -386,7 +386,6 @@
 <h2 id="introduction"><a href="#introduction" class="headerlink" title="introduction"></a>introduction</h2><p>在室外环境中测量密集而准确的深度对于自动驾驶和无人驾驶飞机等各种应用至关重要。 而大多数用于室内环境的主动深度感应解决方案由于光照条件的强烈干扰而失效，并且立体视觉在远距离处不稳定。 LiDAR是户外环境的主要可靠解决方案。 然而，高端激光雷达价格昂贵得令人望而却步，并且商品级设备也有低分辨率的困扰，这在中远距离区域造成了感知困难。 空间和时间融合提供了更密集的深度，但要么需要多个设备，要么需要从目标的运动中恢复三维信息，这会产生延迟的问题。 尚不存在实时而且具有精确深度的解决方案。</p>
 <p>一种可能的方法是从低成本的LiDAR中获取稀疏但准确的深度，并借助对齐的彩色图像使其变得密集。 随着深度学习的巨大成功，一种显而易见的方法是将稀疏深度和彩色图像直接输入到神经网络中，并回归到稠密深度。不幸的是，这种黑匣子与可解释模型相比效果不佳。 从彩色图像中学习局部深度值以内插稀疏信号。对于室内场景，Zhang等人估计表面法线作为中间表示，并通过单独的优化解决深度问题，从而获得了出色的结果。 但是，对于表面法线是否可以合理表示室外场景以及该系统如何执行，尚无很好的研究。</p>
 <img src="/2020/04/06/DeepLidar/surfaceNormal.png" class="">
-
 <!-- <img src="./DCU/surfaceNormal.png" style="zoom:80%"  /> -->
 <p>图2.对噪声的敏感性。当距离增加时，从法线重构的深度值对估计法线中的噪声/错误变得更加敏感。 我们展示了两种情况，可以通过正确的（绿色）和嘈杂的（黄色）法线来估计相邻像素的深度。 即使两种情况下表面法向误差相同（15°），与较近的误差相比，另一种情况也会导致较大的误差（红色）</p>
 <p>在这项工作中，我们提出了一种端到端深度学习系统，该系统可以从稀疏的激光雷达数据和利用表面法线作为中间表示的室外道路场景中获取的彩色图像中产生密集的深度，我们发现要使得这种方法取得与室内环境同样好的效果是很难的。通常是由于以下三个挑战</p>
@@ -400,15 +399,15 @@
 <!-- <img src="./DCU/NetStructure.png" style="zoom:80%"  /> -->
 <p>图3.我们模型的管道。 我们的模型包括两个途径。 表面法线路径（下半部分）均从RGB图像，稀疏深度和二进制蒙版作为输入开始，生成场景的像素级表面法线，并进一步与稀疏输入深度和置信度相结合 从颜色路径估计的蒙版产生密集的深度。 色彩通道也产生密集的深度。 最终的密集深度输出是使用估计的注意力图来自两个路径的深度的加权总和</p>
 <h3 id="3-1-Deep-Completion-Unit"><a href="#3-1-Deep-Completion-Unit" class="headerlink" title="3.1. Deep Completion Unit"></a>3.1. Deep Completion Unit</h3><p>Zhang等人建议在预测深度或表面法线时从输入中除去不完整的深度，以摆脱局部最优值。 但是，由于稀疏深度与密集深度和表面法线密切相关，因此如果网络没有机会向其学习，则肯定不是最佳选择。 受传统彩色图像引导式修补的启发，我们提出了一种网络架构，使编码器从彩色图像或表面法线中学习局部信息，然后解码器利用该编码器通过另一个编码器对输入的稀疏深度生成的特征进行插值</p>
-<p>DCU单元的详细信息如图4所示。用于RGB/表面法线和稀疏深度的两种编码器均由一系列ResNet块组成，然后进行大步卷积以最终将特征分辨率减小至输入的1/32。解码器由五个向上投影单元组成，它们被引入以逐渐提高特征分辨率，并整合两个编码器的特征以产生密集的输出。由于输入的稀疏深度与解码器的输出密切相关，例如表面法线或深度，因此稀疏深度的特征应在解码器中贡献更大，因此，我们将rgb/表面法线的特征串联起来，但将稀疏的特征求和加入解码器中。由于求和有利于同一域中两侧的特征，因此鼓励解码器学习与深度更相关的特征，以便与稀疏深度中的特征保持一致。如图3所示，我们使用dCU预测具有相同输入但是使用grounding truth训练表面法线或深度</p>
-<img src="/2020/04/06/DeepLidar/DCU.png" class="">
-
+<p>DCU单元的详细信息如图4所示。用于RGB/表面法线和稀疏深度的两种编码器均由一系列ResNet块组成，然后进行大步卷积以最终将特征分辨率减小至输入的1/32。解码器由五个向上投影单元组成，它们被引入以逐渐提高特征分辨率，并整合两个编码器的特征以产生密集的输出。由于输入的稀疏深度与解码器的输出密切相关，例如表面法线或深度，因此稀疏深度的特征应在解码器中贡献更大，因此，我们将rgb/表面法线的特征串联起来，但将稀疏的特征求和加入解码器中。由于求和有利于同一域中两侧的特征，因此鼓励解码器学习与深度更相关的特征，以便与稀疏深度中的特征保持一致。如图3所示，我们使用dCU预测具有相同输入但是使用grounding truth训练表面法线或深度<br><img src="/2020/04/06/DeepLidar/DCU.png" class=""></p>
 <!-- <img src="./DCU/DCU.png" style="zoom:80%"  /> -->
 <p>图4.DCU单元的详细架构。 我们的深度完成单元采用后期融合策略，其中RGB/表面法线和稀疏深度的特征仅在解码器中组合。 与文献[19]不同，我们在整个解码器中，每一种分辨率都融合了双方的特征。</p>
 <h3 id="3-2-Attention-Based-Integration"><a href="#3-2-Attention-Based-Integration" class="headerlink" title="3.2. Attention Based Integration"></a>3.2. Attention Based Integration</h3><p>从表面法线恢复深度并不是一直都work，并且某些区域可能对法线噪声敏感。 我们建议利用彩色图像的先验值而不是估计的表面法线的几何形状为这些区域生成深度。 因此，我们的模型由两条平行的路径组成，分别根据输入的彩色图像和估计的表面法线来预测密集深度。 两条路径都将稀疏深度作为输入。 最终的密集深度应该是这两个估计深度的综合，其中从正确的一个中选择相对更准确的深度测量。</p>
-<p>我们使用一种注意力机制来整合从两个路径恢复的深度，其中两个深度的组合不是固定的，而是取决于当前上下文。特别是，我们首先使用输出之前的最后一个特征图为每个路径预测得分图，其是通过三个带有RElU的卷积层。然后，将来自两个路径的两个得分图馈入softmax层并转换为组合权重。然后将最终的密集深度输出计算为<br>$$\widehat D=\omega_c\cdot{\widehat D}_c+\omega_n\cdot{\widehat D}_n \tag{1}$$<br>其中$\widehat D_c$和$\widehat D_n$分别是从彩色图像和表面法线路径预测的深度图。$\omega_c$和$\omega_n$分别是学习到的权重。从图7中可以看出$\omega_c$和$\omega_n$有效的对应了最后的输出。</p>
+<p>我们使用一种注意力机制来整合从两个路径恢复的深度，其中两个深度的组合不是固定的，而是取决于当前上下文。特别是，我们首先使用输出之前的最后一个特征图为每个路径预测得分图，其是通过三个带有RElU的卷积层。然后，将来自两个路径的两个得分图馈入softmax层并转换为组合权重。然后将最终的密集深度输出计算为</p>
+<script type="math/tex; mode=display">\widehat D=\omega_c\cdot{\widehat D}_c+\omega_n\cdot{\widehat D}_n \tag{1}</script><p>其中$\widehat D_c$和$\widehat D_n$分别是从彩色图像和表面法线路径预测的深度图。$\omega_c$和$\omega_n$分别是学习到的权重。从图7中可以看出$\omega_c$和$\omega_n$有效的对应了最后的输出。</p>
 <h3 id="3-3-Conﬁdence-Prediction"><a href="#3-3-Conﬁdence-Prediction" class="headerlink" title="3.3. Conﬁdence Prediction"></a>3.3. Conﬁdence Prediction</h3><p>如前所述，如图5所示。由于LiDAR传感器和彩色摄像机之间的位移，存在前景和背景深度信号混合的不明确区域。 这通常是由y闭塞引起的，它在近距离内沿对象边界发生的频率更高。 理想情况下，我们应该找到这些令人困惑的区域并解决歧义，但是这更加具有挑战性，因为这需要在深度不连续附近进行准确的3D测量估算。相反，我们要求网络自动学习置信度掩码以指示输入稀疏深度的可靠性。我们用从色彩途径学到的置信度掩码$m_d$替换了简单的二进制掩码，该二进制掩码是输入的置信度。如图5所示，即使没有这种遮罩的ground truth。 该模型可以成功地学习重叠的稀疏深度值（例如，树干权重低）</p>
-<h3 id="3-4-Loss-Function"><a href="#3-4-Loss-Function" class="headerlink" title="3.4. Loss Function"></a>3.4. Loss Function</h3><p>整个网络的损失函数可以定义为：<br>$$L=\lambda_1L_d({\widehat D}_n)+\lambda_2L_d({\widehat D}_c)+\lambda_3L_d(\widehat D)+\lambda_4L_n(N) \tag{2}$$<br>其中$L_d$定义了估计的深度图的损失，$L_n$定义了估计的法向量图的损失。对于$L_n$我们使用<a href="#56">[56]</a>中的cosine损失，对于$L_d$，在估计的深度图上使用$L_2$损失，从深度图转换的法向量图使用cosine损失。$\lambda_1$，$\lambda_2$，$\lambda_3$和$\lambda_4$调整损失函数想项之间的权重。为了达到稳定的收敛，我们采取多阶段的训练策略。首先$\lambda_4=1$其他权重项等于0来仅仅训练表面法向量估计。然后使得$\lambda_1=\lambda_2=0.3$，$\lambda_3=0$，$\lambda_4=0.1$来进一步训练彩色图像路径和法线路径。最终使得$\lambda_1=\lambda_2=0.3$，$\lambda_3=0.5$，$\lambda_4=0.1$来对整个网络进行端到端的训练。在训练参数方面，使用Adam优化方法，起始学习率为0.001，$\beta_1=0.9$，$\beta_2=0.9990$。学习率每5个epoch减半。</p>
+<h3 id="3-4-Loss-Function"><a href="#3-4-Loss-Function" class="headerlink" title="3.4. Loss Function"></a>3.4. Loss Function</h3><p>整个网络的损失函数可以定义为：</p>
+<script type="math/tex; mode=display">L=\lambda_1L_d({\widehat D}_n)+\lambda_2L_d({\widehat D}_c)+\lambda_3L_d(\widehat D)+\lambda_4L_n(N) \tag{2}</script><p>其中$L_d$定义了估计的深度图的损失，$L_n$定义了估计的法向量图的损失。对于$L_n$我们使用<a href="#56">[56]</a>中的cosine损失，对于$L_d$，在估计的深度图上使用$L_2$损失，从深度图转换的法向量图使用cosine损失。$\lambda_1$，$\lambda_2$，$\lambda_3$和$\lambda_4$调整损失函数想项之间的权重。为了达到稳定的收敛，我们采取多阶段的训练策略。首先$\lambda_4=1$其他权重项等于0来仅仅训练表面法向量估计。然后使得$\lambda_1=\lambda_2=0.3$，$\lambda_3=0$，$\lambda_4=0.1$来进一步训练彩色图像路径和法线路径。最终使得$\lambda_1=\lambda_2=0.3$，$\lambda_3=0.5$，$\lambda_4=0.1$来对整个网络进行端到端的训练。在训练参数方面，使用Adam优化方法，起始学习率为0.001，$\beta_1=0.9$，$\beta_2=0.9990$。学习率每5个epoch减半。</p>
 <h3 id="3-5-Training-Data"><a href="#3-5-Training-Data" class="headerlink" title="3.5. Training Data"></a>3.5. Training Data</h3><p>由于实际数据集中缺乏真实的地面法线，我们使用开放的城市驾驶模拟器Carla<a href="#7">[7]</a>生成了一个综合数据集。 我们渲染了5万个训练样本，包括RGB图像，稀疏深度图，密集深度图和表面法线图像，这些示例在补充材料中显示。对于ground truth，我们使用kitti深度补全基准数据集进行微调和评估。kitti数据集的完整表面法线ground truth是通过局部平面拟合从密集深度图的ground truth计算得出的<a href="#44">[44]</a>。</p>
 <h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4. Experiments"></a>4. Experiments</h2><p>我们进行了广泛的实验以验证我们模型的有效性，包括与相关工作进行比较和消融研究。由于我们模型的主要应用之一是在车载激光雷达设备上，大多数实验都是在KITTI深度补全基准上进行的。尽管如此，我们还在室内环境中运行我们的模型以验证泛化能力。</p>
 <h3 id="4-1-Comparison-to-State-of-the-art"><a href="#4-1-Comparison-to-State-of-the-art" class="headerlink" title="4.1. Comparison to State-of-the-art"></a>4.1. Comparison to State-of-the-art</h3><p>我们首先在kitti深度完成基准的测试集上评估我们的方法。该测试集包含1000个数据，包括彩色图像，稀疏激光雷达深度图以及彩色相机和lidaR之间的转换。评价标准计算四个度量：均方根误差（RMSE mm），平均绝对误差（MAE mm），反深度的均方根误差（iRMSE 1/km）和反深度均方根误差（iMAE 1/km）中，RMSE是最重要的指标，并被选择在排行榜上排名提交，因为它直接在深度上测量误差，并且在远距离的惩罚更多，而远距离的测量更具挑战性。</p>
@@ -416,7 +415,6 @@
 <h3 id="4-2-Ablation-Study"><a href="#4-2-Ablation-Study" class="headerlink" title="4.2. Ablation Study"></a>4.2. Ablation Study</h3><p>为了了解每个模型组件对最终性能的影响，我们通过分别禁用每个组件并显示结果如何变化进行了全面的消融研究。定量结果显示在表3中。在禁用每个组件的情况下性能会合理下降，并且完整模型的效果最佳。</p>
 <img src="/2020/04/06/DeepLidar/Tabel3.png" class="">
 <!-- <img src="./DCU/Tabel3.png" style="zoom:80%"  /> -->
-
 <h4 id="Effect-of-Surface-Normal-Pathway"><a href="#Effect-of-Surface-Normal-Pathway" class="headerlink" title="Effect of Surface Normal Pathway"></a>Effect of Surface Normal Pathway</h4><p>验证表面法线对于室外场景是否类似于室内情况是合理的中间深度表示。 我们训练模型时不估计法线，而是直接输出完整深度。在这种设置下，由于只有一条路径可用，因此也没有注意力整合。 该性能在表3中显示为“-Normal Pathway”。性能显着下降。与我们的完整型号相比，RMSE增加了约87mm。 这表明表面法线还有助于室外深度补全。</p>
 <h4 id="Effect-of-Attention-Based-Integration"><a href="#Effect-of-Attention-Based-Integration" class="headerlink" title="Effect of Attention Based Integration"></a>Effect of Attention Based Integration</h4><p>然后，我们禁用基于注意力的集成以验证两种途径组合的必要性，即仅考虑从正常路径生成的深度图。与完整的模型相比，没有这种集成所有评估指标都会下降。（表3-Attention Integration）。图7（行$\omega_c$，$\omega_n$）显示了从颜色路径和表面法线路径自动学习的的注意力图。可以看出，表面法线路径的效果更好（即权重较大），但距离越远，质量越差，这与我们的分析一致。相比之下，与表面法线路径相比，颜色路径无法在近距离捕获准确的细节，但在远距离处更好。 尽管与表面法线路径相比，颜色通道在较少的区域上效果更好，但是在较远的区域获得良好的性能至关重要，因为在较远的区域更可能发生较大的错误。</p>
 <h4 id="Effect-of-Deep-Completion-Unit"><a href="#Effect-of-Deep-Completion-Unit" class="headerlink" title="Effect of Deep Completion Unit"></a>Effect of Deep Completion Unit</h4><p>我们还将深度补全单元替换为具有早期融合功能的传统编码器-解码器体系结构，该结构在开始时将输入彩色图像，稀疏深度和二进制掩码连接起来，并作为输入输入到网络。 即使启用了模型的所有其他组件，此修改也会导致性能显着下降。（表3-DCU）我们将稀疏深度编码器的特征与解码器的特征相加，而不是普通的串联，我们也尝试了串联选项，但是这会占用更多的内存，并产生稍差的性能。</p>
@@ -428,13 +426,11 @@
 <img src="./DCU/Figure7-1.png">
 <img src="./DCU/Figure7-2.png">
 <img src="./DCU/Figure7-3.png"> -->
-
 <h3 id="4-3-Generalization-Capability"><a href="#4-3-Generalization-Capability" class="headerlink" title="4.3. Generalization Capability"></a>4.3. Generalization Capability</h3><p>即使在本文中我们特别着重于为车载激光雷达设备生产密集深度，我们的模型也可以视为通用的深度完成方法。因此，我们研究了模型在不同情况下（特别是在不同输入深度下）的泛化能力，特别是稀疏性和室内环境。</p>
 <h4 id="Robustness-Against-Depth-Sparsity"><a href="#Robustness-Against-Depth-Sparsity" class="headerlink" title="Robustness Against Depth Sparsity"></a>Robustness Against Depth Sparsity</h4><p>有趣的是，我们的模型是否仍然可以在输入深度更稀疏的更具挑战性的情况下工作。基准提供的原始激光雷达深度大约是每个深度图像的18400个样本，分辨率为352×1216。即4.3％的像素具有深度。 我们分别以1 / 4、1 / 16、1 / 64和1/256的比率对原始LiDar深度进行二次采样，分别对应于具有深度的像素的1.075％，0.269％，0.0672％和0.0168％。 值得注意的是，0.0168％对应于每个深度图像72个像素。 这是极端困难的情况，其中输入稀疏深度几乎不包含场景结构。</p>
 <p>我们的模型和其他方法在稀疏度不同的LiDaR上的性能如图8所示。我们可以看到性能更好（即较低的RMSE）。随着输入稀疏深度的增加。 即使在最具挑战性的情况下，我们的方法仍然表现良好（例如 0.0168％）。</p>
 <img src="/2020/04/06/DeepLidar/Figure8.png" class="">
 <!-- <img src="./DCU/Figure8.png"> -->
-
 <h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5. Conclusion"></a>5. Conclusion</h2><p>在本文中，我们提出了一种从稀疏激光雷达数据和单色图像进行深度预测的端到端神经网络。 我们直接在网络中使用表面法线作为中间表示，并证明它对于类似于室内场景的室外场景仍然有效。 我们建议使用深度补全单元，以更好地融合彩色图像和稀疏输入深度。 我们还分析了户外场景的特定挑战，并在网络体系结构内提供了解决方案，例如基于注意力的集成以提高远距离性能并估计遮挡处理的置信度。大量实验表明，我们的方法达到了最先进的性能，并能很好地推广到稀疏输入和室内场景。</p>
 
       
@@ -564,7 +560,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -586,7 +582,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1003,7 +999,24 @@
         }
       });
     </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 

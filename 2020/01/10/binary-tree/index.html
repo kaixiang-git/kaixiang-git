@@ -364,8 +364,7 @@
 
       
         <h1 id="二叉树遍历的总结帖"><a href="#二叉树遍历的总结帖" class="headerlink" title="二叉树遍历的总结帖"></a>二叉树遍历的总结帖</h1><h2 id="深度优先"><a href="#深度优先" class="headerlink" title="深度优先"></a>深度优先</h2><p>leetcode相关题目：105（根据先序与中序重建二叉树）,112/113(路径和)，145（后序遍历），226（通过中序遍历来翻转二叉树），572（判断子树）</p>
-<p>递归遍历与非递归遍历最大的区别在于，递归可回溯，而非递归不可回溯（这里指的回溯是回溯到其父节点）。比如在访问完右孩子之后想要得到其父节点的信息只能通过递归的方式得到，在递归遍历中虽然同样是先访问根节点，但是当访问完其子树之后可以回到访问根节点的状态，而非递归遍历中根节点访问完成后就从栈中弹出，无法在遍历完其子树后再获得根节点的信息。</p>
-<a id="more"></a>
+<p>递归遍历与非递归遍历最大的区别在于，递归可回溯，而非递归不可回溯（这里指的回溯是回溯到其父节点）。比如在访问完右孩子之后想要得到其父节点的信息只能通过递归的方式得到，在递归遍历中虽然同样是先访问根节点，但是当访问完其子树之后可以回到访问根节点的状态，而非递归遍历中根节点访问完成后就从栈中弹出，无法在遍历完其子树后再获得根节点的信息。<br><a id="more"></a></p>
 <h3 id="递归遍历"><a href="#递归遍历" class="headerlink" title="递归遍历"></a>递归遍历</h3><p>递归遍历的实现非常简单，根据访问根节点的顺序分为先序，中序，后序遍历。</p>
 <ul>
 <li>递归的先序遍历<ul>
@@ -522,7 +521,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -544,7 +543,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -961,7 +960,24 @@
         }
       });
     </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 

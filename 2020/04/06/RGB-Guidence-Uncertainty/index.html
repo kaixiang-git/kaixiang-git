@@ -377,9 +377,7 @@
 
       
         <h1 id="Sparse-and-noisy-LiDAR-completion-with-RGB-guidance-and-uncertainty"><a href="#Sparse-and-noisy-LiDAR-completion-with-RGB-guidance-and-uncertainty" class="headerlink" title="Sparse and noisy LiDAR completion with RGB guidance and uncertainty"></a>Sparse and noisy LiDAR completion with RGB guidance and uncertainty</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>（全局和局部融合，早期和后期融合，置信图预测）</p>
-<p>这项工作提出了一种新的方法来精确完成由rgB图像引导的稀疏LidaR映射。 对于自动驾驶汽车和机器人，必须使用LiDaR才能实现精确的深度预测。 大量的应用取决于对周围环境的了解，并使用深度提示进行推理和做出相应的反应。一方面，单目深度预测方法无法生成绝对的和精确的深度图。 另一方面，基于立体匹配的方法仍然远远优于基于激光雷达的方法。 深度补全任务的目标是从稀疏点和不规则点云生成密集的深度预测，这些点云被映射到2D平面。我们提出了一个新的框架，该框架提取全局和本地信息，以便生成适当的深度图。 我们认为简单的深度补全不需要深度网络。我们还提出了一种融合了单目相机RGB指导的融合方法，以利用对象信息并纠正稀疏输入中的错误。这大大提高了准确性。此外，利用置信掩码来考虑来自每个模态的深度预测中的不确定性。 这种融合方法的性能优于现有技术，在kITTI深度完成基准测试中排名第一。</p>
-<a id="more"></a>
-
+<p>这项工作提出了一种新的方法来精确完成由rgB图像引导的稀疏LidaR映射。 对于自动驾驶汽车和机器人，必须使用LiDaR才能实现精确的深度预测。 大量的应用取决于对周围环境的了解，并使用深度提示进行推理和做出相应的反应。一方面，单目深度预测方法无法生成绝对的和精确的深度图。 另一方面，基于立体匹配的方法仍然远远优于基于激光雷达的方法。 深度补全任务的目标是从稀疏点和不规则点云生成密集的深度预测，这些点云被映射到2D平面。我们提出了一个新的框架，该框架提取全局和本地信息，以便生成适当的深度图。 我们认为简单的深度补全不需要深度网络。我们还提出了一种融合了单目相机RGB指导的融合方法，以利用对象信息并纠正稀疏输入中的错误。这大大提高了准确性。此外，利用置信掩码来考虑来自每个模态的深度预测中的不确定性。 这种融合方法的性能优于现有技术，在kITTI深度完成基准测试中排名第一。<br><a id="more"></a></p>
 <h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>深度补全预测稀疏点云中的密集深度图。 在许多计算机视觉应用中，精确的深度值至关重要。 近年来，由于工业需求，该任务已引起关注。其他计算机视觉任务（其中包括3D对象检测和2D或3D语义分割以及slam跟踪）可以利用这些准确的深度线索，从而在这些领域中获得更好的准确性。 这项工作将集中在使用稀疏LiDAR和单目RGB图像的自动驾驶汽车上。在这里，需要准确地检测和区分近处和远处的物体。LiDAR会生成周围的点云，但是扫描线数量有限会导致高度稀疏。 具有64条扫描线的LiDAR很常见，但仍然很昂贵。稀疏且不规则的输入点间距使该任务在其他应用中脱颖而出。由于大量应用程序使用的LiDaR扫描线数量有限，因此产业相关性是无可争辩的，目前已成为一个非常活跃的研究领域。这项任务具有挑战性的原因有三点。 首先，输入是随机间隔的，这使得难以使用正向卷积。 其次，由于传感器融合的多种组合是可能的，即早期和晚期融合，多种形式的组合仍然是研究的活跃领域。本文将重点介绍RGB信息和LidaR点之间的融合。 第三，使用的标注信息仅部分被准确标注。 毕竟，逐像素地标注的构造是昂贵的。 我们的方法需要解决这个限制。本文的贡献是：</p>
 <ul>
 <li>全局信息和局部信息组合在一起，以准确地完成和纠正稀疏输入。 单目RGB图像可用作此深度完成任务的指导。</li>
@@ -399,10 +397,7 @@
 <h3 id="3-1-Extracting-local-and-global-information"><a href="#3-1-Extracting-local-and-global-information" class="headerlink" title="3.1 Extracting local and global information"></a>3.1 Extracting local and global information</h3><p>全局分支可以被认为是先验的，即纠正由局部分支提取的特征。由于LiDAR输入帧中有错误，因此全局信息可帮助局部网络检测这些伪像并更准确地重建稀疏输入。我们推测全局信息是相关的。首先，全局网络能够检测（移动）物体，并能够检测框架中可能具有相同深度的结构。其次，我们期望从LiDAR输入中计算出更渐进的深度图，以防止深度和误差的突然变化。通过检查RGB输入，可以确定此信息，因为由于其颜色信息，可以更轻松地提取对象的边界。 因此，可以提取语义上有意义的信息。</p>
 <p>局部网络检查输入的LiDAR帧并执行局部上采样。为了修复有噪声的LiDAR数据，我们将LiDAR图与全局引导图融合在一起。 一方面，这种引导技术背后的原因是局部网络可以进一步关注正确和确信的LiDAR点。另一方面，全局网络可以推断对象，其边缘和框架中的较大结构。最后，为了保持不断改进的预测，使用了一种残差学习方法，该方法通过跳过小型局部网络上的连接来实现。</p>
 <h3 id="3-2-Exploiting-uncertainty"><a href="#3-2-Exploiting-uncertainty" class="headerlink" title="3.2 Exploiting uncertainty"></a>3.2 Exploiting uncertainty</h3><p>我们利用了全局和局部网络中的不确定性。框架的两个部分都预测了置信度图。 这样，置信度图就像权重图一样，用于两种输入类型之间的最终融合。 因此，按像素执行加权，并且网络以无监督的方式学习权重。使用这种技术，可以根据学习到的置信度权重，利用不同网络路径中的不确定性来更加关注某种输入类型。 网络学会了在某些区域优先选择全局信息而不是局部信息。事实上，在激光雷达点准确且足够的位置，局部网络将以较高的置信度进行深度预测，而在激光雷达数据不正确或稀缺时（例如在对象边界处）将使用全局信息。这种融合方法是组合多个传感器的有效方法，这在第4节的结果中得到了支持。</p>
-<h3 id="3-3-Network"><a href="#3-3-Network" class="headerlink" title="3.3 Network"></a>3.3 Network</h3><p>全局网络是基于ERFNet 16的编码器/解码器网络，而局部网络是堆叠的沙漏网络。后者由两个沙漏模块组成，目的是学习原始深度预测的残差，该模块受ResNet<a href="#4">[4]</a>和人体姿势估计架构<a href="#15">[15]</a>的启发，总共只有350k参数。 每层由六层组成，具有一个小的接收域，并且使用stride卷积仅进行两次下采样。在第一层卷积和第一个沙漏模块的编码器中不存在批量归一化<a href="#6">[6]</a>，因为零的数量会使该层参数倾斜，尤其是在输入稀疏度不恒定的情况下。沙漏模块的结构可以在表1中找到。选择基于ERFNet的全局网络，是因为它在达到cityscapes benchmark<a href="#22">[22]</a>的同时仍保持实时性，因此具有很高的精度。</p>
-<img src="/2020/04/06/RGB-Guidence-Uncertainty/Table1.png" class="">
-<!-- <img src="./RGB-Guidence&Uncertainty/Table1.png"   /> -->
-
+<h3 id="3-3-Network"><a href="#3-3-Network" class="headerlink" title="3.3 Network"></a>3.3 Network</h3><p>全局网络是基于ERFNet 16的编码器/解码器网络，而局部网络是堆叠的沙漏网络。后者由两个沙漏模块组成，目的是学习原始深度预测的残差，该模块受ResNet<a href="#4">[4]</a>和人体姿势估计架构<a href="#15">[15]</a>的启发，总共只有350k参数。 每层由六层组成，具有一个小的接收域，并且使用stride卷积仅进行两次下采样。在第一层卷积和第一个沙漏模块的编码器中不存在批量归一化<a href="#6">[6]</a>，因为零的数量会使该层参数倾斜，尤其是在输入稀疏度不恒定的情况下。沙漏模块的结构可以在表1中找到。选择基于ERFNet的全局网络，是因为它在达到cityscapes benchmark<a href="#22">[22]</a>的同时仍保持实时性，因此具有很高的精度。<br><img src="/2020/04/06/RGB-Guidence-Uncertainty/Table1.png" class=""><br><!-- <img src="./RGB-Guidence&Uncertainty/Table1.png"   /> --><br>
 全局引导图像与稀疏的LiDAR帧融合在一起，以利用全局信息。这类似于早期融合作为局部网络的引导。 一方面，全局网络提供了三个输出图：具有全局信息的引导图，深度图和置信度图。 另一方面，局部网络提供深度图和置信度图。 通过将置信度图与其深度图相乘并将来自两个网络的预测相加，可以得出最终预测。使用softmax函数来计算置信度图的概率值。此选择过程允许框架从全局深度图中选择像素，或从堆叠的沙漏模块中选择调整后的深度值。 因此，最终深度预测$\widehat d$利用置信度图X和Y，等式(1)是最终深度值$\widehat d$的数学表达。图1是整个框架的可视化效果。
 $${\widehat d}_{out}(i,j)=\frac{e^{X(i,j)}\cdot{\displaystyle\widehat d}_{global}(i,j)+e^{Y(i,j)}\cdot{\widehat d}_{local}(i,j)}{e^{X(i,j)}+e^{Y(i,j)}}\tag{1}$$
 
@@ -424,8 +419,7 @@ $${\widehat d}_{out}(i,j)=\frac{e^{X(i,j)}\cdot{\displaystyle\widehat d}_{global
 $$\lambda(\widehat y,y)=\frac1n\sum_{i=1}^n(1+0.05\cdot epoch\cdot\left|y_i-{\widehat y}_i\right|)\cdot(y_i-{\widehat y}_i)^2 \tag{2}$$
 $$\Lambda=w_1\cdot\lambda({\widehat y}_{global},y)+w_2\cdot\lambda({\widehat y}_{local},y)+w_3\cdot\lambda({\widehat y}_{out},y) \tag{3}$$
 
-
-
+</p>
 <p>RMSE（均方根误差）和MAE（均值绝对误差）均用于评估KITTI benchmark，但我们主要关注RMSE，因为它是benchmark的主要指标。表2中的消融研究表明，全局网络和局部网络的结合可带来非常耗的结果。实际上，我们基于不确定性的后期融合方法有助于获得较大的精度。 通过利用引导图，我们最终在结果上优于先前的工作。我们还坚持使用2个沙漏模块，以免推理时间不必要地增加。由于稀疏度高，将批量归一化（BatchNormalization）添加到局部网络中的所有卷积中，会使MAE稍微增加。 我们得出的结论是，仅350k个参数，局部网络就已经可以达到良好的效果。 但是，为了纠正错误，我们利用全局网络预测不确定性图和引导图。</p>
 <p>表3显示了KITTI测试集的结果。 我们的表现优于<a href="#14">[14]</a>（目前在KITTI深度补全benchmark中排名第一）在所有指标上均显着提高，而帧速率则高4倍。 此外，当我们在表3中仅在框架中使用LiDAR信息（不使用RGB图像）时，我们在benchmark中也排名第一。从该测试集数据中，我们得出结论，该框架可以提取语义上有意义的信息以指导局部网络。</p>
 <img src="/2020/04/06/RGB-Guidence-Uncertainty/Table3.png" class="">
@@ -434,11 +428,9 @@ $$\Lambda=w_1\cdot\lambda({\widehat y}_{global},y)+w_2\cdot\lambda({\widehat y}_
 <img src="/2020/04/06/RGB-Guidence-Uncertainty/Figure2-1.png" class="">
 <img src="/2020/04/06/RGB-Guidence-Uncertainty/Figure2-2.png" class="">
 <img src="/2020/04/06/RGB-Guidence-Uncertainty/Figure3.png" class="">
-
 <!-- <img src="./RGB-Guidence&Uncertainty/Figure2-1.png"   />
 <img src="./RGB-Guidence&Uncertainty/Figure2-2.png"   />
 <img src="./RGB-Guidence&Uncertainty/Figure3.png"   /> -->
-
 <h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5. Conclusion"></a>5. Conclusion</h2><p>我们提出了一个以RGB图像为指导的框架，以完成和校正稀疏的LiDAR帧。该思想的核心是通过使用全局网络来利用全局信息。 此外，我们利用置信度图，以便根据后期融合方法中的不确定性来合并两个输入。我们使用Focus损失成功地回归到半稀疏的ground truth标注。这种方法需要20毫秒的推理时间，因此可以满足自动驾驶汽车的实时性要求。最后，我们在KITTI数据集上评估我们的方法，在深度补全benchmark中我们排名第一。</p>
 
       
@@ -568,7 +560,7 @@ $$\Lambda=w_1\cdot\lambda({\widehat y}_{global},y)+w_2\cdot\lambda({\widehat y}_
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -590,7 +582,7 @@ $$\Lambda=w_1\cdot\lambda({\widehat y}_{global},y)+w_2\cdot\lambda({\widehat y}_
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1007,7 +999,24 @@ $$\Lambda=w_1\cdot\lambda({\widehat y}_{global},y)+w_2\cdot\lambda({\widehat y}_
         }
       });
     </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 

@@ -383,9 +383,7 @@
 
       
         <h1 id="A-Multi-Scale-Guided-Cascade-Hourglass-Network-for-Depth-Completion"><a href="#A-Multi-Scale-Guided-Cascade-Hourglass-Network-for-Depth-Completion" class="headerlink" title="A Multi-Scale Guided Cascade Hourglass Network for Depth Completion"></a>A Multi-Scale Guided Cascade Hourglass Network for Depth Completion</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>（稀疏数据降采样，多尺度级联沙漏模型，多尺度融合及训练，后期融合）</p>
-<p>深度补全是一项在许多计算机视觉应用中必不可少的任务，它是在高分辨率图像的指导下根据稀疏测量估算密集深度图的任务。 建立在全卷积网络上的大多数先前方法无法有效地处理深度图中的各种模式。 我们提出了一个多尺度的引导级联沙漏网络来解决这个问题。不同level的结构由级联网络中的专用沙漏捕获，并具有各种大小的解析输入。 编码器从彩色图像中提取多尺度特征，以为所有沙漏提供深度指导。 多尺度训练策略进一步激活了级联阶段的效果。 通过明确划分每个子模块的角色，我们可以使用简单的体系结构来实现组件。 广泛的实验表明，与KiTTI深度补全基准测试中的最新技术相比，我们的轻量级模型具有竞争性结果，并且运行时的复杂性较低。</p>
-<a id="more"></a>
-
+<p>深度补全是一项在许多计算机视觉应用中必不可少的任务，它是在高分辨率图像的指导下根据稀疏测量估算密集深度图的任务。 建立在全卷积网络上的大多数先前方法无法有效地处理深度图中的各种模式。 我们提出了一个多尺度的引导级联沙漏网络来解决这个问题。不同level的结构由级联网络中的专用沙漏捕获，并具有各种大小的解析输入。 编码器从彩色图像中提取多尺度特征，以为所有沙漏提供深度指导。 多尺度训练策略进一步激活了级联阶段的效果。 通过明确划分每个子模块的角色，我们可以使用简单的体系结构来实现组件。 广泛的实验表明，与KiTTI深度补全基准测试中的最新技术相比，我们的轻量级模型具有竞争性结果，并且运行时的复杂性较低。<br><a id="more"></a></p>
 <h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>精确的深度感应是许多计算机视觉应用（包括自动导航增强现实和无人机）中至关重要的基本组件。 针对这些任务的一种流行解决方案是基于主动深度传感器，因为它们具有精确的测量值。 不幸的是，诸如lidaR和TOF传感器之类的商品级传感器几乎无法生成稀疏的深度图，并且缺少大量数据。例如，将Velodyne liDAR HDL-64e捕获的3D点云投影到图像平面中，将在KITTI数据集中的深度图上产生约4％的有效像素<a href="#21">[21]</a> 。 深度测量的稀缺性使其难以满足高级应用程序的需求。 结果，近年来，深度完成的任务，即从稀疏的输入深度估计密集的深度图，并以对准的高分辨率相机图像为引导，引起了越来越多的关注。</p>
 <p>除了对准确性的要求外，在实际系统中，深度补全方法对运行时间的要求总是很低，并且参数数量很少。 最近的方法<a href="#21">[21，23，10]</a>利用卷积神经网络（cnn）来解决这个问题。 通用卷积内核在整个图像上在空间上共享，因此可以并行高效地处理计算。沙漏形的全卷积网络（FCN）是最流行的骨干之一<a href="#10">[10，5，16]</a>。 沙漏的收缩部分通过一系列向下采样卷积逐渐遍历大范围的视野。 扩展部分通过跳跃连接从收缩部分接收多尺度特征，以应对各种结构。</p>
 <p>尽管以前的研究已经取得了可喜的结果，但简单的沙漏架构实际上并不是深度完成的最佳选择，这主要是由于场景结构在整个相机图像空间中的分布极度不平衡，主要是由于透视投影所致。如图1（a）所示，相较于近处，远处的物体会收缩，并倾向于以相对精细的结构出现。 如图1（b）所示，这种变形导致深度变化更为严重，但远区域的支撑数据点远少于近区域。在这种情况下，应用空间共享滤波器的基于原始CNN的方法无法适合整个图像的异构模式。 收集多尺度特征的沙漏网络具有覆盖各种结构的能力，然而实际的学习表现却不能令人满意。结构的不平衡使得一定规模的图层可能没有得到足够的有效训练。 因此，成功的沙漏总是取决于大量数据训练的大量参数<a href="#13">[13，10，16]</a>。</p>
@@ -403,56 +401,38 @@
 <h3 id="Multi-Scale-Networks-for-Dense-Estimation"><a href="#Multi-Scale-Networks-for-Dense-Estimation" class="headerlink" title="Multi-Scale Networks for Dense Estimation"></a>Multi-Scale Networks for Dense Estimation</h3><p>诸如语义分割和深度预测之类的逐像素推理任务广泛采用了多尺度网络。 一种方法在统一网络中提取和集成多尺度特征。具有跳跃连接的编码器-解码器体系结构<a href="#12">[19，12]</a>是最受欢迎的骨干网之一，它包含一个编码器，用于依次提取多尺度特征，以及一个解码器，用于通过跳跃连接来收集特征。一些方法<a href="#20">[25，1，20]</a>利用空间金字塔池（SPP）块通过不同空间大小的核学习从粗到细的表示。 然而，充分训练这样的网络是具有挑战性的，并且总是需要很长时间。</p>
 <p>另一种方法将输入的大小调整为几个分辨率，然后将其分配给子网络。 每个子网络负责一定规模，最终预测是多规模输出的组合。 <a href="#2">[2]</a>并行部署子网，并结合注意力模型来合并多个估计。<a href="#3">[3]</a>使用堆叠的子网络来恢复从粗到细的像素级标签。 我们的体系结构还包含堆叠网络，以适应各种结构，而子网络则以彩色图像中的多尺度特征为导向。 此外，在训练过程中，我们的子网功能受到多尺度训练策略的明确限制。</p>
 <h3 id="Real-time-Pixel-Wise-Prediction"><a href="#Real-time-Pixel-Wise-Prediction" class="headerlink" title="Real-time Pixel-Wise Prediction"></a>Real-time Pixel-Wise Prediction</h3><p>逐像素的预测方法可通过两种方式实现实时性能。 一些方法<a href="#18">[15，18，17]</a>通过修剪参数来加速模型。 然而，轻量级模型带来的高速是以准确性为代价的。<a href="#24">[24]</a>认为计算复杂度与特征分辨率有关。他们提出了一种具有级联下采样输入的ICNet，以在不牺牲性能的情况下实现实时推断。 我们的网络与ICNet具有相同的优点。 我们适当地利用了低分辨率稀疏输入来对粗略特征进行编码。该设计显着减少了对运行时间的需求，而对模型的容量几乎没有牺牲。</p>
-<h2 id="3-Model"><a href="#3-Model" class="headerlink" title="3. Model"></a>3. Model</h2><h3 id="3-1-Overview"><a href="#3-1-Overview" class="headerlink" title="3.1. Overview"></a>3.1. Overview</h3><p>给定稀疏的深度图$sD$和与$sD$对齐的引导RGB图像I，我们旨在恢复密集的深度图。 为了解决这个问题，我们提出了一个多尺度的级联沙漏网络（MSG-CHN）。管道如图2所示。网络以两种不同的方式处理稀疏深度和图像输入。三个级联的沙漏分别以四分之一大小的稀疏图$sD^2$，一半大小的$sD^1$和完整大小的$sD^0$作为输入，以捕获不同比例的结构。 具有降采样卷积层的RGB编码器应用于图像$I$，以实现多尺度引导功能。 图像和深度特征在深度路径中的每个编码器处进行协调。 残差连接将来自三个沙漏的预测进行整合，以从最粗的$D^2$逐渐恢复到较细的$D^1$的密集深度，最终达到预测$D^0$。 我们在表1中总结了详细的逐层网络配置。</p>
-<img src="/2020/04/06/MSG-CHN/pipeline.png" class="">
-<img src="/2020/04/06/MSG-CHN/tabel1.png" class="">
-
+<h2 id="3-Model"><a href="#3-Model" class="headerlink" title="3. Model"></a>3. Model</h2><h3 id="3-1-Overview"><a href="#3-1-Overview" class="headerlink" title="3.1. Overview"></a>3.1. Overview</h3><p>给定稀疏的深度图$sD$和与$sD$对齐的引导RGB图像I，我们旨在恢复密集的深度图。 为了解决这个问题，我们提出了一个多尺度的级联沙漏网络（MSG-CHN）。管道如图2所示。网络以两种不同的方式处理稀疏深度和图像输入。三个级联的沙漏分别以四分之一大小的稀疏图$sD^2$，一半大小的$sD^1$和完整大小的$sD^0$作为输入，以捕获不同比例的结构。 具有降采样卷积层的RGB编码器应用于图像$I$，以实现多尺度引导功能。 图像和深度特征在深度路径中的每个编码器处进行协调。 残差连接将来自三个沙漏的预测进行整合，以从最粗的$D^2$逐渐恢复到较细的$D^1$的密集深度，最终达到预测$D^0$。 我们在表1中总结了详细的逐层网络配置。<br><img src="/2020/04/06/MSG-CHN/pipeline.png" class=""><br><img src="/2020/04/06/MSG-CHN/tabel1.png" class=""></p>
 <!-- <img src="./MSG-CHN/pipeline.png" style="zoom:80%"  />
 <img src="./MSG-CHN/tabel1.png" style="zoom:80%"  /> -->
-
 <h3 id="3-2-Cascade-Hourglass-Network"><a href="#3-2-Cascade-Hourglass-Network" class="headerlink" title="3.2. Cascade Hourglass Network"></a>3.2. Cascade Hourglass Network</h3><p>深度路径由三个级联的沙漏模块组成，每个模块都以一定的分辨率输入深度图，并在开始时以相同的分辨率进行预测，将1/4大小的稀疏深度馈入第一个沙漏中以预测最粗略的要素比例， 并以与低分辨率输入相同的分辨率进行初始深度估计，沙漏仅需几层即可轻松捕获大型结构，这足以给出场景的抽象。用作参考的初始预测连同第一个沙漏的特征一起被上采样到半分辨率，并输入到以下模块中。 1/2下采样的稀疏深度还参与第二个沙漏，以提供其他详细信息。 中级模块的输出通过剩余连接与初始深度融合，以修改估算值。 基本模块第三次重复使用全分辨率输入，以提供具有细粒度细节的最终密集图。</p>
 <p>基本模块共享相同的网络体系结构。 沙漏子网以初始卷积层开始，以将输入转换为低级特征图。 2个向下采样的图层（每个步幅为2）缩小了特征图的空间大小，并逐渐增加了视场。 然后反卷积层将特征上采样到输入分辨率，以进行像素级预测。为了保持精细的局部信息，我们通过跳过连接将特征集成到不同级别。 RelU在每个卷积之后（最后一层除外）出现，以更好地解决梯度消失问题。</p>
-<p>对稀疏输入进行下采样时，保持尽可能多的信息非常重要。 受<a href="#21">[21]</a>中提出的稀疏不变卷积的启发，我们采用标准平均池化对稀疏图进行下采样。下采样的稀疏深度图$sD^k$上位置$(x,y)$的数据是原始稀疏图$sD$上像素$(2^kx,2^ky)$的有效领域的平均值，其中$2^k$是下采样因子 此操作可以简单地实现为原始图$sD$平均池化的结果和引导图$C$的的除法，其中$C(x，y)=l$表示观察到$sD$中的像素$(x,y)$，否则$C(x，y)=0$。下采样操作$\Phi_{x,y}^k(sD,C)$可以用公式描述为：<br>$$\Phi_{x,y}^k(sD,C)=\frac{\psi_{x,y}^k(sD)}{\psi_{x,y}^k(C)+\varepsilon} \tag{1}$$<br>其中$\psi_{x,y}^k(\cdot)$是平均池化，$\varepsilon$是一个很小的数，避免除数为0。</p>
+<p>对稀疏输入进行下采样时，保持尽可能多的信息非常重要。 受<a href="#21">[21]</a>中提出的稀疏不变卷积的启发，我们采用标准平均池化对稀疏图进行下采样。下采样的稀疏深度图$sD^k$上位置$(x,y)$的数据是原始稀疏图$sD$上像素$(2^kx,2^ky)$的有效领域的平均值，其中$2^k$是下采样因子 此操作可以简单地实现为原始图$sD$平均池化的结果和引导图$C$的的除法，其中$C(x，y)=l$表示观察到$sD$中的像素$(x,y)$，否则$C(x，y)=0$。下采样操作$\Phi_{x,y}^k(sD,C)$可以用公式描述为：</p>
+<script type="math/tex; mode=display">\Phi_{x,y}^k(sD,C)=\frac{\psi_{x,y}^k(sD)}{\psi_{x,y}^k(C)+\varepsilon} \tag{1}</script><p>其中$\psi_{x,y}^k(\cdot)$是平均池化，$\varepsilon$是一个很小的数，避免除数为0。</p>
 <h3 id="3-3-Multi-Scale-Guidance"><a href="#3-3-Multi-Scale-Guidance" class="headerlink" title="3.3. Multi-Scale Guidance"></a>3.3. Multi-Scale Guidance</h3><p>根据先前工作<a href="#10">[10，20]</a>的指示，应将不同模式的信息与它们的高级功能结合起来，我们设计了一种特殊的路径方法，用于从RGB信号中学习引导功能。</p>
 <p>图像路径包含单个收缩网络以对引导信息进行编码，与稀疏深度图不同，RGB图像具有丰富的信息，因此，我们不像深度分支那样对图像进行手动下采样。 取而代之的是，我们从全分辨率图像开始，并使用降采样卷积层提取多尺度特征。 经过4层向下采样卷积的堆叠层，每个层的步幅为2，最深的特征图达到原始输入大小的1/16空间分辨率，这与深度分支中的最小空间特征大小一致.</p>
 <p>所提取的多尺度图像特征以深度路径的方式在解码器阶段与深度特征合并。 特别是，我们的深度分支由3个具有不同空间分辨率的预测模块组成。 我们在每个深度解码器中结合了具有相同分辨率的RGB特征和深度特征。这样，所有深度沙漏都可以在图像引导下预测密集的特征图。 通过我们的设计，级联网络中的解码层始终可以找到具有相应分辨率RGB的制导特征，并通过加法运算融合深度特征，从而压缩解码器中特征通道的长度。</p>
-<h2 id="4-Training-with-Multi-Scale-Supervision"><a href="#4-Training-with-Multi-Scale-Supervision" class="headerlink" title="4. Training with Multi-Scale Supervision"></a>4. Training with Multi-Scale Supervision</h2><p>为了进一步激活每个功能，我们通过使用多尺度ground truth在中间监督下训练网络。 我们使得每个子模块的输出以相应的分辨率接近于ground truth。总的损失函数$L$是$D^2$，$D^1$和$D^0$的$L_2$损失的总和。<br>$$L=\omega_2\frac1N\sum_{i=1}^NL_2(D_i^2,\widehat D_i^2)+\omega_1\frac1N\sum_{i=1}^NL_2(D_i^1,\widehat D_i^1)+\omega_0\frac1N\sum_{i=1}^NL_2(D_i^0,\widehat D_i^0) \tag{2}$$<br>其中$i$是像素的索引，N是深度图像素的总个数$\widehat D_i^2$，$\widehat D_i^1$和$\widehat D_i^0$分别是真值图在四分之一，二分之一和全尺寸分辨率。</p>
+<h2 id="4-Training-with-Multi-Scale-Supervision"><a href="#4-Training-with-Multi-Scale-Supervision" class="headerlink" title="4. Training with Multi-Scale Supervision"></a>4. Training with Multi-Scale Supervision</h2><p>为了进一步激活每个功能，我们通过使用多尺度ground truth在中间监督下训练网络。 我们使得每个子模块的输出以相应的分辨率接近于ground truth。总的损失函数$L$是$D^2$，$D^1$和$D^0$的$L_2$损失的总和。</p>
+<script type="math/tex; mode=display">L=\omega_2\frac1N\sum_{i=1}^NL_2(D_i^2,\widehat D_i^2)+\omega_1\frac1N\sum_{i=1}^NL_2(D_i^1,\widehat D_i^1)+\omega_0\frac1N\sum_{i=1}^NL_2(D_i^0,\widehat D_i^0) \tag{2}</script><p>其中$i$是像素的索引，N是深度图像素的总个数$\widehat D_i^2$，$\widehat D_i^1$和$\widehat D_i^0$分别是真值图在四分之一，二分之一和全尺寸分辨率。</p>
 <p>在训练过程中我们采取多阶段的策略，在前10个epoch，$\omega_2=\omega_1=\omega_0=1$，然后$\omega_2=\omega_1=0.1$以增强训练结果，在20个epoch之后$\omega_2=\omega_1=0$。</p>
 <h2 id="5-Experiment"><a href="#5-Experiment" class="headerlink" title="5. Experiment"></a>5. Experiment</h2><p>在本节中，我们对KITTI深度补全基准进行了消融研究并与相关工作进行了比较，以验证我们方法的设计。 KITTI基准测试提供了由velodyne liDAR HDL-64e捕获的稀疏深度图，对齐的RGB图像和半密集的ground truth，这是累积的LidaR和立体估计的重合深度。 数据集包含85895个训练数据，1000个选定的验证样本和1000个没有ground truth的测试数据。 由于我们有限的计算能力，消融研究中的网络仅在训练集中的10000个样本上进行训练。</p>
 <p>我们的网络在PyTorch中实现。 所有模型都用Adam<a href="#11">[11]</a>进行了优化（$\beta_1=0.9,\beta_2=0.999$）。学习率从0.01开始，每5个epoch减少一半。 我们训练31个epoch，批处理大小为4。进行随机裁剪和左右翻转作为数据增强。 训练图被裁剪为1216x352的分辨率。 我们使用随机参数初始化网络。正则化的衰减权重为$2\times 10^{-4}$。</p>
 <p>为了进行评估，我们报告了四个常用度量：均方误差（MAE，mm），均方根误差（RMSE，mm）以及在他们在深度图上的倒数iMaE（1 / km）和iRMSE（1 / km）。</p>
-<h3 id="5-1-Ablation-Study"><a href="#5-1-Ablation-Study" class="headerlink" title="5.1. Ablation Study"></a>5.1. Ablation Study</h3><h4 id="a-Veriﬁcation-of-Cascade-Hourglass-Architecture"><a href="#a-Veriﬁcation-of-Cascade-Hourglass-Architecture" class="headerlink" title="a) Veriﬁcation of Cascade Hourglass Architecture"></a>a) Veriﬁcation of Cascade Hourglass Architecture</h4><p>为了调查我们的架构设计，我们测试了通过几种不同的网络配置来处理稀疏深度和彩色图像。 网络变体的示意图如图3所示，比较结果列于表2。 我们将MSG-CHN结构命名为$sD(chn)I(e)$，这意味着稀疏深度路径是级联的沙漏架构，而图像路径是单个编码器。$sD(e)I(e)-a$是一种变体，其中深度和图像路径都是单个多尺度编码器，解码器协调两个特征以进行预测。 $sD(e)I(e)-b$使$sD(e)I(e)-a$的通道长度加倍。$sD(e)I(chn)$中的稀疏深度通过单个编码器，而图像经过堆叠的沙漏。$sDI(chn)$在输入阶段执行数据融合，并将RGBD输入带入chn架构。$sDl(e)$包含一个沙漏来处理RGBD输入。$sD(e)I(e)-a$，$sD(e)I(e)-b$和$sDI(e)$属于深度补全的典型pipeline。</p>
-<img src="/2020/04/06/MSG-CHN/DifferentArchitectural.png" class="">
-<img src="/2020/04/06/MSG-CHN/Tabel2.png" class="">
-
+<h3 id="5-1-Ablation-Study"><a href="#5-1-Ablation-Study" class="headerlink" title="5.1. Ablation Study"></a>5.1. Ablation Study</h3><h4 id="a-Veriﬁcation-of-Cascade-Hourglass-Architecture"><a href="#a-Veriﬁcation-of-Cascade-Hourglass-Architecture" class="headerlink" title="a) Veriﬁcation of Cascade Hourglass Architecture"></a>a) Veriﬁcation of Cascade Hourglass Architecture</h4><p>为了调查我们的架构设计，我们测试了通过几种不同的网络配置来处理稀疏深度和彩色图像。 网络变体的示意图如图3所示，比较结果列于表2。 我们将MSG-CHN结构命名为$sD(chn)I(e)$，这意味着稀疏深度路径是级联的沙漏架构，而图像路径是单个编码器。$sD(e)I(e)-a$是一种变体，其中深度和图像路径都是单个多尺度编码器，解码器协调两个特征以进行预测。 $sD(e)I(e)-b$使$sD(e)I(e)-a$的通道长度加倍。$sD(e)I(chn)$中的稀疏深度通过单个编码器，而图像经过堆叠的沙漏。$sDI(chn)$在输入阶段执行数据融合，并将RGBD输入带入chn架构。$sDl(e)$包含一个沙漏来处理RGBD输入。$sD(e)I(e)-a$，$sD(e)I(e)-b$和$sDI(e)$属于深度补全的典型pipeline。<br><img src="/2020/04/06/MSG-CHN/DifferentArchitectural.png" class=""><br><img src="/2020/04/06/MSG-CHN/Tabel2.png" class=""></p>
 <!-- <img src="./MSG-CHN/DifferentArchitectural.png" style="zoom:80%"  />
 <img src="./MSG-CHN/Tabel2.png" style="zoom:80%"  /> -->
 <p>将$sDI(chn)$的结果与$sDl(e)$的结果进行比较，我们发现，即使在最早融合的数据中，级联网络也显示出优于单级网络的优势。 而且，用其他配置替换任何当前组件都会导致性能下降$sD(e)I(e)-a/b$，$sD(e)I(chn)$）和$sD(chn)I(chn)$。稀疏深度可以在开始时进行下采样以进行多尺度处理，而具有子采样卷积的单个编码器适用于图像数据。（还可以看出图像数据和深度数据早期融合的效果不如后期融合）</p>
 <h4 id="b-Veriﬁcation-of-The-Multi-Scale-Designs"><a href="#b-Veriﬁcation-of-The-Multi-Scale-Designs" class="headerlink" title="b) Veriﬁcation of The Multi-Scale Designs"></a>b) Veriﬁcation of The Multi-Scale Designs</h4><p>为了研究使用多尺度输入的效果，我们比较了两个变体，CHN将全分辨率输入输入到所有三个沙漏，并且图像路径中的编码器为三个网络提供了相同的尺度指导信息。CHN-D还接受单调的分辨率输入和图像指导，同时在每个深度编码器的末尾添加了dilated residual blocks<a href="#22">[22]</a>，用于捕获多尺度结构。 为了保持与我们相同的接收场，我们在第一个沙漏中添加了四个dilated层，将dilated设置为2、2、4和1。在第二个沙漏中添加了两个dilated为2和l的层。</p>
 <p>表3中的结果表明，CHN的准确性和效率都受到性能下降的影响，这是因为没有多尺度输入和指导的重复网络缺乏描述各种结构的能力。全尺寸输入会带来额外的计算负担。 并将已dilated的块添加到CHN。 CHN-d变体能够应对多尺度特征，并达到与我们提出网络相似的精度。 然而，计算复杂度甚至进一步增加。 通过比较，可以证明我们的具有多尺度输入的网络有效且有效地处理了多种模式并同时降低了计算复杂性。</p>
-<h4 id="c-Effect-of-the-Sampling-Strategy"><a href="#c-Effect-of-the-Sampling-Strategy" class="headerlink" title="c) Effect of the Sampling Strategy"></a>c) Effect of the Sampling Strategy</h4><p>我们将稀疏深度图下采样到不同分辨率，以供网络学习多尺度预测，同时加快计算速度。 在这里，我们分析了不同的下采样策略的影响。 在表4中，我们将最终结果与通过直接网格采样，双线性采样，平均池化，最大池化以及等式（1）中介绍的策略采样的输入进行了比较。采样稀疏数据而不考虑无效位置会导致精度大大降低。 最大池化在某种程度上控制了无效数据的负面影响，但仍略逊于引入的策略。这些直接的下采样操作不适用于稀疏数据。 如图4所示，直接在网格上采样会导致确定的数据消失。双线性下采样和平均池化会污染带有无效零值的结果。 此外，最大池化会破坏内部结构。</p>
-<img src="/2020/04/06/MSG-CHN/SparseDownSampling.png" class="">
-<!-- <img src="./MSG-CHN/SparseDownSampling.png" style="zoom:80%"  /> -->
-
-<h4 id="d-Veriﬁcation-of-The-Multi-Scale-Training"><a href="#d-Veriﬁcation-of-The-Multi-Scale-Training" class="headerlink" title="d) Veriﬁcation of The Multi-Scale Training"></a>d) Veriﬁcation of The Multi-Scale Training</h4><p>为了验证多尺度辅助训练的有效性，我们与没有中间监督（无中间监督）的端到端训练模型进行了比较。表5的结果表明引入中间监督可以提高绩效。 我们在图5中可视化每个沙漏的示例中间预测。通过我们的多尺度训练，第一个沙漏学会了给出场景深度的粗略抽象。 接下来的阶段逐步提供相应规模的详细信息。</p>
-<img src="/2020/04/06/MSG-CHN/Figure5&Tabel5.png" class="">
-<!-- <img src="./MSG-CHN/Figure5&Tabel5.png" style="zoom:80%"  /> -->
-
+<h4 id="c-Effect-of-the-Sampling-Strategy"><a href="#c-Effect-of-the-Sampling-Strategy" class="headerlink" title="c) Effect of the Sampling Strategy"></a>c) Effect of the Sampling Strategy</h4><p>我们将稀疏深度图下采样到不同分辨率，以供网络学习多尺度预测，同时加快计算速度。 在这里，我们分析了不同的下采样策略的影响。 在表4中，我们将最终结果与通过直接网格采样，双线性采样，平均池化，最大池化以及等式（1）中介绍的策略采样的输入进行了比较。采样稀疏数据而不考虑无效位置会导致精度大大降低。 最大池化在某种程度上控制了无效数据的负面影响，但仍略逊于引入的策略。这些直接的下采样操作不适用于稀疏数据。 如图4所示，直接在网格上采样会导致确定的数据消失。双线性下采样和平均池化会污染带有无效零值的结果。 此外，最大池化会破坏内部结构。<br><img src="/2020/04/06/MSG-CHN/SparseDownSampling.png" class=""><br><!-- <img src="./MSG-CHN/SparseDownSampling.png" style="zoom:80%"  /> --></p>
+<h4 id="d-Veriﬁcation-of-The-Multi-Scale-Training"><a href="#d-Veriﬁcation-of-The-Multi-Scale-Training" class="headerlink" title="d) Veriﬁcation of The Multi-Scale Training"></a>d) Veriﬁcation of The Multi-Scale Training</h4><p>为了验证多尺度辅助训练的有效性，我们与没有中间监督（无中间监督）的端到端训练模型进行了比较。表5的结果表明引入中间监督可以提高绩效。 我们在图5中可视化每个沙漏的示例中间预测。通过我们的多尺度训练，第一个沙漏学会了给出场景深度的粗略抽象。 接下来的阶段逐步提供相应规模的详细信息。<br><img src="/2020/04/06/MSG-CHN/Figure5&Tabel5.png" class=""><br><!-- <img src="./MSG-CHN/Figure5&Tabel5.png" style="zoom:80%"  /> --></p>
 <h4 id="e-The-Number-of-Cascade-Hourglasses"><a href="#e-The-Number-of-Cascade-Hourglasses" class="headerlink" title="e) The Number of Cascade Hourglasses"></a>e) The Number of Cascade Hourglasses</h4><p>我们在深度路径中研究了正确数量的沙漏。沙漏的数量在1-4之间，RMSE和运行时间的变化趋势如图6所示。当减少沙漏的数量时，我们从最低分辨率开始，以确保最后一个沙漏始终是最细粒度的。也就是说，一个沙漏架构仅包含CHN中的最后一个组件，而两个沙漏架构则包含最后两个。追加架构时，我们的MSG-CHN会跟随另一个具有全分辨率输入的沙漏。</p>
-<p>图6显示，随着引入更多的沙漏，总数不超过3个，误差显着减少，并且运行时间仅在有限的范围内增加。 然而。 一旦添加了第四个沙漏，误差的减少就变得微不足道了，而运行时间的增加变得显而易见。 我们可以得出以下结论：（1）前三个沙漏的效果是互补的。 （2）通过低分辨率网络的推理速度很快，而通过高分辨率网络的推理速度很慢。 （3）使用三个沙漏是精度和速度之间的一个不错的平衡</p>
-<img src="/2020/04/06/MSG-CHN/Figure6.png" class="">
-
+<p>图6显示，随着引入更多的沙漏，总数不超过3个，误差显着减少，并且运行时间仅在有限的范围内增加。 然而。 一旦添加了第四个沙漏，误差的减少就变得微不足道了，而运行时间的增加变得显而易见。 我们可以得出以下结论：（1）前三个沙漏的效果是互补的。 （2）通过低分辨率网络的推理速度很快，而通过高分辨率网络的推理速度很慢。 （3）使用三个沙漏是精度和速度之间的一个不错的平衡<br><img src="/2020/04/06/MSG-CHN/Figure6.png" class=""></p>
 <!-- <img src="./MSG-CHN/Figure6.png" style="zoom:80%"  /> -->
-
 <h3 id="5-2-Overall-Performance"><a href="#5-2-Overall-Performance" class="headerlink" title="5.2. Overall Performance"></a>5.2. Overall Performance</h3><p>在本节中，我们利用KITTI深度补全的验证和测试集与当前公开可用的最新技术进行比较。最终模型将使用KITTI基准所提供的所有训练数据进行训练。我们将模型通道从32增加到64，以获得最终结果。表6报告了定量评估结果，图7显示了几个示例图。</p>
 <p>与KITTI基准测试中的顶级方法相比，我们的方法具有竞争优势，并且运行时间和模型复杂度均较低。 所提出模型的参数数量为DeepliDAR<a href="#16">[16]</a>的百分之一，而精度的牺牲却微不足道。</p>
-<p>图7中的定性结果表明，我们的方法可以充分处理大型结构以及精细的细节。 具体来说，我们可以正确地恢复大型汽车的边界（以黄色框标记）以及标志的细粒度形状（以蓝色框内的箭头指出），而其他方法则不可以。</p>
-<img src="/2020/04/06/MSG-CHN/Tabel6.png" class="">
-<img src="/2020/04/06/MSG-CHN/Figure7.png" class="">
-
+<p>图7中的定性结果表明，我们的方法可以充分处理大型结构以及精细的细节。 具体来说，我们可以正确地恢复大型汽车的边界（以黄色框标记）以及标志的细粒度形状（以蓝色框内的箭头指出），而其他方法则不可以。<br><img src="/2020/04/06/MSG-CHN/Tabel6.png" class=""><br><img src="/2020/04/06/MSG-CHN/Figure7.png" class=""></p>
 <!-- <img src="./MSG-CHN/Tabel6.png" style="zoom:80%"  />
 <img src="./MSG-CHN/Figure7.png" style="zoom:80%"  /> -->
-
 <h2 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6. Conclusion"></a>6. Conclusion</h2><p>在这项工作中，我们提出了一个轻量级的多级引导级联沙漏网络来完成深度补全任务。级联网络由简单的沙漏和稀疏的深度输入组成，这些稀疏的深度输入具有多种比例，以特定地应对各种结构。 每个沙漏从RGB编码器接收不同级别的引导。 鼓励子网络通过多尺度学习策略专注于特定模式。 通过分配具有特定功能的模块，可以使用简单的体系结构来实现网络，我们可以根据KITTI基准进行全面分析，并以较低的运行时间和轻巧的方式获得具有竞争力的精度。</p>
 
       
@@ -582,7 +562,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -604,7 +584,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1021,7 +1001,24 @@
         }
       });
     </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 

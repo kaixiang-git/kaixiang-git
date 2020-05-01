@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,图像去噪,强化学习," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Path-Restore: Learning Network Path Selection for Image  Restoration（为不同的图像区域选择不同路径的CNN） Hexo下Latex无法正常显示的终极解决方案：更换Hexo的Markdown渲染引擎并修改转义字符。 原因是hexo先用marked.js渲染，然后再交给MathJax渲染。在marked.js渲染的时候下划线_是被es">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Path-Restore">
+<meta property="og:url" content="http://yoursite.com/2020/05/01/Path-Restore/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="Path-Restore: Learning Network Path Selection for Image  Restoration（为不同的图像区域选择不同路径的CNN） Hexo下Latex无法正常显示的终极解决方案：更换Hexo的Markdown渲染引擎并修改转义字符。 原因是hexo先用marked.js渲染，然后再交给MathJax渲染。在marked.js渲染的时候下划线_是被es">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure1.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure2.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Alg1.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Tabel1.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Tabel2.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure3.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure4.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure5.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure6.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Table4.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure7.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Tabel5.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure8.png">
+<meta property="og:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure9.png">
+<meta property="article:published_time" content="2020-05-01T02:35:09.000Z">
+<meta property="article:modified_time" content="2020-05-01T06:21:50.549Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="图像去噪">
+<meta property="article:tag" content="强化学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/05/01/Path-Restore/Figure1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/05/01/Path-Restore/"/>
+
+
+
+
+
+  <title>Path-Restore | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About-me" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/05/01/Path-Restore/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Path-Restore</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-05-01T10:35:09+08:00">
+                2020-05-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B2%BE%E8%AF%BB%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">精读论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/05/01/Path-Restore/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/05/01/Path-Restore/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/05/01/Path-Restore/" class="leancloud_visitors" data-flag-title="Path-Restore">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Path-Restore-Learning-Network-Path-Selection-for-Image-Restoration"><a href="#Path-Restore-Learning-Network-Path-Selection-for-Image-Restoration" class="headerlink" title="Path-Restore: Learning Network Path Selection for Image  Restoration"></a>Path-Restore: Learning Network Path Selection for Image  Restoration</h1><p>（为不同的图像区域选择不同路径的CNN）</p>
+<p>Hexo下Latex无法正常显示的终极解决方案：更换Hexo的Markdown渲染引擎并修改转义字符。</p>
+<p>原因是hexo先用marked.js渲染，然后再交给MathJax渲染。在marked.js渲染的时候下划线_是被escape掉并且换成了em标签，即斜体字，另外LaTeX中的\\也会被转义成一个\，这样会导致MathJax渲染时不认为它是一个换行符了。</p>
+<ul>
+<li>针对下划线的问题，取消_作为斜体转义，因为marked.js中*也是斜体的意思，所以取消掉_的转义并不影响我们使用markdown，只要我们习惯用*作为斜体字标记就行了。</li>
+<li>针对marked.js与Mathjax对于个别字符二次转义的问题，我们只要不让marked.js去转义\\,\{,\}在MathJax中有特殊用途的字符就行了。</li>
+</ul>
+<p>hexo-renderer-marked的基础上修改了一些bug，两者比较接近，也比较轻量级。</p>
+<pre><code>npm uninstall hexo-renderer-marked –save
+npm install hexo-renderer-kramed –save
+</code></pre><p>之后修改Latex与Markdown有语法冲突的地方，<br>在博客根目录下，进入node_modules\kramed\lib\rules\inline.js，把第11行的escape变量的值做相应的修改：</p>
+<pre><code>//escape: /^\\([\\`*{}\[\]()#$+\-.!_&gt;])/,
+escape: /^\\([`*\[\]()#$+\-.!_&gt;])/,
+</code></pre><p>同时把第20行的em变量也要做相应的修改:</p>
+<pre><code>//  em: /^\b_((?:__|[\s\S])+?)_\b|^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+</code></pre><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>非常深的卷积神经网络（CNN）极大地提高了各种图像恢复任务的性能。但是，这是以增加计算负担为代价的，这限制了它们的实际使用。我们认为，某些损坏的图像区域本来就比其他区域容易恢复，因为图像中的失真部分和内容部分差别很大。为此，我们提出了Path-Restore，即具有路径查找器的多路径CNN，它可以为每个图像区域动态选择合适的路线。我们使用具有难度调节奖励的强化学习训练查找器，这与性能，复杂性和“恢复区域的难度”有关。我们进行降噪和混合恢复任务的实验。结果表明，我们的方法可以以较低的计算成本实现与现有方法相当或更高的性能。特别地，我们的方法对于现实世界中的降噪有效，在降噪中，噪声分布在单个图像的不同区域之间变化。我们比最新的CBDNet[13]高出0.94 dB，在真实的darmstadt噪声数据集[27]上运行速度提高了29％。型号和代码将发布。<br><a id="more"></a></p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1.Introduction"></a>1.Introduction</h2><p>图像恢复旨在从失真的观察结果中估计出清晰的图像。 非常深的卷积神经网络（CNN）在各种恢复任务上都取得了巨大的成功。 例如，在ntire 2018挑战[32]中，顶级的超分辨率方法是基于非常深的模型构建的，例如EDSr[23]和DenseNet[15]，即使输入图像被噪声和模糊破坏，也可以获得令人印象深刻的性能。但是，随着网络的不断深入，计算成本的不断增加使其在实际应用中的实用性降低。</p>
+<p>我们真的需要一个很深的cnn来处理失真图像的所有区域吗？实际上，单个图像中可能存在图像内容和失真的大量变化，并且某些区域本来就比其他区域更容易处理。 图1中显示了一个示例，其中我们使用了多个深度不同的降噪CNN来恢复噪点图像。 可以观察到，使用5层cnn可以很好地恢复红色框中具有轻微噪声的平滑区域，并且进一步增加网络深度几乎不会带来任何改善。 在绿色框中，类似的平滑区域但具有严重的噪声，需要处理12层cnn，而蓝色框中的纹理区域在经过20层CNN处理后仍然存在一些伪影。 此观察结果激发了通过根据区域的内容和失真为每个区域选择最佳网络路径来节省计算的可能性。<br><img src="/2020/05/01/Path-Restore/Figure1.png" class=""><br><!-- ![](Path-Restore/Figure1.png) --></p>
+<p>在这项研究中，我们提出了“路径还原”，这是一种新颖的框架，可以为具有特定内容和失真的每个图像区域动态选择路径。 特别是，将路径查找器与多路径CNN一起训练，以找到每个图像区域的最佳调度策略。 由于路径选择是不可微分的，因此在增强学习（RL）框架中对路径查找器进行了训练，该框架由鼓励高性能和少计算的奖励驱动。 主要有两个挑战。 首先，多路径CNN应该能够以有限的计算来处理各种各样的失真。 其次，路径查找器需要提供有意义的奖励，才能针对不同的内容且已被破坏的不同地区域学习良好的策略。</p>
+<p>解决这个问题我们的文章有两大贡献：</p>
+<ul>
+<li>我们将动态模块块设计为多路径CNN的基本单元。一个动态模块包含一个共享路径，其后是多个具有不同复杂度的动态路径。 所提出的框架允许根据手头的具体任务灵活地设计路径数量和路径复杂性。</li>
+<li>我们设计了一种难度调节的奖励，与传统的奖励功能不同，这种奖励比简单的样本更看更难恢复的样本的性能增益。 具体地，难度调节的奖励通过表示恢复该区域的难度的自适应系数来缩放不同区域的性能增益。 难度与损失函数成正比（例如，MSE损失），因为损失较大表明该区域难以恢复，例如图1中的蓝色框。我们通过实验发现，这种奖励有助于路径查找器学习合理的调度策略。</li>
+</ul>
+<p>所提出的方法与探索动态处理输入图像的方法的几项著作有很大不同。[39]提出了一种RL-Restore，该RL-Restore动态选择一系列小Cnns以恢复失真的图像。[37]和[33]提出对每张图像动态跳过ResNet[14]中的某些块，以实现快速推理，同时保持良好的图像分类任务性能。这些现有的动态网络均等的对待所有图像区域，因此不能满足我们选择不同路径的需求。我们在相关工作部分提供更多讨论。</p>
+<p>我们总结一下path-Restore的优点：</p>
+<ul>
+<li>由于采用动态路径选择机制，我们的方法在各种恢复任务上具有与现有方法相当或更高的性能，并且速度更快。 </li>
+<li>我们的方法在现实世界中的降噪中特别有效，在降噪中，图像中的噪声分布在空间上是变化的。 我们在逼真的Darmstadt噪声数据集（DND）[27]基准上实现了最先进的性能。 </li>
+<li>我们的方法通过在训练过程中简单地调整提出的奖励函数中的参数就能够平衡性能和复杂性之间的权衡。</li>
+<li>在RL-Restore[39]之后，对于解决图像还原问题，这是将强化学习与深度学习相结合的又一次成功尝试。</li>
+</ul>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2.Related Work"></a>2.Related Work</h2><p><strong>CNN for Image Restoration.</strong>图像恢复已被广泛研究了数十年。 基于CNN的方法在以下几项恢复任务中均取得了显着改善：去噪[22、16、6、13]，去模糊[38、30、26]，去块[8、35、11、12]和超分辨率[9， 18，19，31,21,34]</p>
+<p>尽管以前的大多数论文都着重于解决特定的退化问题，但一些开创性的工作旨在同时处理各种各样的失真。[40]提出了使用单个cnn来解决不同水平的高斯噪声的DnCnn。[13]开发CBDNet来估计噪声图作为处理各种真实噪声的条件。但是，使用单个路径处理所有图像区域会使这些方法效率较低，具有轻微失真的平滑区域不需要深度网络来还原.</p>
+<p>[39]提出RL-Restore来解决混合失真。 RL-Restore是一项开创性的工作，它在解决图像恢复问题时应用了深度强化学习。 他们的方法自适应地选择一系列cnns来处理每个失真的图像，从而在使用较少的计算资源的情况下使用单个深度网络获得可比的性能。与RL-Restore需要手动设计十二个cnns的方法不同，我们仅使用一个网络就可以实现动态处理。 因此，我们的方法可以更轻松地迁移和推广到各种任务。我们还根据经验发现，当处理大图像时，与Rl-Restore相比，我们的方法运行速度更快，并且产生的空间一致性结果更高。 而且，我们的框架具有灵活性，仅通过调整奖励函数就可以在性能和复杂性之间进行权衡，这在[39]中是不可能的。</p>
+<p><strong>Dynamic Networks.</strong>动态网络可以在不同任务中在速度和性能之间实现更好的折衷。[5]使用条件计算来一次选择性地激活网络的一部分。 近年来，人们提出了几种方法[10、37、33]，以通过动态跳过一些残差块来节省ResNet[14]中的计算成本。 虽然上述方法主要解决单个任务。[28]开发路由网络以促进多任务学习，他们的方法为每个特定任务寻找合适的网络路径。 但是，路径选择与每个任务中的图像内容无关。</p>
+<p>现有的动态网络成功地探索了一种路由策略，该策略取决于整个图像内容或要处理的任务。 但是，我们的目标是选择动态路径来处理失真图像的不同区域。 在这种情况下，内容（例如，平滑区域或丰富的纹理）和恢复任务（例如 g，失真类型和严重性）对性能有重要影响，因此在选择路径时应同时考虑它们。 为了解决这一特定挑战，我们提出了一个动态模块来提供多种路径，并采用了难度可调的奖励方式来有效地训练路径查找器。 这些贡献是文献中的新内容</p>
+<h2 id="3-Methodology"><a href="#3-Methodology" class="headerlink" title="3.Methodology"></a>3.Methodology</h2><p>我们的任务是从变形的观测值x中恢复清晰的图像y。 可能存在多种类型的失真（例如 g，模糊和噪点），每种失真的严重程度可能有所不同。 我们希望我们的方法能够有效地扩展到复杂的还原任务。 因此，挑战主要有两个方面。首先，网络应该能够有效解决各种各样的失真。其次，路径查找器需要提供有意义的奖励，才能根据每个图像区域的内容和失真来学习有效的分发策略。</p>
+<p>我们提出路径还原来解决上述挑战。 我们首先概述3.1节中的路径还原的体系结构。然后在3.2节，我们介绍路径查找器的结构和评估其策略的奖励。最后在3.3节中，我们详细介绍了训练算法。<br><img src="/2020/05/01/Path-Restore/Figure2.png" class=""><br><!-- ![](Path-Restore/Figure2.png) --></p>
+<h3 id="3-1-Architecture-of-Path-Restore"><a href="#3-1-Architecture-of-Path-Restore" class="headerlink" title="3.1.Architecture of Path-Restore"></a>3.1.Architecture of Path-Restore</h3><!--  -->
+
+我们旨在设计一个可以提供不同复杂性选项的框架。 为此，如图2所示，路径还原由起点和终点的卷积层以及中间的N个动态块组成。 在第$i$个动态块$f^i_{DB}$中，每个图像区域都应经过一个共享路径$f^i_S$。 平行于共享路径，路径查找器$f_{PF}$生成可能路径的概率分布以供选择。在共享路径之后，有$M$条动态路径，分别由$f^i_1,f^i_2,...,f^i_M$表示。 每个动态路径都包含一个剩余块，但第一个路径是旁路连接。 根据路径查找器的输出，将激活概率最高的动态路径，其中路径索引由$a_i$表示。 因此，第$i$个动态块可以表示为:
+$$x_{i+1}=f^i_{a_i}(f^i_S(x_i)) \tag{1}$$
+其中$x_i$和$x_{i+1}$表示第$i$个动态模块的输入和输出。需要注意的是在两个不同的动态模块中，对应的两条路径的参数不同，但是路径查找器的参数相同。
+
+从等式（1）可以看出，图像特征经过共享路径和一条动态路径。 共享路径旨在探索不同任务和图像之间的相似性。 动态路径提供了复杂性的不同选择。 直观上，应该将简单的样本引导至旁路路径以节省计算，而根据其内容和失真，可以将困难的示例引导至另一路径。 可以根据特定任务中失真类型的复杂性来设计动态路径的数量。 我们在实验中展示了各种选择。
+
+<!--  -->
+<h3 id="3-2-Pathﬁnder"><a href="#3-2-Pathﬁnder" class="headerlink" title="3.2.Pathﬁnder"></a>3.2.Pathﬁnder</h3><p>路径查找器是实现路径选择的关键组件。 如图2所示，路径查找器包含$C$个卷积层，然后是两个全连接层，中间是一个长短期记忆（LSTM）模块。卷积层的数量取决于特定任务，这将在第四节中指定。 LSTM模块用于捕获不同动态块中路径选择的相关性。路径查找器占总计算量的不到3％。</p>
+<p>由于路径选择是不可微的，因此我们将顺序路径选择公式化为马尔可夫决策过程（MDP），并采用强化学习来训练路径查找器。我们将首先阐明该MDP的状态和动作，然后说明提出的难度调节奖励以训练路径查找器。</p>
+<p><strong>State and Action.</strong>在第$i$个动态模块，状态$s_i$由输入特征$x_i$和隐藏的LSTM状态$h_i$组成，表示为$s_i=\{x_i,h_i\}$。给定状态$s_i$，路径查找器$f_{PF}$生成路径选择的概率分布，可以被公式化为$f_{PF}(s_i)=\pi(a|s_i)$。在训练阶段，动作（即路径索引）就是从概率分布中采样，表示为$a_i\sim \pi(a|s_i)$。在测试阶段，动作就是选择概率最高的那条路径，即$a_i=argmax_a\pi(a|x_i)$。</p>
+<p><strong>Difﬁculty-Regulated Reward.</strong> 在RL框架中，路径查找器经过训练以使累积奖励最大化，因此正确设计奖励功能至关重要。 现有的用于分类的动态模型[37，33]通常使用精度和计算之间的权衡作为奖励。 但是，在我们的任务中，需要更有效的奖励，以针对具有不同内容和失真的不同图像区域学习合理的分发策略。 因此，我们提出了一种难度调节的奖励，该奖励不仅考虑性能和复杂性，而且还取决于恢复图像区域的难度。特别是，将第$i$个动态块的奖励表示为：</p>
+<script type="math/tex; mode=display">r_i=\left\{\begin{array}{ll}-p(1-1_{\{1\}}(a_i)),&1\leq i<N \\\\ -p(1-1_{\{1\}}(a_i))+d(-\bigtriangleup L_2),&i=N\end{array}\right.\tag{2}</script><p>其中$p$是在一个动态模块中选择复杂路径的奖励函数的惩罚，$1_{\{1\}}(\cdot)$是一个指标功能，$a_i$是在第$i$个动态模块中选择路径的索引，当第一条路经（短路路径）被选择时，$a_i=1$，此时奖励函数不会被惩罚。在第$N$个动态模块中才会评估性能和难度。特别的，$-\bigtriangleup L_2$表示以$L_2$为损失函数的性能表现，难度在下面的公式中表示为$d$：</p>
+<script type="math/tex; mode=display">d\left\{\begin{array}{cc}L_d/L_0,&0\leq L_d<L_0 \\\\ 1,&L_d\geq L_0\end{array}\right. \tag{3}</script><p>其中$L_d$是输出图像损失函数，$L_0$是一个阈值。当$L_d$接近零时，难度$d$减小，表明输入区域易于恢复。 在这种情况下，性能增益由$d&lt;1$调节，并且奖励也变小，因此提出的难度调节的奖励将对路径查找器造成惩罚，因为它浪费了太多计算力在容易区域上。$L_d$有多种选择，例如$L_2$损失和VGG损失[17]，不同的损失函数可能导致不同的路径选择策略。</p>
+<h3 id="3-3-Training-Algorithm"><a href="#3-3-Training-Algorithm" class="headerlink" title="3.3.Training Algorithm"></a>3.3.Training Algorithm</h3><p>训练过程分为两个阶段。 在第一阶段，我们使用随机选择路径的策略训练多路径CNN，作为良好的初始化。在第二阶段，我们随后同时训练路径查找器和多路径CNN，以便更好地关联和优化这两个组件。</p>
+<p><strong>The First Stage.</strong> 我们首先使用随机选择的路线训练多路径CNN。 损失函数由两部分组成。首先，最终的L2损失将输出图像约束为具有合理的质量。 其次，中间损失会迫使路径查找器在每个动态块处观察到的状态连续。 具体来说，损失函数被模拟为：</p>
+<script type="math/tex; mode=display">L_1=\left\|y-\widehat y\right\|_2^2+\alpha\sum_{i=1}^N\left\|y-f_{last}(x_i)\right\|_2^2 \tag{4}</script><p>其中$\widehat{y}$和$y$分别表示输出图像和真值，$N$代笔动态模块的数量路径恢复的最后一个卷积层表示为$f_{last}$，$\alpha$是中间损失的权重。如果不采用中间损失，则在不同动态块处观察到的特征可能会彼此差异很大，这将使路径查找器更难学习良好的调度策略。</p>
+<p><strong>The Second Stage.</strong>我们将路径查找器与多路径CNN一起训练。 在这一阶段，使用等式（4）中的损失函数训练多径CNN，但是$\alpha=0$，即中间损失不生效。同时，我们使用REINFORCE算法[36]训练探路者，如算法1所示。路径查找器的参数和学习率分别用$\theta$和$\beta$表示。我们采用单独的基准奖励$b^{(k)}$来减小梯度的变化并稳定训练。特别地，当在所有动态块中选择短路连接时，$b^{(k)}$是第k个图像的奖励。<br><img src="/2020/05/01/Path-Restore/Alg1.png" class=""><br><!-- ![](Path-Restore/Alg1.png) --></p>
+<h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4.Experiments"></a>4.Experiments</h2><p>在本节中，我们首先阐明实验细节。在4.1节中，我们给出了盲高斯去噪的结果。然后在4.2节中，我们展示了路径还原能力，可以解决复杂失真的混合问题。 在4.3节中，我们进一步证明了我们的方法在现实世界中的去噪效果良好。最后，在4.4节中，我们提供了一项消融研究，以验证网络体系结构的有效性和难度调节的奖励。</p>
+<p><strong>Network Architecture.</strong>如表1所示。我们为不同的还原任务选择了不同的体系结构。具体来说，我们为所有降噪任务采用$N = 6$动态块和$M = 2$路径，并且路径查找器具有$C = 2$卷积层。为了解决混合失真的任务，我们在路径查找器中采用了$N = 5$个动态块，$M = 4$个路径和$C = 4$个卷积层。 这些参数是根据验证集上的经验选择的，以实现良好的性能以及与基线方法的合理比较。</p>
+<p><strong>Training Details.</strong>如表1所示，根据具体任务来设定难度阈值$L_0$和奖励惩罚$p$。通常，当失真更严重时，它需要较大的阈值和奖励损失。 对于所有任务，难度$d$由$L_2$损失衡量。在第一训练阶段，将中间损耗系数$\alpha$设置为0.1。两个训练阶段都要进行80万次迭代。 训练图像被裁剪为$63\times 63$的小块，批量大小为32。学习率最初为$2\times 10^{-4}$，在训练过程的每四分之一之后衰减一半。 我们使用Adam[20]作为优化器，并在TensorFlow[1]上实现我们的方法。</p>
+<p><strong>Evaluation Details.</strong>在测试过程中，每幅图像的步幅为53，分成63x63个区域。在通过多路径CNN处理后，所有区域均合并为一个重叠区域平均像素的大图像。 在每个任务中，我们给出了平均处理$63\times 63$大小的浮点运算（FLOP）数值。 我们还记录了CPU处理512 X512图像的运行时间。<br><img src="/2020/05/01/Path-Restore/Tabel1.png" class=""><br><!-- ![](Path-Restore/Tabel1.png) --></p>
+<h3 id="4-1-Evaluationon-Blind-Gaussian-Denoising"><a href="#4-1-Evaluationon-Blind-Gaussian-Denoising" class="headerlink" title="4.1.Evaluationon Blind Gaussian Denoising"></a>4.1.Evaluationon Blind Gaussian Denoising</h3><p><strong>Training and Testing Details.</strong>我们首先在盲降噪任务上进行实验，该任务的失真是高斯噪声，标准偏差范围很广[O,50]。 训练数据集包括DIV2K[3]训练集的前750张图像（用DIV2K-T750表示）和400张[7]中的图像。为了公平起见，我们使用正式发布的代码以与我们相同的训练数据集来训练DnCNN[40]。继[40]之后，我们在CBSD68上测试了模型，并进一步评估了 DIV2K训练集中剩余的50张图像（用DIV2K-T50表示）。除了均匀的高斯噪声外，我们还使用41]中的空间可变高斯噪声进行了实验。具体地，“线性”表示高斯噪声水平从图像的左侧到右侧从0逐渐增加到50。 通过对[41]中的高斯分布进行平移和缩放，可以得到另一种空间变化的噪声，由峰值表示。噪声水平也在0到50的范围内。</p>
+<p><strong>Quantitative and Qualitative Results.</strong>我们在表2中报告了PSNR性能和平均FLOP。对于不同数据集上的均匀和空间变体去噪，Path-Restore的速度比DnCNN[40]快约26％，同时具有相当的性能。 DIV2K-T50上的速度比CBSD68上的速度稍快，因为DIV2K-T50上的高分辨率图像往往具有更平滑的区域，可以在较短的网络路径中进行还原。 处理512x512图像时，DnCNN Cpu运行时间为3.16s。在给定$\sigma=10$和$\sigma=50$的情况下，路径还原的运行时为2.37s和2.99s。 实际上，Path-Restore平均比DnCNN快20％。<br><img src="/2020/05/01/Path-Restore/Tabel2.png" class=""><br><!-- ![](Path-Restore/Tabel2.png) --></p>
+<p>图3显示了空间可变（峰值类型）高斯消噪的几个定性结果。尽管大多数恢复图像在视觉上都是可比的。由于可以选择Path -Restore，因此Path-Restore在具有细粒度纹理的某些区域上可获得更好的结果。处理具有细纹理的更难样例的可以选择更复杂的路径。<br><img src="/2020/05/01/Path-Restore/Figure3.png" class=""><br><!-- ![](Path-Restore/Figure3.png) --></p>
+<p><strong>Path Selection.</strong>我们首先在图4中可视化统一高斯降噪的路径选择。第一行显示输入的噪点图像，第二行和第三行分别显示$p=8\times 10^{-6}$和$p=5\times 10^{-6}$下的策略。 绿色代表一条短而简单的路径，而红色代表一条长而复杂的路径。</p>
+<p>可以发现，较大的惩罚$p$会导致路径较短，因为路径查找器学会了避免选择具有很高惩罚的过于复杂的路径。尽管每个图像中的噪声水平是一致的，但路径查找器会学习依赖于图像内容的调度策略。 例如，路径查找器着重于处理图像的主题（例如，左边两幅图像中的飞机和企鹅），同时将平滑背景分配给简单路径。<br><img src="/2020/05/01/Path-Restore/Figure4.png" class=""><br><!-- ![](Path-Restore/Figure4.png) --><br>空间可变（“线性”高斯去噪）的分配策略如图5所示。随着噪声水平从左到右逐渐增加，所选路径变得越来越复杂，这表明路径查找器学习了基于失真的分配策略。 此外，在每条蓝色虚线上，噪声水平保持不变，但是路径选择非常多样，再次证明路径查找器可以为平滑区域选择短路径，而为纹理区域选择长路径。<br><img src="/2020/05/01/Path-Restore/Figure5.png" class=""><br><!-- ![](Path-Restore/Figure5.png) --></p>
+<h3 id="4-2-Evaluationon-Mixed-Distortions"><a href="#4-2-Evaluationon-Mixed-Distortions" class="headerlink" title="4.2.Evaluationon Mixed Distortions"></a>4.2.Evaluationon Mixed Distortions</h3><p><strong>Training and Testing Details.</strong>我们对RL-Restore[39]中的复杂恢复任务进一步评估了我们的方法，在该过程中，图像同时受到不同级别的高斯模糊，高斯噪声和JPEG压缩的破坏。根据[39]，我们使用DIV2K-T750进行训练，并使用DIV2K-T50进行测试。 我们不仅给出了[39]中的63×63子图像的结果，而且给出了2K分辨率的整个图像的结果。为了进行全面比较，我们以两种方式对大图像测试RL-Restore：（1）使用特定处理路径（由RL-Restore-re表示）处理每个63×63区域，以及（2）每个63×63区域都对其处理路径投票票，整个图像将使用获得最多票数的统一处理路径进行处理（由RL-Restore-im表示）。</p>
+<p><strong>Quantitative Results.</strong>定量结果示于表3。63×63子图像的结果表明，与RL-Restore相比，Path-Restore的性能稍好。 在具有2K分辨率的大型图像上进行测试时，我们的方法显示出比RL-Restore-re和RL-Restore-im更高的表观增益（高0.2 dB），而计算复杂度（FLOPs）仅略有增加。RL-Restore-re，RL-Restore-im和Path-Restore的CPU运行时间分别为1.34s，1.09s和0.954s。 这些结果表明，Path-Restore在实践中比RL-Restore运行得更快。 原因是RL-Restore需要额外的时间在不同模型之间切换，而在统一框架Path-Restore中则不需要此开销。<br><br><!-- ![](Path-Restore/Tabel3.png) --></p>
+<p><strong>Qualitative Results.</strong>如图6所示，RL-Restore-re往往会在相邻的63×63区域之间产生不一致的边界和外观，因为每个区域都可以通过完全不同的模型进行处理。 RL-Restore-im无法解决某些区域的严重噪点或模糊，因为只能为整个图像选择单个工具链。 相反，得益于统一网络中的动态块，Path-Restore不仅可以消除不同区域的失真，而且可以产生空间一致的结果。<br><img src="/2020/05/01/Path-Restore/Figure6.png" class=""><br><!-- ![](Path-Restore/Figure6.png) --></p>
+<h3 id="4-3-Evaluation-on-Real-World-Denoising"><a href="#4-3-Evaluation-on-Real-World-Denoising" class="headerlink" title="4.3.Evaluation on Real-World Denoising"></a>4.3.Evaluation on Real-World Denoising</h3><p><strong>Training and Testing Details.</strong>我们进一步进行实际环境的去噪实验。训练数据与CBDNet[13]一致，可以进行公平的比较。特别是，我们使用BSD500 [25]和Waterloo [24]数据集来合成噪声图像，并使用与CBDNet相同的噪声模型。真实的数据集RENOIR [4]也被用作CBDNet进行训练。 我们根据达姆施塔特噪声数据集（DND）评估我们的方法[27]。 DND包含50张逼真的高分辨率成对噪声和无噪点图像，由具有不同传感器尺寸的四个不同的消费类相机捕获。</p>
+<p><strong>Quantitative Results.</strong>定量结果预示于表4中，其中CBDNet [13]是在所有已发表工作中均获得最高性能的方法。 使用与CBD-Net相同的训练数据集，Path-Restore可以将性能提高近1 dB，而计算成本和CPU运行时间却更少。 Path-Restore-Ext表示使用更多数据训练的扩展的更深模型，它可以进一步提高0.7 dB，目前在DND基准上达到了最新的性能。 补充材料中提供了更多详细信息。<br><img src="/2020/05/01/Path-Restore/Table4.png" class=""><br><!-- ![](Path-Restore/Table4.png) --></p>
+<p><strong>Qualitative Results.</strong>如图7所示，CBDNet无法消除昏暗区域中的严重噪声，并且倾向于沿边缘生成伪像。 这可能是由于对真实世界图像的噪声估计不正确引起的。 相反，Path-Restore可以成功清除不同区域中的噪声并恢复没有伪像的尖锐边缘，这表明与CBDNet中的噪声估计相比，我们的路径选择在处理实际噪声方面更强大。<br><img src="/2020/05/01/Path-Restore/Figure7.png" class=""><br><!-- ![](Path-Restore/Figure7.png) --></p>
+<h3 id="4-4-Ablation-Study"><a href="#4-4-Ablation-Study" class="headerlink" title="4.4.Ablation Study"></a>4.4.Ablation Study</h3><p><strong>Architecture of Dynamic Block.</strong>我们调查每个动态块中的路径数。对于解决混合失真的任务，路径数最初设置为4，因为存在3种针对各种失真的路径和1个旁路连接。如表5所示，我们可以选择使用2条路径来解决同一任务。可以观察到，当与原始设置实现相当的性能时，FLOP会增加近10％。<br><img src="/2020/05/01/Path-Restore/Tabel5.png" class=""><br><!-- ![](Path-Restore/Tabel5.png) --></p>
+<p><strong>Difﬁculty-RegulatedReward.</strong>可以通过在训练时调整奖励惩罚$p$来实现性能复杂性的权衡。 去噪任务的原始设置为$p=8\times 10^{-6}$，我们逐渐将p减小为$p=3\times 10^{-6}$。如图8所示，蓝色曲线表示PSNR和FLOP都随着奖励惩罚的减少而增加。 这是合理的，因为较小的奖励罚款会鼓励探路者为每个区域选择更长的路径。 我们还调整了DnCNN的深度，以实现PSNR和FLOP之间的权衡，如图8的绿色曲线所示。我们观察到，在相同的FLOP情况下，路径恢复始终比DnCNN好0.1 dB。 当达到相同的性能时，我们的方法比DnCNN快30％。<br><img src="/2020/05/01/Path-Restore/Figure8.png" class=""><br><!-- ![](Path-Restore/Figure8.png) --></p>
+<p>然后，我们研究了“难度”对提出的奖励功能的影响。 特别地，我们在等式（3）中设置难度$d = 1$，以形成非调节难度奖励。 如图8所示，橙色曲线始终低于蓝色曲线，表明提出的难度调节奖励可帮助Path-Restore实现更好的性能-复杂度折衷。 我们在图9中进一步提出了不同奖励的路径选择策略。与非调节难度奖励相比，我们的难易调节奖励在处理简单区域（例如红色框中的区域）时节省了更多计算，而处理更难的区域（例如，蓝色框中的区域）使用了更长的路径。<br><img src="/2020/05/01/Path-Restore/Figure9.png" class=""><br><!-- ![](Path-Restore/Figure9.png) --></p>
+<h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5.Conclusion"></a>5.Conclusion</h2><p>我们设计了一种计算成本低的图像恢复新框架。 结合强化学习和深度学习，我们提出了Path-Restore，可以为每个图像区域选择路径。具体地说，Path-Restore由多路径CNN和探路者组成。 多路径CNN提供了几种路径来解决不同类型的失真，并且探路者能够找到最佳路径以有效地恢复每个区域。 为了学习合理的调度策略，我们提出了一种难度可调节的奖励措施，该奖励措施鼓励探路者为容易的区域选择短路径。 路径还原可通过各种还原任务进行更少的计算来达到与现有方法相当或更高的性能。我们的方法对于现实世界中的去噪特别有效，因为去噪中噪声在不同图像区域的分布是不同的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E5%9B%BE%E5%83%8F%E5%8E%BB%E5%99%AA/" rel="tag"># 图像去噪</a>
+          
+            <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag"># 强化学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/18/InformationCompetingProcess-ICP/" rel="next" title="InformationCompetingProcess-ICP">
+                <i class="fa fa-chevron-left"></i> InformationCompetingProcess-ICP
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Path-Restore-Learning-Network-Path-Selection-for-Image-Restoration"><span class="nav-number">1.</span> <span class="nav-text">Path-Restore: Learning Network Path Selection for Image  Restoration</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1.Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.3.</span> <span class="nav-text">2.Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Methodology"><span class="nav-number">1.4.</span> <span class="nav-text">3.Methodology</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Architecture-of-Path-Restore"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1.Architecture of Path-Restore</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Pathﬁnder"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2.Pathﬁnder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Training-Algorithm"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.3.Training Algorithm</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Experiments"><span class="nav-number">1.5.</span> <span class="nav-text">4.Experiments</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Evaluationon-Blind-Gaussian-Denoising"><span class="nav-number">1.5.1.</span> <span class="nav-text">4.1.Evaluationon Blind Gaussian Denoising</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Evaluationon-Mixed-Distortions"><span class="nav-number">1.5.2.</span> <span class="nav-text">4.2.Evaluationon Mixed Distortions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Evaluation-on-Real-World-Denoising"><span class="nav-number">1.5.3.</span> <span class="nav-text">4.3.Evaluation on Real-World Denoising</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-Ablation-Study"><span class="nav-number">1.5.4.</span> <span class="nav-text">4.4.Ablation Study</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Conclusion"><span class="nav-number">1.6.</span> <span class="nav-text">5.Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

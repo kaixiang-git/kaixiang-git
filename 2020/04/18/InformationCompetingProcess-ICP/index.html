@@ -382,103 +382,44 @@
       
 
       
-        <h1 id="Information-Competing-Process-for-Learning-Diversiﬁed-Representations"><a href="#Information-Competing-Process-for-Learning-Diversiﬁed-Representations" class="headerlink" title="Information Competing Process for Learning Diversiﬁed Representations"></a>Information Competing Process for Learning Diversiﬁed Representations</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>学习具有多样化信息的表示形式仍然是一个开放的问题。针对学习多样化表示形式，本文提出了一种称为信息竞争过程（ICP）的新方法。 ICP为了丰富特征表示所携带的信息，ICP将表示分为具有互不相同的信息约束的两个部分。分开的部分被迫在竞争环境中独立完成下游任务，这阻止了两个部分相互学习下游任务的知识。然后将这些竞争部分进行协同组合以完成任务。通过融合在不同条件下竞争学习的表示部分，ICP有助于获得包含丰富信息的多样化表示。图像分类和图像重建任务的实验证明了ICP在学习区分和纠缠表示方面的巨大潜力在有监督和自我监督的学习环境中。</p>
-<a id="more"></a>
-
+        <h1 id="Information-Competing-Process-for-Learning-Diversiﬁed-Representations"><a href="#Information-Competing-Process-for-Learning-Diversiﬁed-Representations" class="headerlink" title="Information Competing Process for Learning Diversiﬁed Representations"></a>Information Competing Process for Learning Diversiﬁed Representations</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>学习具有多样化信息的表示形式仍然是一个开放的问题。针对学习多样化表示形式，本文提出了一种称为信息竞争过程（ICP）的新方法。 ICP为了丰富特征表示所携带的信息，ICP将表示分为具有互不相同的信息约束的两个部分。分开的部分被迫在竞争环境中独立完成下游任务，这阻止了两个部分相互学习下游任务的知识。然后将这些竞争部分进行协同组合以完成任务。通过融合在不同条件下竞争学习的表示部分，ICP有助于获得包含丰富信息的多样化表示。图像分类和图像重建任务的实验证明了ICP在学习区分和纠缠表示方面的巨大潜力在有监督和自我监督的学习环境中。<br><a id="more"></a></p>
 <h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1 Introduction"></a>1 Introduction</h2><p>表示学习的目的是使学习到的特征表示对于下游任务更有效地从输入中提取有用信息[4]，这已成为近年来的活跃研究课题，并已成为许多任务的基础[28、8、11、15 ，40，20，6]。 值得注意的是，大部分关于表示学习的工作已经从互信息约束的角度进行了研究。例如，信息瓶颈（iB）理论[38，1]最小化表示所携带的信息以适应目标输出，而生成模型（如B-VAE[13，5]）也依靠这种信息约束来学习解缠结 表示形式。 其他一些著作[22，3，26，14]揭示了最大化互信息以学习判别表示的优势。尽管取得了令人兴奋的进步，但是学习多元化的表示形式仍然是一个悬而未决的问题。 学习具有不同约束条件的多样化表示形式，鼓励表示部分从输入中提取各种信息，从而获得强大的功能来表示输入。 原则上，一种好的表示学习方法应该能够区分和弄清隐藏在输入中的潜在解释因素[4]。 但是，由于现有方法通常仅依靠一种类型的信息约束，因此难以实现此目标。 结果，学习到的表示的信息多样性变差。</p>
 <p>本文提出了一种多样化的表示学习方案，称为信息竞争过程（ICP），该方案通过一个新的信息多样化目标来解决上述问题。首先，必须将通过学习不同约束条件得到的分离表示进行竞争性竞争，以完成下游任务。 然后，将竞争对手的表示部分进行组合以协同解决下游任务。 进一步提出了一种新颖的解决方案，以在有监督和自监督环境中优化新目标。</p>
 <p>我们在将神经网络用作特征提取器的情况下，验证了所提出的ICP在图像分类和图像重建任务上的有效性。 在有监督的图像分类任务中，我们将ICP与四种不同的网络体系结构（即VGG [34]，GoogleNet [35]，ResNet [12]和DenseNet [16]）集成在一起，以演示多样化表示如何提高分类精度。 在自我监督的图像重建任务中，我们使用B-VAE[13]来实现ICP，以研究其学习纠缠表示来重建和处理输入的能力。 实证评估表明，ICP适合使用更精细的标记数据集，并且可以分解细粒度的语义信息来表示。</p>
 <h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2 Related Work"></a>2 Related Work</h2><p><strong>Representation Learning with Mutual Information.</strong>长期以来，互信息一直是表示学习的强大工具。 在无监督的情况下，通常会研究互信息最大化，其目的是将特定信息添加到表示中，使得表示具有区别性。 例如，InfoMax原理[22，3]提倡最大化输入和表示之间的互信息，这构成了独立成分分析的基础[17]。 Contrastive Predictive Coding [26]和Deep InfoMax[14]最大化全局和局部表示对或输入和全局/局部表示对之间的互信息。</p>
 <p>在有监督或自监督的环境中，通常采用互信息最小化的方法。例如，信息瓶颈理论（IB）[38]以信息理论为目标来约束输入与表示之间的互信息。 神经网络[37、33、31]和深度变分信息瓶颈（VIB）[l]最近被提出以变分近似来完善IB。另一组在自监督下的工作采用生成模型来学习表征[19，30]，其中相互信息在学习纠缠的表征中起着重要的作用。 例如，B-VAE[13]是变分自动编码器[19]的一种变体，它试图通过在互信息最小化的情况下优化重罚目标来学习纠缠表示。 在[5，18，7]中的最新工作通过应用各种约束条件修改了B-vae的目标。 一种特殊情况是Infogan[8]，它使表示和因式高斯分布之间的互信息最大化。 此外，互信息神经估计[2]估计了连续变量的互信息。 与上述方案不同的是，拟议的ICP充分利用了相互信息最大化和信息最小化的特点，为学习多元化的表示形式创造了竞争环境。</p>
 <p><strong>Representation Collaboration.</strong>协作神经表示的想法可以在神经期望最大化[10]和Tagger[9]中找到，它们使用不同的表示来分组和表示单个实体。竞争合作法[29]与我们的工作最相关。 它定义了一个由两个竞争者和一个主持人组成的三人游戏，主持人扮演评论者的角色，两个竞争者共同训练主持人。不同于竞争性协作，提出的ICP强制执行两个（或多个）代表部分作为补充 通过竞争环境对同一下游任务通过不同的互信息约束，从而赋予了学习更多辨别力和纠缠表示的能力。</p>
-<h2 id="3-Information-Competing-Process"><a href="#3-Information-Competing-Process" class="headerlink" title="3 Information Competing Process"></a>3 Information Competing Process</h2><p>ICP的关键思想如图1所示，其中不同的表示部分相互竞争和协作以使信息多样化。 在本节中，我们首先将监督和自监督任务统一起来，以完成目标任务。 然后，提出了学习多元化表示的信息竞争目标。</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Figure1.png" class="">
-<!-- ![](./InformationCompetingProcess-ICP/Figure1.png) -->
-<p>图1：提出的信息竞争过程。 在竞争步骤中，通过防止两个部分都知道彼此在任务的不同约束下学到了什么，使竞争对手的表示部分完成下游任务。 在协同步骤中，将这些表示部分进行组合以综合完成下游任务。 ICP可以推广为任意数量的受约束零件，在本文中，我们举两个例子</p>
-<h3 id="3-1-Unifying-Supervised-and-Self-Supervised-Objectives"><a href="#3-1-Unifying-Supervised-and-Self-Supervised-Objectives" class="headerlink" title="3.1 Unifying Supervised and Self-Supervised Objectives"></a>3.1 Unifying Supervised and Self-Supervised Objectives</h3><p>监督设置中的信息约束目标与自监督设置中的目标约束形式相同，但目标输出除外。 因此，我们通过使用$t$作为下游任务的输出来统一这两个目标。 在监督设置中，$t$表示输入$x$的标签。 在自监督设置中，$t$代表输入本身。 这导致将输入$x$的表示$r$与目标$t$链接为的统一目标函数:<br>$$max\lbrack\mathcal L(r,t)\rbrack \tag{1}$$<br>其中$\mathcal L(\cdot,\cdot)$表示互信息。 这个统一的目标描述了一个约束，其目标是最大化表示$r$和目标$t$之间的互信息</p>
-<h3 id="3-2-Separating-and-Diversifying-Representations"><a href="#3-2-Separating-and-Diversifying-Representations" class="headerlink" title="3.2 Separating and Diversifying Representations"></a>3.2 Separating and Diversifying Representations</h3><p>为了使表示的信息显着多样化，我们将表示$r$直接分为具有不同约束的两部分$[z,y]$，并鼓励表示从输入$x$中学习差异信息。 具体而言，我们在增加表示部分$y$的信息容量的同时，限制了表示部分$z$的信息容量。 为此，我们具有以下目标函数:<br>$$max\lbrack\mathcal L(r,t)+\alpha\mathcal L(y,x)-\beta\mathcal L(z,x)\rbrack \tag{2}$$<br>其中$\alpha&gt;0,\beta&gt;0$是正则化参数。</p>
-<h3 id="3-3-Competition-of-Representation-Parts"><a href="#3-3-Competition-of-Representation-Parts" class="headerlink" title="3.3 Competition of Representation Parts"></a>3.3 Competition of Representation Parts</h3><p>为了防止任何一个表示部分控制下游任务，我们让$z$和$y$仅通过利用互信息约束$\mathcal L(z,t)$和$\mathcal L(y,t)$来完成下游任务$t$。 ICP通过不同的约束捕获各种信息，ICP阻止$z$和$y$彼此了解下游任务的知识，这是通过使$z$和$y$相互独立实现的。 这些限制导致在竞争环境中丰富了表示所携带的信息。相应地，ICP的目标是：</p>
-
+<h2 id="3-Information-Competing-Process"><a href="#3-Information-Competing-Process" class="headerlink" title="3 Information Competing Process"></a>3 Information Competing Process</h2><p>ICP的关键思想如图1所示，其中不同的表示部分相互竞争和协作以使信息多样化。 在本节中，我们首先将监督和自监督任务统一起来，以完成目标任务。 然后，提出了学习多元化表示的信息竞争目标。<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Figure1.png" class=""><br><!-- ![](./InformationCompetingProcess-ICP/Figure1.png) --><br>图1：提出的信息竞争过程。 在竞争步骤中，通过防止两个部分都知道彼此在任务的不同约束下学到了什么，使竞争对手的表示部分完成下游任务。 在协同步骤中，将这些表示部分进行组合以综合完成下游任务。 ICP可以推广为任意数量的受约束零件，在本文中，我们举两个例子</p>
+<h3 id="3-1-Unifying-Supervised-and-Self-Supervised-Objectives"><a href="#3-1-Unifying-Supervised-and-Self-Supervised-Objectives" class="headerlink" title="3.1 Unifying Supervised and Self-Supervised Objectives"></a>3.1 Unifying Supervised and Self-Supervised Objectives</h3><p>监督设置中的信息约束目标与自监督设置中的目标约束形式相同，但目标输出除外。 因此，我们通过使用$t$作为下游任务的输出来统一这两个目标。 在监督设置中，$t$表示输入$x$的标签。 在自监督设置中，$t$代表输入本身。 这导致将输入$x$的表示$r$与目标$t$链接为的统一目标函数:</p>
+<script type="math/tex; mode=display">max\lbrack\mathcal L(r,t)\rbrack \tag{1}</script><p>其中$\mathcal L(\cdot,\cdot)$表示互信息。 这个统一的目标描述了一个约束，其目标是最大化表示$r$和目标$t$之间的互信息</p>
+<h3 id="3-2-Separating-and-Diversifying-Representations"><a href="#3-2-Separating-and-Diversifying-Representations" class="headerlink" title="3.2 Separating and Diversifying Representations"></a>3.2 Separating and Diversifying Representations</h3><p>为了使表示的信息显着多样化，我们将表示$r$直接分为具有不同约束的两部分$[z,y]$，并鼓励表示从输入$x$中学习差异信息。 具体而言，我们在增加表示部分$y$的信息容量的同时，限制了表示部分$z$的信息容量。 为此，我们具有以下目标函数:</p>
+<script type="math/tex; mode=display">max\lbrack\mathcal L(r,t)+\alpha\mathcal L(y,x)-\beta\mathcal L(z,x)\rbrack \tag{2}</script><p>其中$\alpha&gt;0,\beta&gt;0$是正则化参数。</p>
+<h3 id="3-3-Competition-of-Representation-Parts"><a href="#3-3-Competition-of-Representation-Parts" class="headerlink" title="3.3 Competition of Representation Parts"></a>3.3 Competition of Representation Parts</h3><p>为了防止任何一个表示部分控制下游任务，我们让$z$和$y$仅通过利用互信息约束$\mathcal L(z,t)$和$\mathcal L(y,t)$来完成下游任务$t$。 ICP通过不同的约束捕获各种信息，ICP阻止$z$和$y$彼此了解下游任务的知识，这是通过使$z$和$y$相互独立实现的。 这些限制导致在竞争环境中丰富了表示所携带的信息。相应地，ICP的目标是：<br>
 $$max\lbrack\underbrace{\lbrack\mathcal L(r,t)}_{①synergy}+\underbrace{\alpha\mathcal L(y,x)}_{②maximization}-\underbrace{\beta\mathcal L(z,x)}_{③minimization}+\underbrace{\mathcal L(z,t)+\mathcal L(y,t)-\gamma\mathcal L(z,y)}_{④competition}\rbrack \tag{3}$$
 其中$\gamma>0$是正则化参数。
-
-
+</p>
 <h2 id="4-Optimizing-the-Objective-of-ICP"><a href="#4-Optimizing-the-Objective-of-ICP" class="headerlink" title="4 Optimizing the Objective of ICP"></a>4 Optimizing the Objective of ICP</h2><p>在本节中，我们得出一种解决方案，以优化ICP的目标。 尽管此目标的所有术语具有相同的公式来计算两个变量之间的互信息，但由于目标不同，因此需要使用不同的方法对其进行优化。 因此，我们将这些术语分类为互信息最小化项$\mathcal L(z,x)$，互信息最大化项$\mathcal L(y,x)$，推理项$\mathcal L(z,t),\mathcal L(y,t),\mathcal L(r,t)$和可预测性最小化项$\mathcal L(z,y)$。</p>
-<h3 id="4-1-Mutual-Information-Minimization-Term"><a href="#4-1-Mutual-Information-Minimization-Term" class="headerlink" title="4.1 Mutual Information Minimization Term"></a>4.1 Mutual Information Minimization Term</h3><p>为了使$x$和$z$之间的互信息最小化，我们可以找到一个$\mathcal L(z,x)$的可处理的上界。在现有的工作[19，1]中，$\mathcal L(z,x)$通常是在输入的联合分布及其编码分布下定义的。因为它是输入和表示之间的约束。具体而言，公式推导为：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation4.png" class="">
-<!-- ![](./InformationCompetingProcess-ICP/Equation4.png) -->
-<p>令$Q(z)$为$P(z)$的变分近似，我们有:</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation5.png" class="">
-<!-- ![](./InformationCompetingProcess-ICP/Equation5.png) -->
-<p>根据等式(5)应用变分近似的可追踪上界为：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation6.png" class="">
-<!-- ![](./InformationCompetingProcess-ICP/Equation6.png) -->
-<p>这将以$x$为条件提取$z$到一个预定义的分布，例如高斯分布。</p>
-<h3 id="4-2-Mutual-Information-Maximization-Term"><a href="#4-2-Mutual-Information-Maximization-Term" class="headerlink" title="4.2 Mutual Information Maximization Term"></a>4.2 Mutual Information Maximization Term</h3><p>为了最大化$x$和$y$之间的互信息，我们推导了一个易处理的可替代项$\mathcal L(y,x)$具体来说，像上述最小化项一样，互信息也应定义为输入的联合分布及其编码分布。由于很难得出该项的可处理下界，因此我们将互信息扩展为：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation7.png" class="">
-<!-- ![](./InformationCompetingProcess-ICP/Equation7.png) -->
-<p>由于等式(7)表示最大化互信息等于扩大分布$P(y|x)P(x)$和$P(y)P(x)$之间的Kullback-Leibler（KL）距离，而KL距离的最大化是发散的。 相反，我们将Jensen-Shannon（Js）距离最大化，作为近似KL距离的最大值但收敛的选择。 如[25]，可将js距离的可处理变分估计定义为：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation8.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation8.png) -->
-<p>其中$D$是一个估计输入对概率的判别器，$(y,x)$是从$P(y|x)P(x)$采样的正对，而$(\widehat y,x)$是从$P(y)P(x)$采样的负对。 由于$\widehat y$应该是以$x$为条件。我们对正对$(y,x)$中的$y$进行分解以获得负对$(x,\widehat y)$。</p>
-<h3 id="4-3-InferenceTerm"><a href="#4-3-InferenceTerm" class="headerlink" title="4.3 InferenceTerm"></a>4.3 InferenceTerm</h3><p>等式(3)中的推理项应该定义为表示和下游任务求解器的输出分布<br>的联合分布。我们用$\mathcal L(r,t)$举例，$\mathcal L(z,t)$和$\mathcal L(y,t)$与$\mathcal L(r,t)$有相同的形式，我们扩展互信息项如下：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation9.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation9.png) -->
-<p>其中$H(t)\geq0$，表示$t$的信息熵。令$Q(t|r)$是$P(t|r)$的变分近似，则有：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation10.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation10.png) -->
-<p>通过应用变分近似，$r$和$t$之间的互信息下界为：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation11.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation11.png) -->
-<p>基于上述公式，对于有监督和自监督有不同的设置，具体如下：</p>
-<p><strong>SupervisedSetting.</strong> 在有监督设置中，$t$表示已知的目标标签，假设表示$r$不依赖于标签$t$，即$P(r|x,t)=P(r|x)$。则有：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation12.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation12.png) -->
-<p>相应的$r$和$t$的联合分布可以写为：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation13.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation13.png) -->
-<p>结合等式(11)和等式(13)，我们可以得到在有监督中推理项的下界：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation14.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation14.png) -->
-<p>因为在有监督中条件概率$P(t|x)$表示了标签的分布，等式(14)实际上是分类任务的交叉熵损失。<br><strong>Self-supervisedSetting</strong>在自监督中，$t$就是输入$x$，因此等式(11)可以被写为：</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation15.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation15.png) -->
-<p>假设$Q(t|r)$是高斯分布，对于输入$x$等式(15)可以被扩展为$L2$损失函数。</p>
-<h3 id="4-4-Predictability-Minimization-Term"><a href="#4-4-Predictability-Minimization-Term" class="headerlink" title="4.4 Predictability Minimization Term"></a>4.4 Predictability Minimization Term</h3><p>为了使信息多样化并防止一个表示部分占主要的优势，我们限制$z$和$y$之间的互信息，这等于使$z$和$y$彼此独立。 受[32]的启发，我们引入了一个预测变量$H$来实现这个目标。 具体而言，我们让$H$预测以$z$为条件的$y$，并防止提取器生成可以预测$y$的$z$。 对$y$到$z$进行相同的操作。相应的目标是</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Equation16.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Equation16.png) -->
-<p>到目前为止，我们拥有优化ICP信息多元化目标的所有可行边界和替代方案。</p>
-<h2 id="5-Experiments"><a href="#5-Experiments" class="headerlink" title="5 Experiments"></a>5 Experiments</h2><p>在实验中，所有的概率特征提取器，任务求解器，预测器和鉴别器都是通过神经网络实现的。 我们假设$Q(Z),Q(t|r),Q(t|z),Q(t|y)$是标准的高斯分布，并通过遵循VAE[19]来使用重新参数化技巧。 目标是不同的的，并使用反向传播进行了训练。 在分类任务（监督设置）中，我们使用一个全连接层作为分类器。 在重构任务（自监督设置）中，使用多个反卷积层作为解码器来重构输入。实施细节和实验日志都可以在我们的源代码页面上找到。</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Figure2.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Figure2.png) -->
-<p>在CIFAR-10上，类别和VGGNet表示维度之间的相关性热图，水平轴表示维度，垂直轴表示相关性，颜色越深表示相关性越高。</p>
+<h3 id="4-1-Mutual-Information-Minimization-Term"><a href="#4-1-Mutual-Information-Minimization-Term" class="headerlink" title="4.1 Mutual Information Minimization Term"></a>4.1 Mutual Information Minimization Term</h3><p>为了使$x$和$z$之间的互信息最小化，我们可以找到一个$\mathcal L(z,x)$的可处理的上界。在现有的工作[19，1]中，$\mathcal L(z,x)$通常是在输入的联合分布及其编码分布下定义的。因为它是输入和表示之间的约束。具体而言，公式推导为：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation4.png" class=""><br><!-- ![](./InformationCompetingProcess-ICP/Equation4.png) --><br>令$Q(z)$为$P(z)$的变分近似，我们有:<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation5.png" class=""><br><!-- ![](./InformationCompetingProcess-ICP/Equation5.png) --><br>根据等式(5)应用变分近似的可追踪上界为：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation6.png" class=""><br><!-- ![](./InformationCompetingProcess-ICP/Equation6.png) --><br>这将以$x$为条件提取$z$到一个预定义的分布，例如高斯分布。</p>
+<h3 id="4-2-Mutual-Information-Maximization-Term"><a href="#4-2-Mutual-Information-Maximization-Term" class="headerlink" title="4.2 Mutual Information Maximization Term"></a>4.2 Mutual Information Maximization Term</h3><p>为了最大化$x$和$y$之间的互信息，我们推导了一个易处理的可替代项$\mathcal L(y,x)$具体来说，像上述最小化项一样，互信息也应定义为输入的联合分布及其编码分布。由于很难得出该项的可处理下界，因此我们将互信息扩展为：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation7.png" class=""><br><!-- ![](./InformationCompetingProcess-ICP/Equation7.png) --><br>由于等式(7)表示最大化互信息等于扩大分布$P(y|x)P(x)$和$P(y)P(x)$之间的Kullback-Leibler（KL）距离，而KL距离的最大化是发散的。 相反，我们将Jensen-Shannon（Js）距离最大化，作为近似KL距离的最大值但收敛的选择。 如[25]，可将js距离的可处理变分估计定义为：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation8.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation8.png) --><br>其中$D$是一个估计输入对概率的判别器，$(y,x)$是从$P(y|x)P(x)$采样的正对，而$(\widehat y,x)$是从$P(y)P(x)$采样的负对。 由于$\widehat y$应该是以$x$为条件。我们对正对$(y,x)$中的$y$进行分解以获得负对$(x,\widehat y)$。</p>
+<h3 id="4-3-InferenceTerm"><a href="#4-3-InferenceTerm" class="headerlink" title="4.3 InferenceTerm"></a>4.3 InferenceTerm</h3><p>等式(3)中的推理项应该定义为表示和下游任务求解器的输出分布<br>的联合分布。我们用$\mathcal L(r,t)$举例，$\mathcal L(z,t)$和$\mathcal L(y,t)$与$\mathcal L(r,t)$有相同的形式，我们扩展互信息项如下：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation9.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation9.png) --><br>其中$H(t)\geq0$，表示$t$的信息熵。令$Q(t|r)$是$P(t|r)$的变分近似，则有：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation10.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation10.png) --><br>通过应用变分近似，$r$和$t$之间的互信息下界为：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation11.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation11.png) --><br>基于上述公式，对于有监督和自监督有不同的设置，具体如下：</p>
+<p><strong>SupervisedSetting.</strong> 在有监督设置中，$t$表示已知的目标标签，假设表示$r$不依赖于标签$t$，即$P(r|x,t)=P(r|x)$。则有：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation12.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation12.png) --><br>相应的$r$和$t$的联合分布可以写为：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation13.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation13.png) --><br>结合等式(11)和等式(13)，我们可以得到在有监督中推理项的下界：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation14.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation14.png) --><br>因为在有监督中条件概率$P(t|x)$表示了标签的分布，等式(14)实际上是分类任务的交叉熵损失。<br><strong>Self-supervisedSetting</strong>在自监督中，$t$就是输入$x$，因此等式(11)可以被写为：<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation15.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation15.png) --><br>假设$Q(t|r)$是高斯分布，对于输入$x$等式(15)可以被扩展为$L2$损失函数。</p>
+<h3 id="4-4-Predictability-Minimization-Term"><a href="#4-4-Predictability-Minimization-Term" class="headerlink" title="4.4 Predictability Minimization Term"></a>4.4 Predictability Minimization Term</h3><p>为了使信息多样化并防止一个表示部分占主要的优势，我们限制$z$和$y$之间的互信息，这等于使$z$和$y$彼此独立。 受[32]的启发，我们引入了一个预测变量$H$来实现这个目标。 具体而言，我们让$H$预测以$z$为条件的$y$，并防止提取器生成可以预测$y$的$z$。 对$y$到$z$进行相同的操作。相应的目标是<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Equation16.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Equation16.png) --><br>到目前为止，我们拥有优化ICP信息多元化目标的所有可行边界和替代方案。</p>
+<h2 id="5-Experiments"><a href="#5-Experiments" class="headerlink" title="5 Experiments"></a>5 Experiments</h2><p>在实验中，所有的概率特征提取器，任务求解器，预测器和鉴别器都是通过神经网络实现的。 我们假设$Q(Z),Q(t|r),Q(t|z),Q(t|y)$是标准的高斯分布，并通过遵循VAE[19]来使用重新参数化技巧。 目标是不同的的，并使用反向传播进行了训练。 在分类任务（监督设置）中，我们使用一个全连接层作为分类器。 在重构任务（自监督设置）中，使用多个反卷积层作为解码器来重构输入。实施细节和实验日志都可以在我们的源代码页面上找到。<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Figure2.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Figure2.png) --><br>在CIFAR-10上，类别和VGGNet表示维度之间的相关性热图，水平轴表示维度，垂直轴表示相关性，颜色越深表示相关性越高。</p>
 <h3 id="5-1-Supervised-Setting-Classiﬁcation-Tasks"><a href="#5-1-Supervised-Setting-Classiﬁcation-Tasks" class="headerlink" title="5.1 Supervised Setting: Classiﬁcation Tasks"></a>5.1 Supervised Setting: Classiﬁcation Tasks</h3><h4 id="5-1-1-Datasets"><a href="#5-1-1-Datasets" class="headerlink" title="5.1.1 Datasets"></a>5.1.1 Datasets</h4><p>CIFAR-10和CIFAR-100[21]用于评估图像分类任务中ICP的性能。 这些数据集包含分别属于10和100类的自然图像。 CIFAR-100的标签要比CIFAR-10更好。 原始图像具有32 x 32像素，我们使用通道均值和标准差对其进行归一化处理，通过随机裁剪和镜像将标准数据增强应用于训练集。</p>
 <h4 id="5-1-2-Classiﬁcation-Performance-and-Ablation-Study"><a href="#5-1-2-Classiﬁcation-Performance-and-Ablation-Study" class="headerlink" title="5.1.2 Classiﬁcation Performance and Ablation Study"></a>5.1.2 Classiﬁcation Performance and Ablation Study</h4>
 我们利用VGGNet[34]，GoogLeNet[35、36]，ResNet[12]和DenseNet[16]四种体系结构来测试ICP的普遍适用性，并研究ICP所学习的各种表示形式。我们使用原始网络体系结构的分类结果作为基准。深度变分信息瓶颈（VIB）[1]和DeepInfoMax的全局版本以及一个附加的互信息最大化项（DIM*）[14]被用作参考，其中通过最大化$\mathcal L(z,t)-\beta\mathcal L(z,x)$来优化VIB，并且通过最大化$\mathcal L(y,t)-\alpha\mathcal L(y,x)$来优化DIM*。为了公平地比较，我们将两种方法的表示维度扩展到相同大小的ICP（表示为$VIB_{\times2},{DIM^*}_{\times2}$），$VIB,DIM^*,VIB_{\times2}和{DIM^*}_{\times2}$是在ICP中仅使用一种表示约束的方法，也可以视为对ICP的消融研究并且具有单一信息约束而且没有信息多元化目标。
 
-
 <p>为了进一步进行消融研究，我们在没有所有信息多样化和竞争约束的情况下优化ICP（即优化等式1），表示为$ICP_{-ALL}$。 我们还以信息多样化为目标但不以信息竞争为目标的情况（例如，优化等式2），表示为$ICP_{-COM}$。</p>
-<p>表1和表2列出了cifar-10和cifar-100的分类结果。我们发现，由于表示形式的多样性有限，$VIB,DIM^<em>,VIB_{\times2}和{DIM^</em>}<em>{\times2}$达到了次优的结果。$ICP</em>{-ALL}$效果不好，因为模型容量大超出了训练集，产生过拟合，并且$ICP_{-COM}$由于单一表示形式占据主导地位效果也不好。</p>
+<p>表1和表2列出了cifar-10和cifar-100的分类结果。我们发现，由于表示形式的多样性有限，$VIB,DIM^<em>,VIB_{\times2}和{DIM^</em>}_{\times2}$达到了次优的结果。$ICP_{-ALL}$效果不好，因为模型容量大超出了训练集，产生过拟合，并且$ICP_{-COM}$由于单一表示形式占据主导地位效果也不好。</p>
 <p>这些结果表明，扩展具有唯一约束的模型或从目标中删除一个约束会降低性能。只有ICP才能推广到所有这些架构，并实现最佳性能。 此外，在不同数据集（即CIFAR-10和CIFAR-100）上的结果表明，ICP在更精细的标记数据集（即CIFAR-100）上表现更好。我们将成功归因于多元化的表现形式，这些表现形式捕获了更详细的输入信息。</p>
 <h4 id="5-1-3-Interpretability-of-The-Diversiﬁed-Representations"><a href="#5-1-3-Interpretability-of-The-Diversiﬁed-Representations" class="headerlink" title="5.1.3 Interpretability of The Diversiﬁed Representations"></a>5.1.3 Interpretability of The Diversiﬁed Representations</h4><p>为了解释ICP的直观想法和出色结果，我们研究了学习到的分类模型，以探讨ICP为何起作用，并提供了有关学习到的表示的可解释性的一些见解。</p>
-<p>下面，我们以CIFAR-10上的VGGNet为例，可视化分类器权重的归一化绝对值。 如图2（a）所示，在$ICP_{-ALL}$中融合了分类相关性，这意味着直接组合两个表示而没有任何约束不会使表示多样化。第一个绿色边界框表明分类依赖于两个部分。 第二个和第三个绿色边界框显示分类更加依赖于第一部分或第二部分。 相反，如图2（b）所示，分类依存关系可以分为两部分。</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Figure2.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Figure2.png) -->
-<p>在CIFAR-10上，类别和VGGNet表示维度之间的相关性热图，水平轴表示维度，垂直轴表示相关性，颜色越深表示相关性越高。</p>
+<p>下面，我们以CIFAR-10上的VGGNet为例，可视化分类器权重的归一化绝对值。 如图2（a）所示，在$ICP_{-ALL}$中融合了分类相关性，这意味着直接组合两个表示而没有任何约束不会使表示多样化。第一个绿色边界框表明分类依赖于两个部分。 第二个和第三个绿色边界框显示分类更加依赖于第一部分或第二部分。 相反，如图2（b）所示，分类依存关系可以分为两部分。<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Figure2.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Figure2.png) --><br>在CIFAR-10上，类别和VGGNet表示维度之间的相关性热图，水平轴表示维度，垂直轴表示相关性，颜色越深表示相关性越高。</p>
 <p>由于互信息最小化使得表示携带更多的通用输入信息，而最大化则使表示携带更多的特定输入信息，因此少量维就足以进行通用推理（即图2（b）的左边界框，而特定类别的推理则需要大量维度（即图2（b）的右边界框）。这表明ICP学习了多种表示方法用于分类。</p>
 <h3 id="5-2-Self-supervisedSetting-Reconstruction"><a href="#5-2-Self-supervisedSetting-Reconstruction" class="headerlink" title="5.2 Self-supervisedSetting: Reconstruction"></a>5.2 Self-supervisedSetting: Reconstruction</h3><h4 id="5-2-1-Datasets"><a href="#5-2-1-Datasets" class="headerlink" title="5.2.1 Datasets"></a>5.2.1 Datasets</h4><p>我们使用2D形状数据集（dSprites）【24】和合成3D Faces【27】的数据集进行定量和定性的纠缠评估。 dSprite的ground truth参数是比例（6），旋转（40），posX（32）和位置Y（32）。3D人脸的ground truth参数是方位角（21）仰角（11）和照明（11）。 括号中包含每个因子的量化值数量。 dSprite和3D Faces分别包含3种形状和50个标识，在评估期间将其视为噪声。 将两个数据集的图像重塑为64 x 64像素，以与基线方法进行比较。 我们还评估了更具挑战性的CelebA【23】数据集的重构和处理性能，该数据集包含大量名人面孔。 图像被重塑为128 x 128像素，而不是64 x 64像素，可进行更精确的重建。</p>
 <h4 id="5-2-2-Quantitative-Evaluation"><a href="#5-2-2-Quantitative-Evaluation" class="headerlink" title="5.2.2 Quantitative Evaluation"></a>5.2.2 Quantitative Evaluation</h4><p>我们利用Mutual Information Gap（MIG）得分【7】，2D形状（dSprites）【24】和3D Faces【27】数据对解纠缠性能进行定量评估。 MIG是无分类器的信息理论解缠结度量标准，对于任何因式分解的潜在分布都有意义。如表3所示，ICP在解缠结的定量评估方面达到了最新的性能。 我们还进行了消融研究，就像我们在有监督的环境中所做的一样。</p>
-<p>根据$ICP_{-ALL}$和$ICP_{-COM}$的结果。 我们发现，在没有信息多样化和竞争过程的情况下，纠缠性能会降低。 对于具有挑战性的CelebA【23】数据集，我们通过平均均方误差（MSE）和结构相似性指数（SSIM）【39】来评估重建性能。 ICP的MSE为$8.5 \times 10^{-3}$，而$\beta-VAE$为$9.2 \times 10^{-3}$，ICP的SSIM为0.62,$\beta-VAE$为0.6，结果表明ICP保留了更多用于重建的输入信息。</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Tabel3.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Tabel3.png) -->
-
-<h4 id="5-2-3-Qualitative-Evaluation"><a href="#5-2-3-Qualitative-Evaluation" class="headerlink" title="5.2.3 Qualitative Evaluation"></a>5.2.3 Qualitative Evaluation</h4><p>为了进行定性评估，我们通过在【-3，3】范围内遍历学习到的表示的单个维度，同时保持其他维度不变，来进行潜在空间遍历。我们从重建结果中手动选择具有与人类概念相关的语义含义的维度。 定性的解缠结果示于图3和图4。可以看出，许多细粒度的语义属性（例如dSprites数据集上的旋转，3D Face数据集上的脸部宽度和Celeba数据集上的山羊胡子）都被ICP清楚地解开了。</p>
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Figure3.png" class="">
-<img src="/2020/04/18/InformationCompetingProcess-ICP/Figure4.png" class="">
-<!-- ![](InformationCompetingProcess-ICP/Figure3.png)
-![](InformationCompetingProcess-ICP/Figure4.png) -->
-
-
+<p>根据$ICP_{-ALL}$和$ICP_{-COM}$的结果。 我们发现，在没有信息多样化和竞争过程的情况下，纠缠性能会降低。 对于具有挑战性的CelebA【23】数据集，我们通过平均均方误差（MSE）和结构相似性指数（SSIM）【39】来评估重建性能。 ICP的MSE为$8.5 \times 10^{-3}$，而$\beta-VAE$为$9.2 \times 10^{-3}$，ICP的SSIM为0.62,$\beta-VAE$为0.6，结果表明ICP保留了更多用于重建的输入信息。<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Tabel3.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Tabel3.png) --></p>
+<h4 id="5-2-3-Qualitative-Evaluation"><a href="#5-2-3-Qualitative-Evaluation" class="headerlink" title="5.2.3 Qualitative Evaluation"></a>5.2.3 Qualitative Evaluation</h4><p>为了进行定性评估，我们通过在【-3，3】范围内遍历学习到的表示的单个维度，同时保持其他维度不变，来进行潜在空间遍历。我们从重建结果中手动选择具有与人类概念相关的语义含义的维度。 定性的解缠结果示于图3和图4。可以看出，许多细粒度的语义属性（例如dSprites数据集上的旋转，3D Face数据集上的脸部宽度和Celeba数据集上的山羊胡子）都被ICP清楚地解开了。<br><img src="/2020/04/18/InformationCompetingProcess-ICP/Figure3.png" class=""><br><img src="/2020/04/18/InformationCompetingProcess-ICP/Figure4.png" class=""><br><!-- ![](InformationCompetingProcess-ICP/Figure3.png)
+![](InformationCompetingProcess-ICP/Figure4.png) --></p>
 <h2 id="6-Conclusion"><a href="#6-Conclusion" class="headerlink" title="6 Conclusion"></a>6 Conclusion</h2><p>我们提出了一种新的方法，称为信息竞争过程（ICP），用于学习各种表示形式。 为了丰富表示形式所携带的信息，ICP会将表示形式分为具有互不相同的信息约束的两个部分，并防止这两个部分相互了解下游任务所学的知识。 然后，将这些相互竞争的表示形式组合起来，以综合完成下游任务。 实验表明，在有监督和无监督情况下，ICP都有很大的潜力。 性能提升背后的本质在于，ICP能够学习多种表示形式，这为表示学习问题提供了新的见解。</p>
 
       
@@ -519,6 +460,10 @@ $$max\lbrack\underbrace{\lbrack\mathcal L(r,t)}_{①synergy}+\underbrace{\alpha\
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/05/01/Path-Restore/" rel="prev" title="Path-Restore">
+                Path-Restore <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -602,7 +547,7 @@ $$max\lbrack\underbrace{\lbrack\mathcal L(r,t)}_{①synergy}+\underbrace{\alpha\
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -624,7 +569,7 @@ $$max\lbrack\underbrace{\lbrack\mathcal L(r,t)}_{①synergy}+\underbrace{\alpha\
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -1041,7 +986,24 @@ $$max\lbrack\underbrace{\lbrack\mathcal L(r,t)}_{①synergy}+\underbrace{\alpha\
         }
       });
     </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
   
 
 
