@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,注意力机制,视频字幕," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SCA-CNN: Spatial and Channel-wise Attention in Convolutional Networks for Image CaptioningAbstract视觉注意力已成功应用于结构预测任务，例如视觉字幕和问题解答。现有的视觉注意力模型通常是空间的，即e，注意力被建模为空间概率，该概率对输入图像的CNN编码的最后一个卷积层特征图重新加权。但是，我们认为这种空">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SCA-CNN">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/SCA-CNN/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="SCA-CNN: Spatial and Channel-wise Attention in Convolutional Networks for Image CaptioningAbstract视觉注意力已成功应用于结构预测任务，例如视觉字幕和问题解答。现有的视觉注意力模型通常是空间的，即e，注意力被建模为空间概率，该概率对输入图像的CNN编码的最后一个卷积层特征图重新加权。但是，我们认为这种空">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/SCA-CNN/Figure1.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/SCA-CNN/Figure2.png">
+<meta property="article:published_time" content="2020-08-11T12:56:31.000Z">
+<meta property="article:modified_time" content="2020-08-11T12:58:10.301Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="注意力机制">
+<meta property="article:tag" content="视频字幕">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/11/SCA-CNN/Figure1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/SCA-CNN/"/>
+
+
+
+
+
+  <title>SCA-CNN | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About-me" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/SCA-CNN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SCA-CNN</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-11T20:56:31+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/11/SCA-CNN/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/SCA-CNN/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/08/11/SCA-CNN/" class="leancloud_visitors" data-flag-title="SCA-CNN">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="SCA-CNN-Spatial-and-Channel-wise-Attention-in-Convolutional-Networks-for-Image-Captioning"><a href="#SCA-CNN-Spatial-and-Channel-wise-Attention-in-Convolutional-Networks-for-Image-Captioning" class="headerlink" title="SCA-CNN: Spatial and Channel-wise Attention in Convolutional Networks for Image Captioning"></a>SCA-CNN: Spatial and Channel-wise Attention in Convolutional Networks for Image Captioning</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>视觉注意力已成功应用于结构预测任务，例如视觉字幕和问题解答。现有的视觉注意力模型通常是空间的，即e，注意力被建模为空间概率，该概率对输入图像的CNN编码的最后一个卷积层特征图重新加权。但是，我们认为这种空间注意力不一定与注意力机制相符-动态特征提取器会随着时间的流逝而结合上下文信息，因为CNN特征中的信息是与空间相关的，逐通道的和多层的：在本文中，我们介绍了一种新颖的卷积神经网络，称为SCA-CNN，在CNN中融合了空间和通道注意力。在图像字幕的任务中，SCA-CNN在多层特征图中动态调制句子生成上下文，对视觉注意力所在的位置（即，多层的注意力空间位置）和内容（即注意力的通道）进行编码。我们在三个基准图像字幕数据集上评估了拟议的SCA-CNN体系结构：Flickr＆K，Flickr30K和MSCOCO始终观察到SCA-CNN的性能明显优于基于视觉关注的最新图像字幕方法。<br><a id="more"></a></p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>视觉注意已显示在各种结构预测任务中有效，例如图像/视频字幕[34，36]和视觉问题解答[4，35，33]。 它的成功主要是由于合理的假设，即人类视觉不会趋向于一次完整地处理整个图像；相反，人们只在需要的时间和地点专注于整个视觉空间的特定部分[5]， 注意不是将图像编码为静态矢量，而是使图像特征从当前的句子上下文演变而来，从而为混乱的图像提供了更丰富和更长的描述。 通过这种方式，视觉注意力可以被视为一种动态特征提取机制，该机制结合了一段时间内的上下文注视[19，26]。</p>
+<p>SOTA的算法通常通过深度卷积神经网络（CNN）[8、25、32]提取图像特征，首先从大小为$W \times H \times 3$的彩色图像输入开始，由$C$通道组成的卷积层扫描输入图像并输出$W \times H \times C$的特征图，它将作为下一个卷积层的输入。3D特征图的每个2D切片都会对滤波器通道所产生的空间视觉响应进行编码，在该通道中，滤波器充当模式检测器-低层滤波器检测诸如边缘和拐角的低级视觉提示，而高层滤波器则检测高级语义 像零件和物体一样的图案[40]。通过堆叠卷积层，CNN通过视觉抽象层次提取图像特征。 因此，CNN图像特征本质上是空间的，逐通道的和多层的。 然而，大多数现有的基于注意力的图像字幕模型仅考虑了空间特征[34]，即那些注意力模型仅通过空间注意力权重将句子上下文调制为最后的卷积层特征图。</p>
+<p>在本文中，我们将充分利用CNN特征的三个特征来进行基于视觉注意的图像字幕任务。 特别是，我们提出了一种新颖的基于空间和基于通道注意的卷积神经网络，称为SCA-CNN，该网络学会了注意多层3D特征图中的每个特征条目。图一说明了在多层特征图中引入逐通道注意力的动机。首先，由于逐通道特征图实质上是相应滤波器的检测响应图，因此逐通道力注意可以看作是根据句子上下文的需求选择语义属性的过程。 例如，当我们要预测蛋糕时，我们在逐通道方面的注意力机制（例如，在conv5_3 / conv5_4特征图中），将根据蛋糕，火，光和类似蜡烛的形状的语义，在由滤波器生成的通道特征图上分配更多权重。其次，由于特征图依赖于其下层特征图，因此自然而然地将注意力集中在多个层次上，从而获得对多个语义抽象的视觉关注。 例如，强调对应于组成蛋糕的更多基本形状（例如矩阵和圆柱体）的较低层通道是有益的。<br><img src="/2020/08/11/SCA-CNN/Figure1.png" class=""><br><!-- ![](./SCA-CNN/Figure1.png) --></p>
+<p>我们在三个著名的图像字幕基准上验证了提议的SCA-CNN的有效性：Flick-r8K，Flickr30K和MsCoCo。 SCA-CNN可以在BLEU4中大大超过空间关注模型[34]4.8％。总而言之，我们提出了一个统一的SCA-CNN框架，可以有效地将CNN特征中的空间，通道和多层等注意力集中到图像字幕中。特别是，提出了一种新颖的空间和通道注意力模型。该模型是通用的，因此可以应用于任何CNN体系结构中的任何层，例如流行的VGG[25]和ResNet[8]。 SCA-CNN帮助我们更好地了解CNN功能在句子生成过程中的演变。</p>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h2><p>我们对用于神经图像/视频字幕（NIC）和视觉问答（VQA）的编码器-解码器框架中使用的视觉注意模型感兴趣，这些模型属于连接计算机视觉和自然语言的最新趋势[14、41、24 ，23，42，12]。 在NIC[31,13,6,30,29]和VQA[1,17,7,21]上的开拓性工作是使用CNN将图像或视频编码为静态视觉特征向量，然后将其输入到RNN[9]解码字幕或答案等语言序列。然而，静态向量不允许图像特征适应当前的句子上下文。 受机器翻译[2]中引入的注意力机制的启发，其中解码器动态选择有用的源语言单词或子序列以将其翻译成目标语言，视觉注意力模型已在NIC和VOA中得到广泛使用。 我们将这些基于关注的模型分为以下三个领域，这些领域可以激发我们的SCA-CNN：</p>
+<ul>
+<li>Spatial Attention：[34]提出了图像字幕中的第一个视觉注意力模型。通常，他们使用“硬”池化来选择最可能的注意区域，或者使用“软”池化来对空间特征和注意力进行平均。至于VQA，[43]通过“软”的注意来融合图像区域特征。为了进一步完善空间注意力，[35]和[33]应用了一个堆叠式的注意力集中模型，其中第二个注意力是基于第一个被调制的注意力特征图。与他们不同的是，我们对CNN的多层应用了多层注意力模型。上述空间模型的共同缺陷是，它们通常会在注意力特征图上求助于加权池。因此，空间信息将不可避免地丢失。更严重的是，它们的注意力仅应用于最后一个转换层，在该层中感受野的大小会很大，并且每个感受野区域之间的差异会非常有限，从而导致空间上的注意力微不足道。</li>
+<li>Semantic Attention： 除了空间信息，[37]提出在NIC中选择语义概念。 其中图像特征是属性分类器的置信度的向量。[11]利用图像和标题之间的相关性作为全局语义信息，指导LSTM生成句子。 但是，这些模型需要外部资源来训练这些语义属性。 在SCA-CNN中。 卷积层的每个滤波器内核都作为语义检测器[40]。 因此，SCA-CNN的通道注意与语义注意类似。</li>
+<li>Multi-layer Attention：根据CNN架构的性质，对应于不同特征图层的感受野大小是不同的。 为了克服最后一个卷积层注意力中较大的感受野的弱点，[22]提出了一种多层注意力网络。 与他们的相比，SCA-CNN还整合了多层逐通道注意力。</li>
+</ul>
+<h2 id="3-Spatial-and-Channel-wise-Attention-CNN"><a href="#3-Spatial-and-Channel-wise-Attention-CNN" class="headerlink" title="3. Spatial and Channel-wise Attention CNN"></a>3. Spatial and Channel-wise Attention CNN</h2><h3 id="3-1-Overview"><a href="#3-1-Overview" class="headerlink" title="3.1. Overview"></a>3.1. Overview</h3><p>我们采用流行的编码器-解码器框架来生成图像字幕，其中CNN首先将输入图像编码为向量，然后LSTM将向量解码为单词序列。 如图2所示，SCA-CNN通过多层的通道注意和空间注意使原始的CNN多层特征图适应句子上下文。</p>
+<p>形式上，假设我们要生成图像标题的第t个字。我们将最后一个句子上下文信息编码在LSTM内存$h_{t-1} \in \mathbb{R}^d$中，其中$d$是隐藏层。在第$l$层，空间和通道注意力权重$\gamma^l$是$h_{t-1}$和当前CNN的特征$V^l$的函数。因此，SCA-CNN使用注意力权重$\gamma^l$以递归和多层的方式重新分配$V^l$。</p>
+<script type="math/tex; mode=display">V^l=CNN(X^{l-1})\\\gamma^l=\Phi(h_{t-1},V^l)\\X^l=f(V^l,\gamma^l) \tag{1}</script><p>其中$X^l$是重新分配后的特征图，$\Phi(\cdot)$表示空间和通道注意力函数，在3.2和3.3节详细解释。$V^l$是前一卷积层输出的特征图。$f(\cdot)$是一个线性权重函数，用来重新分配CNN的特征的注意力权重。与现有流行的分配策略（即基于注意力权重将所有视觉特征相加）不同，$f(\cdot)$采取逐元素相乘的方法。至此，我们可以生成第t个单词通过下面这个公式：</p>
+<script type="math/tex; mode=display">h_t=LSTM(h_{t-1},X^L,y_{t-1})\\y_t\sim p_t=softmax(h_t,y_{t-1}) \tag{2}</script><p>其中$L$是卷积层的总数量，$p_t\in\mathbb{R}^{\left|D\right|}$是一个概率向量，$D$是一个预定义的词典，包括所有标题词。</p>
+<p>需要注意的是$\gamma^l$与$V^l$和$X^L$有相同的尺寸，例如$W^l \times H^l \times C^l$，其需要$O(W^l H^l C^lk)$的空间用来计算注意力，$k$是$V^l$和$h_{t-1}$的公共层。对于GPU来说这样的计算需要的空间太大了，因此我们提出一个近似的方法分别学习空间注意力权重$\alpha^l$和通道注意力权重$\beta^l$：</p>
+<script type="math/tex; mode=display">\alpha^l=\Phi_s(h_{t-1},V^l) \tag{3}</script><script type="math/tex; mode=display">\beta^l=\Phi_c(h_{t-1},V^l) \tag{4}</script><p>其中$\Phi_c$和$\Phi_s$分别代表通道和空间注意力模型。他们能够显著降低显存，空间注意力降低至$O(W^l H^lk)$，通道注意力降低至$O(C^lk)$。</p>
+<h3 id="3-2-Spatial-Attention"><a href="#3-2-Spatial-Attention" class="headerlink" title="3.2. Spatial Attention"></a>3.2. Spatial Attention</h3><p>通常，标题词仅与图像的部分区域有关。例如，在图1中，当我们要预测蛋糕时，只有包含蛋糕的图像区域才有用。 因此，由于不相关的区域，应用全局图像特征向量来生成字幕可能导致次优结果。 空间注意力机制不是平等地考虑每个图像区域，而是尝试更多地关注与语义相关的区域。在不失一般性的前提下，我们丢弃了每一层的上标$l$。通过扩展原向量$V$的宽和高reshape$V=[v_1,v_2,…,v_m]$。其中$v_i \in \mathbb{R}^C$并且$m=W\cdot H$，我们设定$V_i$是第$i$个区域的视觉特征，给定前序的LSTM隐藏状态$h_{t-1}$，我们使用单层神经网络接一个softmax函数来生成图像区域的注意力权重$\alpha$。以下是空间注意力模型$\Phi_s$的定义：</p>
+<script type="math/tex; mode=display">a=tanh((W_sV+b_s)\oplus W_{hs}h_{t-1})\\\alpha=softmax(W_ia+b_i) \tag{5}</script><p>其中$W_s \in \mathbb{R}^{k \times C},w_ \in \mathbb{R}^{k \times d},W_i \in \mathbb{R}^k$是映射图像特征的变换矩阵。使用$\oplus$表示一个矩阵和一个向量的相加，具体是将矩阵的每一列都加上向量。$b_s \in \mathbb{R}^k,b_i \in \mathbb{R}^l$是模型偏置。</p>
+<h3 id="3-3-Channel-wise-Attention"><a href="#3-3-Channel-wise-Attention" class="headerlink" title="3.3. Channel-wise Attention"></a>3.3. Channel-wise Attention</h3><p>注意，等式（3）中的空间注意功能仍然需要视觉特征$V$来计算空间注意力权重，但是用于空间注意力的视觉特征$V$实际上并不是基于注意力的。 因此，我们引入了一种基于通道的注意力机制来参与特征$V$。值得注意的是，每个CNN滤波器都充当模式检测器，并且CNN中特征图的每个通道都是相应卷积滤波器的响应激活。 因此，逐通道应用注意力机制可以看作是选择语义属性的过程。</p>
+<p>对于逐通道注意力机制，我们将$V$reshape为$U=[U_1,U_2,…,U_C]$，其中$U_i \in \mathbb{R}^{W \times H}$代表特征图$V$的第$i$个通道，$C$是通道的总数量，之后对每个通道应用平均池化获得最终的通道特征$v$：</p>
+<script type="math/tex; mode=display">v=[v_1,v_2,...,v_C],v \in \mathbb{R}^C \tag{6}</script><p>其中标量$v_i$是向量$U_i$的平均值，代表第$i$个通道的特征，与空间注意力的模型一样，通道注意力的模型可以定义为：</p>
+<script type="math/tex; mode=display">b=tanh((W_c \otimes v + b_c) \oplus W_{hc}h_{t-1})\\ \beta=softmax({W'}_ib+{b'}_i) \tag{7}</script><p>其中$W_c \in \mathbb{R}^k,W_{hc} \in \mathbb{R}^{k \times d},{w’}_i \in \mathbb{R}^k$是变换矩阵，$\otimes$代表向量的外积，$b_c \in \mathbb{R}^k,{b’}_i \in \mathbb{R}^l$是偏置项。</p>
+<p>根据通道注意和空间注意的不同实现顺序，存在两种结合了两种注意机制的模型。</p>
+<p><strong>Channel-Spatial</strong>第一种类型是先通道后空间（C-S）的方式，C-S的结构可以参照图2，首先给一个初始的特征图$V$，采用通道注意力机制$\Phi_c$获得通道注意力权重$\beta$，在通过$\beta$与$V$的线性结合，获得逐通道权重结合的特征图。然后将该特征图作为空间注意力模型$\Phi_s$的输入，来获得空间注意力权重$\alpha$，在获得两种注意力权重$\alpha$和$\beta$后，以$V,\alpha,\beta$作为输入，利用函数$f$来计算最终的特征图$X$的输出。所有步骤可以总结为：</p>
+<script type="math/tex; mode=display">\beta=\Phi_c(h_{t-1},V)\\\alpha=\Phi_s(h_{t-1},f_c(V,\beta))\\X=f(V,\alpha,\beta) \tag{8}</script><p>其中$f(\cdot)$是特征图逐通道与其对应的权重相乘。</p>
+<p><strong>Spatial-Channel</strong>第二种是先空间后通道（S-C）结构，处理方式与C-S结构相似，总结为：</p>
+<script type="math/tex; mode=display">\alpha=\Phi_s(h_{t-1},V)\\\beta=\Phi_c(h_{t-1},f_s(V,\alpha))\\X=f(V,\alpha,\beta) \tag{9}</script><p>其中$f(\cdot)$是特征图中每个区域与其对应权重的逐元素乘法。<br><img src="/2020/08/11/SCA-CNN/Figure2.png" class=""><br><!-- ![](SCA-CNN/Figure2.png) --></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/" rel="tag"># 注意力机制</a>
+          
+            <a href="/tags/%E8%A7%86%E9%A2%91%E5%AD%97%E5%B9%95/" rel="tag"># 视频字幕</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/11/SA-Gate/" rel="next" title="SA-Gate">
+                <i class="fa fa-chevron-left"></i> SA-Gate
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/11/SPN/" rel="prev" title="SPN">
+                SPN <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SCA-CNN-Spatial-and-Channel-wise-Attention-in-Convolutional-Networks-for-Image-Captioning"><span class="nav-number">1.</span> <span class="nav-text">SCA-CNN: Spatial and Channel-wise Attention in Convolutional Networks for Image Captioning</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.3.</span> <span class="nav-text">2. Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Spatial-and-Channel-wise-Attention-CNN"><span class="nav-number">1.4.</span> <span class="nav-text">3. Spatial and Channel-wise Attention CNN</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Overview"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1. Overview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Spatial-Attention"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2. Spatial Attention</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Channel-wise-Attention"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.3. Channel-wise Attention</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

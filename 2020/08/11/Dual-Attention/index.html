@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,语义分割," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Dual Attention Network for Scene SegmentationAbstract在本文中，我们通过基于自注意力机制捕获丰富的上下文相关性来解决场景分割任务。与以前的通过多尺度特征融合捕获上下文的工作不同，我们提出了一种双重注意网络（DANet）来将局部特征与其全局依赖项进行自适应集成。具体来说，我们在扩张的FCN之上附加了两种类型的注意模块，分别对空间和通道的语义相互依赖">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dual_Attention">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/Dual-Attention/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="Dual Attention Network for Scene SegmentationAbstract在本文中，我们通过基于自注意力机制捕获丰富的上下文相关性来解决场景分割任务。与以前的通过多尺度特征融合捕获上下文的工作不同，我们提出了一种双重注意网络（DANet）来将局部特征与其全局依赖项进行自适应集成。具体来说，我们在扩张的FCN之上附加了两种类型的注意模块，分别对空间和通道的语义相互依赖">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Figure1.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Figure2.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Figure3.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Tabel1.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Figure4.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Figure5.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Tabel2.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Figure6.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Tabel3.png">
+<meta property="article:published_time" content="2020-08-11T12:37:03.000Z">
+<meta property="article:modified_time" content="2020-08-11T12:44:34.739Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="语义分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/11/Dual-Attention/Figure1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/Dual-Attention/"/>
+
+
+
+
+
+  <title>Dual_Attention | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About-me" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/Dual-Attention/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Dual_Attention</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-11T20:37:03+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B2%BE%E8%AF%BB%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">精读论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/11/Dual-Attention/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/Dual-Attention/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/08/11/Dual-Attention/" class="leancloud_visitors" data-flag-title="Dual_Attention">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Dual-Attention-Network-for-Scene-Segmentation"><a href="#Dual-Attention-Network-for-Scene-Segmentation" class="headerlink" title="Dual Attention Network for Scene Segmentation"></a>Dual Attention Network for Scene Segmentation</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>在本文中，我们通过基于自注意力机制捕获丰富的上下文相关性来解决场景分割任务。与以前的通过多尺度特征融合捕获上下文的工作不同，我们提出了一种双重注意网络（DANet）来将局部特征与其全局依赖项进行自适应集成。具体来说，我们在扩张的FCN之上附加了两种类型的注意模块，分别对空间和通道的语义相互依赖性进行建模。位置注意模块通过所有位置上的特征的加权总和选择性地聚合每个位置上的特征。相似的特征将彼此相关，而与它们之间的距离无关。同时，通道关注模块通过在所有通道图之间聚合相关特征来选择性地强调相互依赖的通道图。我们对两个注意模块的输出求和，以进一步改善特征表示，这有助于更精确的分割结果。我们在三个具有挑战性的场景分割数据集即Cityscapes，PASCAL Context和COCO Stuff数据集上实现了最新的分割性能。特别是，无需使用coarse data即可在Cityscapes测试集中获得81.5％的平均loU得分。<br><img src="/2020/08/11/Dual-Attention/Figure1.png" class=""><br><!-- ![](Dual_Attention_network/Figure1.png) --><br>图1：场景分割的目标是识别每个像素，包括物体，不同的物体。 物体/东西的各种比例，遮挡和照度变化使得解析每个像素具有挑战性。<br><a id="more"></a></p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>场景分割是一个基本且具有挑战性的问题，其目标是将场景图像分割并解析为与语义类别（包括东西）相关的不同图像区域（例如天空，道路，草地）和离散物体（例如行人，车辆，自行车）。 该任务的研究可以应用于潜在的应用，例如自动驾驶，机器人感应和图像编辑。为了有效地完成场景分割的任务，我们需要区分一些令人困惑的类别，并考虑具有不同外观的对象。 例如，田野和“草”的区域通常是无法区分的，“汽车”的对象可能经常受到比例，遮挡和照明的影响。因此，有必要增强特征表示的像素级识别能力。</p>
+<p>最近，已经提出了基于完全卷积网络（FCN）【13】的最新方法来解决上述问题。 一种方法是利用多尺度上下文融合。 例如，一些工作【3，4，29】通过组合由不同的空洞卷积和池化操作生成的特征图来聚合多尺度上下文。 还有一些工作【15，27】通过用分解的结构扩大卷积核大小或在网络之上引入有效的编码层来捕获更丰富的全局上下文信息。 另外，提出了一种编码器-解码器结构【6、10、16】，以融合中，高层语义特征。 尽管上下文融合有助于捕获不同比例的对象，但是它无法利用全局视图中对象或事物之间的关系，这对于场景分割也必不可少。</p>
+<p>另一种类型的方法采用递归神经网络来利用远程依存关系，从而提高了场景分割的准确性。 提出了一种基于二维LSTM网络【1】的方法来捕获标签上复杂的空间相关性。 工作【18】建立了一个有向无环图的递归神经网络，以捕获对局部特征的丰富上下文依赖。 这些方法利用递归神经网络隐式捕获了全局关系，其有效性在很大程度上取决于长期记忆的学习结果。</p>
+<p>为了解决上述问题，我们提出了一种新颖的框架，称为双注意力网络（daNet），用于自然场景图像分割，如图2所示。它引入了一种自注意力机制来捕获空间和通道维度中的特征依赖性。分别具体来说，我们在扩张的FCN顶部附加两个并行注意模块。一个是位置注意模块，另一个是通道注意模块。对于位置注意模块，我们引入了自注意机制，以捕获特定位置处的特征在特征图的任何两个位置之间的空间依赖性，通过在所有位置使用加权求和来聚合特征来更新它，其中权重由对应的两个位置之间的特征相似性决定。即，具有相似特征的任何两个位置都可以相互促进，而无论它们在空间维度上的距离如何。对于通道关注模块，我们使用类似的自我关注机制来捕获任意两个频道映射之间的频道依存关系，并使用所有通道映射的加权和更新每个频道映射。最后，将这两个注意模块的输出融合在一起，以进一步增强特征表示。<br><img src="/2020/08/11/Dual-Attention/Figure2.png" class=""><br><!-- ![](Dual_Attention_network/Figure2.png) --><br>图2：Dual Attention Network的总览</p>
+<p>应该注意的是，在处理复杂多样的场景时，我们的方法比以前的方法【4、29】更有效，更灵活。以图1中的街道场景为例。首先，由于照明和视野，第一行中的某些“人”和“交通灯”是不明显或不完整的物体。如果探索简单的上下文嵌入，则来自主要显性对象的上下文（例如汽车，建筑）会损害那些不起眼的物体标签。相比之下，我们的注意力模型选择性地聚合了不起眼的对象的相似特征，以突出其特征表示，并避免了显着对象的影响。其次，“汽车”和“人”的比例是多种多样的，并且要认识到这种不同的物体需要不同比例的上下文信息。就是说不同比例的特征应该同等对待以表示相同的语义。我们的带有注意力机制的模型的目的只是从全局的角度适应性地整合任何规模的相似特征，这可以在某种程度上解决上述问题。第三，我们明确考虑了空间和通道关系，以便场景理解可以受益于远程依赖性。</p>
+<p>我们的主要贡献总结如下：</p>
+<ul>
+<li>我们提出了双注意力网络（DANet），通过注意力机制提升对于场景分割特征表示的判别能力。</li>
+<li>提出了位置注意力模块来学习特征的空间相关性，提出了通道注意力模块来对模型通道的相关性建模。这两种模型通过对局部特征丰富的上下文依赖性进行减模显著提升了分割的效果。</li>
+<li>我们在三个主要的benchmark上达到了SOTA，包括Cityscapes dataset [5], PASCAL Context dataset [14]和 COCO Stuff dataset [2]。</li>
+</ul>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h2><p><strong>Semantic Segmentation.</strong> 基于全卷积网络（FCNS）的方法在语义分割上取得了长足的进步。提出了几种模型变体来增强上下文聚合。首先，Deeplabv2【3】和Deeplabv3【4】采用粗糙的空间金字塔池来嵌入上下文信息，上下文信息由具有不同扩张速率的平行空洞卷积组成。 PSP Net【29】设计了一个金字塔池模块来收集有效的上下文先验，其中包含不同规模的信息。编解码结构【6、8、9】融合了中，高层语义特征，获得了不同的尺度上下文。其次，学习对局部特征的上下文依赖性也有助于特征表示。 DAG-RNN【18】使用循环神经网络对有向图进行建模，以捕获丰富的上下文相关性。 PSANet【30】通过卷积层和空间位置的相对位置信息捕获像素关系。此外，EncNet【27】引入了一种渠道关注机制来捕获全局上下文。</p>
+<p><strong>Self-attention Modules.</strong> 注意力机制能够对long-range的依赖性建模并且能够应用于多个任务[11,12,17,19-21]，在[21]中，第一次使用注意力机制来获取输入全局的全局依赖性，并且将其应用于机器翻译。同时，注意力模型在图像领域增长迅速。[28]介绍了使用自注意力机制学习更好的图像生成器。[23]同样基于自注意力机制探索了对于图像和视频在空间维度non-local操作的有效性。</p>
+<p>与以前的作品不同，我们在场景分割的任务中扩展了自注意力机制，并精心设计了两种类型的注意力模块，以捕获丰富的上下文关系，从而以类内紧凑性更好地表示特征。 综合经验结果验证了我们提出的方法的有效性。</p>
+<h2 id="3-Dual-Attention-Network"><a href="#3-Dual-Attention-Network" class="headerlink" title="3. Dual Attention Network"></a>3. Dual Attention Network</h2><p>在本节中，我们首先介绍我们的网络的一般框架，然后介绍两个注意模块，分别在空间和通道维度上捕获远程上下文信息。 最后，我们描述如何将它们汇总在一起以进一步完善。</p>
+<h3 id="3-1-Overview"><a href="#3-1-Overview" class="headerlink" title="3.1. Overview"></a>3.1. Overview</h3><p>给定场景分割的图片，其中的东西或物体在比例，照明和视图上各不相同。 由于卷积运算将导致局部接受场。具有相同标签的像素对应的特征可能会有一些差异。 这些差异会导致类内不一致并影响识别准确性。 为了解决此问题，我们通过建立具有注意机制的要素之间的关联来探索全局上下文信息。 我们的方法可以自适应地聚合远程上下文信息，从而改善场景分割的特征表示。</p>
+<p>如图2所示，我们设计了两种类型的注意力模块，以在扩张的残差网络生成的局部特征上绘制全局上下文，从而获得更好的特征表示以进行像素级预测。我们采用空洞卷积策略【3】的预训练残差网络为backbone。 注意，我们删除了下采样操作，并在最后两个ResNet块中使用了空洞卷积，从而将最终特征图的大小缩小到输入图像的1/8。 它保留了更多详细信息，而无需添加额外的参数。 然后，来自扩张残差网络的特征将被馈送到两个并行注意模块中。以图2中上部的空间注意模块为例。我们首先应用卷积层以获得降维特征，然后将特征向量馈入空间注意力模块并通过以下三个步骤生成空间域long-range的上下文信息。第一步生成空间注意力矩阵，其能够对特征中任意两个像素的空间相关性建模。然后将注意力矩阵域原始特征矩阵相乘。最后我们将上面相乘的结果与原始特征逐元素相加获得最终具有long-range上下文信息的特征向量。同时，通道上的long-range上下文信息由通道注意力模块得到。获得通道相关性的步骤与位置注意力模块相似，除了第一步，即在通道维度计算通道注意力矩阵。最终我们将两个注意力模块的输出聚合来获得像素级预测的更好的特征表示。</p>
+<h3 id="3-2-Position-Attention-Module"><a href="#3-2-Position-Attention-Module" class="headerlink" title="3.2. Position Attention Module"></a>3.2. Position Attention Module</h3><p>区分特征表示对于场景理解至关重要，可以通过捕获远程上下文信息来获得。 然而，许多工作【15，29】表明，传统FCNS生成的局部特征可能导致物体和物品的错误分类。 为了在局部特征上建模丰富的上下文关系，我们引入了一个位置注意模块。 位置注意模块将范围广泛的上下文信息编码为局部特征，从而增强其表示能力。 接下来，我们详细说明自适应聚合空间上下文的过程。</p>
+<p>如图3（A)所示，给定一个局部特征$A\in R^{C\times H\times W}$，我们首先将其馈入一个卷积层生成两张新的特征图$B$和$C$，$\{B,C\}\in R^{C\times H\times W}$，然后将其reshape为$R^{C\times N}$，其中$N=H\times W$是像素的总数。之后我们将$C$的转置与$B$相乘，再用一个softmax层来计算空间注意力图$S\in R^{N\times N}$</p>
+<script type="math/tex; mode=display">S_{ji}=\frac{exp(B_i\cdot C_j)}{\sum_{i=1}^Nexp(B_i\cdot C_j)}\tag{1}</script><p>其中$S_{ji}$表示位置$i^{th}$的像素与位置$j^{th}$间的相似性度量。两个位置的特征表示越相似，它们之间的相关性就越高。</p>
+<p>同时，我们将特征图$A$馈入一个卷积层生成一个新的特征图$D\in R^{C\times H\times W}$，然后将其reshape为$R^{C\times N}$。再将$D$与$S$的转置相乘，得到结果reshape为$R^{C\times H\times W}$，最终我们乘以一个尺度因子$\alpha$，然后再与特征图$A$逐像素相加得到最终的输出$E\in R^{C\times H\times W}$，可表示为下式：</p>
+<script type="math/tex; mode=display">E_j=\alpha\sum_{i=1}^N(S_{ji}D_i)+A_j\tag{2}</script><p>$\alpha$初始化为0然后通过学习逐渐增加权重[28]。从等式2可以得出，每个位置上的结果特征$E$是所有位置上的特征与原始特征的加权和。因此，它具有全局上下文视图，并根据空间关注图选择性地聚合上下文。 相似的语义特征具有相同的权重，从而改善了类内部的紧凑性和语义一致性。<br><img src="/2020/08/11/Dual-Attention/Figure3.png" class=""><br><!-- ![](Dual_Attention_network/Figure3.png) --><br>图3：位置注意力模块（A）和通道注意力模块（B）的细节</p>
+<h3 id="3-3-Channel-Attention-Module"><a href="#3-3-Channel-Attention-Module" class="headerlink" title="3.3. Channel Attention Module"></a>3.3. Channel Attention Module</h3><p>每个高层的通道图都可以作为特定于类的响应，并且不同的语义响应相互关联。 通过利用通道图之间的相互依赖关系，我们可以强调相互依赖的特征图并改善特定语义的特征表示。 因此，我们构建了一个通道关注模块，以明确地建模通道之间的相互依存关系。</p>
+<p>通道注意力模块的结构如图3（B）所示。区别于位置注意模块，我们从原始特征$A\in R^{C\times H\times W}$计算通道注意力图$X\in R^{C\times C}$，接着将其reshape为$R^{C\times N}$，接着将$A$与$A$的转置相乘。最终应用一层softmax层得到通道注意力图$X\in R^{C\times C}$：</p>
+<script type="math/tex; mode=display">x_{ji}=\frac{exp(A_i\cdot A_j)}{\sum_{i=1}^Cexp(A_i\cdot A_j)}\tag{3}</script><p>其中$x_{ji}$通道$i^{th}$对通道$j^{th}$的影响的度量。此外我们将$X$的转置与$A$相乘并reshape为$R^{C\times H\times W}$。再将结果乘以尺度因子$\beta$并与$A$逐像素相加得到最终的输出$E\in R^{C\times H\times W}$:</p>
+<script type="math/tex; mode=display">E_j=\beta\sum_{i=1}^C(x_{ji}A_i)+A_j\tag{4}</script><p>$\beta$从0开始逐渐增加。等式4展示了最终的特征图是所有通道的特征与原特征的加权和，这个最终的特征图能够对两张特征图的long-range的语义依赖性建模，即能够提高特征的区分能力。</p>
+<p>在计算两个通道的关系之前，我们不使用卷积层来embed特征，因为它可以保持不同通道图之间的关系。 另外，与最近的研究[27]通过全局池化或编码层探索通道的关系不同，我们利用所有有关联的位置的空间信息来对通道相关性进行建模。</p>
+<h3 id="3-4-Attention-Module-Embedding-with-Networks"><a href="#3-4-Attention-Module-Embedding-with-Networks" class="headerlink" title="3.4. Attention Module Embedding with Networks"></a>3.4. Attention Module Embedding with Networks</h3><p>为了充分利用远程上下文信息，我们汇总了这两个注意模块的功能。 具体来说，我们通过卷积层转换两个注意力模块的输出，并执行逐元素求和以完成特征融合。 最后，在卷积层之后生成最终的预测图。 我们不采用级联操作，因为它需要更多的GPU内存。我们的注意力模块很简单，可以直接插入现有的FCN网络中。 它们不会增加太多参数，但可以有效地增强特征表示</p>
+<h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4. Experiments"></a>4. Experiments</h2><p>为了评估该方法，我们对Cityscapes数据集【5】，PASCAL VOC2012【7】，PASCAL Context数据集【14】和COCO Stuff数据集【2】进行了综合实验。 实验结果表明，DaNet在三个数据集上均达到了最先进的性能。 在接下来的小节中。 我们首先介绍数据集和实现细节，然后在Cityscapes数据集上进行一系列的消融实验。 最后，我们在PASCAL VOC 2012，PASCA Context和coco Stuff上报告了我们的结果。</p>
+<h3 id="4-1-Datasets-and-Implementation-Details"><a href="#4-1-Datasets-and-Implementation-Details" class="headerlink" title="4.1. Datasets and Implementation Details"></a>4.1. Datasets and Implementation Details</h3><p><strong>Cityscapes</strong> 该数据集包含从50个不同城市捕获的5,000张图像。 每个图像都有2048 x 1024像素，这些像素具有19个语义类的高质量像素级标签。 训练集中有2979张图像，验证集中有500张图像，测试集中有1525张图像。 我们在实验中不使用coarse data。</p>
+<p><strong>PASCAL VOC 2012</strong> 该数据集包含10582张用于训练的图像，1449张用于验证的图像和1456张用于测试的图像，其中涉及20个前景对象类和一个背景类。</p>
+<p><strong>PASCAL Context</strong> 数据集为整个场景提供了详细的语义标签，其中包含用于训练的4998张图像和用于测试的5105张图像。 继【10、27】之后，我们对最常见的59个类别和一个背景类别（总共60个类别）进行了评估。</p>
+<p><strong>COCO Stuff</strong> 数据集包含用于训练的9,000张图像和用于测试的1,000张图像。 继【6，10】之后，我们报告了171个类别的结果，其中包括对每个像素进行标记的80个对象和91个stuff</p>
+<h4 id="4-1-1-Implementation-Details"><a href="#4-1-1-Implementation-Details" class="headerlink" title="4.1.1 Implementation Details"></a>4.1.1 Implementation Details</h4><p>我们基于Pytorch实现我们的方法。 继【14，27】之后，我们采用了一种多元学习率策略，其中每次迭代后，初始学习率乘以${(1-\frac{iter}{total-iter})}^{0.9}$。 对于Cityscapes数据集，基本学习率设置为0.0l。 动量和重量衰减系数分别设置为0.9和0.0001。 我们用同步Bn【27】训练模型。 对于Cityscapes，Batchsize设置为8，对于其他数据集，Batchsize设置为16。 在采用多尺度增强时，我们将COCO Stuff的训练次数设置为180个epoch，而将其他数据集的训练时间设置为240个epoch。 按照【3】，当同时使用两个注意模块时，我们在网络端采用多损失。 对于数据扩充，我们在Cityscapes数据集的消融研究中，在训练过程中应用了随机裁剪（cropsize 768）和随机左右翻转。</p>
+<h3 id="4-2-Results-on-Cityscapes-Dataset"><a href="#4-2-Results-on-Cityscapes-Dataset" class="headerlink" title="4.2. Results on Cityscapes Dataset"></a>4.2. Results on Cityscapes Dataset</h3><h4 id="4-2-1-Ablation-Study-for-Attention-Modules"><a href="#4-2-1-Ablation-Study-for-Attention-Modules" class="headerlink" title="4.2.1 Ablation Study for Attention Modules"></a>4.2.1 Ablation Study for Attention Modules</h4><p>我们在扩张网络的顶部采用了双重关注模块来捕获远程依赖关系，以更好地了解场景。 为了验证关注模块的性能，我们在表1中进行了不同设置的实验。</p>
+<p>如表1所示，关注模块显着提高了性能。 与基线FCN（ResNet-50）相比，采用位置注意模块的平均loU结果为75.74％，提高了5.71％。 同时，单独使用通道上下文模块的性能优于基线4.25％。 当我们将两个注意力模块整合在一起时，性能进一步提高到76.34％。此外，当我们采用更深的预训练网络（ResNet-101）时，具有两个注意模块的网络可将基线模型的分割性能显着提高5.03％。结果表明，注意力模块为场景分割带来了很大的好处。<br><img src="/2020/08/11/Dual-Attention/Tabel1.png" class=""><br><!-- ![](Dual_Attention_network/Tabel1.png) --><br>表1：在Cityscape验证集上的消融研究。PAM代表位置注意力模块，CAM代表通道注意力模块。</p>
+<p>位置注意模块的效果可以在图4中看到。位置注意模块的一些细节和对象边界更加清晰，例如第一行中的杆和第二行中的“人行道”，通过局部特征的选择性融合增强了区分细节。 同时，图5展示了使用我们的通道关注模块，现在可以正确分类一些错误分类的类别，例如第一行和第三行中的“公共汽车”。 通道图之间的选择性集成有助于捕获上下文信息语义一致性已得到明显改善。<br><img src="/2020/08/11/Dual-Attention/Figure4.png" class=""><br><!-- ![](Dual_Attention_network/Figure4.png) --><br>图4：在Cityscape验证集上位置注意力模块的可视化结果。<br><img src="/2020/08/11/Dual-Attention/Figure5.png" class=""><br><!-- ![](Dual_Attention_network/Figure5.png) --><br>图5：在Cityscape验证集上通道注意力的可视化结果。</p>
+<h4 id="4-2-2-Ablation-Study-for-Improvement-Strategies"><a href="#4-2-2-Ablation-Study-for-Improvement-Strategies" class="headerlink" title="4.2.2 Ablation Study for Improvement Strategies"></a>4.2.2 Ablation Study for Improvement Strategies</h4><p>遵循【4】，我们采用相同的策略来进一步提高性能。 （1）DA：随机缩放的数据扩充。 （2）多重网格：我们在最后一个ResNet块中采用不同大小（4、8、16）的网格层次结构。（3）MS：我们对来自8个图像尺度{0.5 0.75 1 1.25 1.5 1.75 2 2.2}的分割概率图求平均值以进行推理。</p>
+<p>实验结果如表2所示。随机缩放的数据增强将性能提高了近1. 26％，这表明网络受益于丰富训练数据的规模多样性。 我们采用多网格以获得更好的预训练网络特征表示，从而进一步提高了1.11％。 最后，分割图融合进一步将性能提高到81.50％，比著名方法Deeplabv3【4】（在Cityscape val上为79.30％）提高了2.20％<br><img src="/2020/08/11/Dual-Attention/Tabel2.png" class=""><br><!-- ![](Dual_Attention_network/Tabel2.png) --><br>表2：在Cityscape验证集上不同训练策略的比较。DANet-101表示使用了基准网络的ResNet-101，DA表示使用随机尺度进行数据增强。Multi-Grid表示使用多网格方法，MS表示在推理阶段使用多尺度输入。</p>
+<h4 id="4-2-3-Visualization-of-Attention-Module"><a href="#4-2-3-Visualization-of-Attention-Module" class="headerlink" title="4.2.3 Visualization of Attention Module"></a>4.2.3 Visualization of Attention Module</h4><p>对于位置注意力，整个自注意力图的大小为$(H\times W)\times (H\times W)$，这意味着对于图像中的每个特定点，都有一个相应的子注意图，其大小为$(H\times W)$，在图6中，对于每个输入图像，我们选择两个点（标记为＃1和＃2），并分别在第2列和第3列中显示它们对应的子注意图。我们注意到，位置注意模块可以捕获清晰的语义相似性和长期关系。例如，在第一行中，红色点＃1标记在建筑物上，并且其注意图（在第2列中）突出显示了建筑物所在的大部分区域。此外，在子注意力图中，即使其中一些边界远离点＃1，边界也非常清晰。至于第二点，它的注意力图集中在标记为“汽车”的大多数位置上。在第二行中，相应像素的数量较少，全局区域中的“交通标志”和“人”也是如此。第三行是“植被”类和“人”类的。特别的是，第2点不会对附近的“骑手”类做出反应，但是会对遥远的“人”做出响应。</p>
+<p>对于通道关注，很难直接对关注图进行全面的可视化。 相反，我们显示某些通道，以查看它们是否突出显示了清晰的语义区域。 在图6中，我们在第4列和第5列中显示了第11和第4个通道。我们发现，在通道关注模块增强后，特定语义的响应是明显的。 例如，在所有三个示例中，第11个通道图都对汽车类别做出响应，而第4个通道图则是针对“植被”类的，这有利于两个场景类别的分割。 简而言之，这些可视化进一步证明了捕获远程依存关系以改善场景分割中的特征表示的必要性。<br><img src="/2020/08/11/Dual-Attention/Figure6.png" class=""><br><!-- ![](Dual_Attention_network/Figure6.png) --><br>图6：在Cityscape验证集上注意力模块的可视化结果。对于每一行，我们列出了输入图，输入图中对应两个点的注意力子图$(H\times W)$。同时，我们列出了通道注意力模块输出的两个通道图，来自第4通道和第11通道。最后是对应的结果以及groundtruth。</p>
+<h4 id="4-2-4-Comparing-with-State-of-the-art"><a href="#4-2-4-Comparing-with-State-of-the-art" class="headerlink" title="4.2.4 Comparing with State-of-the-art"></a>4.2.4 Comparing with State-of-the-art</h4><p>我们进一步将我们的方法与Cityscapes测试集中的现有方法进行比较。 具体来说，我们仅使用精细的标记数据来训练daNet-101，并将测试结果提交给官方评估服务器。 结果显示在表3中。DANet的主要优势是优于现有方法。 特别是，在使用相同的主干网ResNet-101的情况下，我们的模型大大优于PSANet【30】。 而且，它也超过了DenseASPP，[25]，它使用比我们更强大的预训练模型<br><img src="/2020/08/11/Dual-Attention/Tabel3.png" class=""><br><!-- ![](Dual_Attention_network/Tabel3.png) --><br>表3：在Cityscape测试集上每一类的结果。DANet超过了之前的方法并且在Mean IoU上达到了81.5%。</p>
+<h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5. Conclusion"></a>5. Conclusion</h2><p>在本文中，我们提出了一种用于场景分割的双重注意力网络（DANet），它利用自我注意机制自适应地整合了局部语义特征。 具体来说，我们引入了一个位置关注模块和一个通道关注模块，以分别捕获空间和通道维度上的全局依赖性。 消融实验表明，双注意力模块有效地捕获了远程上下文信息，并给出了更精确的分割结果。 我们的注意力网络在四个场景分割数据集上始终保持出色的性能。即Cityscapes，Pascal voc 2012，Pascal context和coco Stuff数据集。 此外，重要的是减少计算复杂度并增强模型的鲁棒性，这将在以后的工作中进行研究。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E8%AF%AD%E4%B9%89%E5%88%86%E5%89%B2/" rel="tag"># 语义分割</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/11/CSPN/" rel="next" title="CSPN">
+                <i class="fa fa-chevron-left"></i> CSPN
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/11/Gate-Conv/" rel="prev" title="Gate_Conv">
+                Gate_Conv <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Dual-Attention-Network-for-Scene-Segmentation"><span class="nav-number">1.</span> <span class="nav-text">Dual Attention Network for Scene Segmentation</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.3.</span> <span class="nav-text">2. Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Dual-Attention-Network"><span class="nav-number">1.4.</span> <span class="nav-text">3. Dual Attention Network</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Overview"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1. Overview</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Position-Attention-Module"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2. Position Attention Module</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Channel-Attention-Module"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.3. Channel Attention Module</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Attention-Module-Embedding-with-Networks"><span class="nav-number">1.4.4.</span> <span class="nav-text">3.4. Attention Module Embedding with Networks</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Experiments"><span class="nav-number">1.5.</span> <span class="nav-text">4. Experiments</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Datasets-and-Implementation-Details"><span class="nav-number">1.5.1.</span> <span class="nav-text">4.1. Datasets and Implementation Details</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-1-Implementation-Details"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">4.1.1 Implementation Details</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Results-on-Cityscapes-Dataset"><span class="nav-number">1.5.2.</span> <span class="nav-text">4.2. Results on Cityscapes Dataset</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-Ablation-Study-for-Attention-Modules"><span class="nav-number">1.5.2.1.</span> <span class="nav-text">4.2.1 Ablation Study for Attention Modules</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-Ablation-Study-for-Improvement-Strategies"><span class="nav-number">1.5.2.2.</span> <span class="nav-text">4.2.2 Ablation Study for Improvement Strategies</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-3-Visualization-of-Attention-Module"><span class="nav-number">1.5.2.3.</span> <span class="nav-text">4.2.3 Visualization of Attention Module</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-4-Comparing-with-State-of-the-art"><span class="nav-number">1.5.2.4.</span> <span class="nav-text">4.2.4 Comparing with State-of-the-art</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Conclusion"><span class="nav-number">1.6.</span> <span class="nav-text">5. Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

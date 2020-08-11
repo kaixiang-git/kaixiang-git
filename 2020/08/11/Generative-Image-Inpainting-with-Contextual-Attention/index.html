@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,图像修复," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Generative Image Inpainting with Contextual AttentionAbstract最近基于深度学习的方法对于修复图像中较大的缺失区域的任务已取得了令人鼓舞的结果。这些方法可以生成视觉上看似合理的图像结构和纹理，但通常会生成扭曲的结构或与周围区域不一致的模糊纹理。这主要是由于卷积神经网络无法有效地从遥远的空间位置借用或复制信息。另一方面，当需要从周围区域借用纹">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Generative Image Inpainting with Contextual Attention">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="Generative Image Inpainting with Contextual AttentionAbstract最近基于深度学习的方法对于修复图像中较大的缺失区域的任务已取得了令人鼓舞的结果。这些方法可以生成视觉上看似合理的图像结构和纹理，但通常会生成扭曲的结构或与周围区域不一致的模糊纹理。这主要是由于卷积神经网络无法有效地从遥远的空间位置借用或复制信息。另一方面，当需要从周围区域借用纹">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/Figure1.png">
+<meta property="article:published_time" content="2020-08-11T12:47:50.000Z">
+<meta property="article:modified_time" content="2020-08-11T12:49:13.586Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="图像修复">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/Figure1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/"/>
+
+
+
+
+
+  <title>Generative Image Inpainting with Contextual Attention | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About-me" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Generative Image Inpainting with Contextual Attention</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-11T20:47:50+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/" class="leancloud_visitors" data-flag-title="Generative Image Inpainting with Contextual Attention">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Generative-Image-Inpainting-with-Contextual-Attention"><a href="#Generative-Image-Inpainting-with-Contextual-Attention" class="headerlink" title="Generative Image Inpainting with Contextual Attention"></a>Generative Image Inpainting with Contextual Attention</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>最近基于深度学习的方法对于修复图像中较大的缺失区域的任务已取得了令人鼓舞的结果。这些方法可以生成视觉上看似合理的图像结构和纹理，但通常会生成扭曲的结构或与周围区域不一致的模糊纹理。这主要是由于卷积神经网络无法有效地从遥远的空间位置借用或复制信息。另一方面，当需要从周围区域借用纹理时，传统的纹理和补丁合成方法特别适合。基于这些观察，我们提出了一种基于深度生成模型的新方法，该方法不仅可以合成新颖的图像结构，而且可以显式地在网络训练期间利用周围的图像特征作为参考，以做出更好的预测。该模型是前馈的全卷积神经网络，可以处理任意位置带有多个孔且尺寸可变的图像。在包括面部（CelebA，CelebA-HQ），纹理（DTD）和自然图像（ImageNet，Places2）在内的多个数据集上进行的实验表明，我们提出的方法比现有的方法产生更高质量的修复效果。<br><a id="more"></a></p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>填充图像的缺失像素（通常称为图像修补或补全）是计算机视觉中的重要任务。 它在照片编辑，基于图像的渲染和计算摄影中有许多应用[3,23,28,29,34,39]。 图像修复的核心挑战在于，为与现有像素连贯的缺失区域合成视觉上逼真的和语义上合理的像素。</p>
+<p>早期的作品[3,13]尝试使用类似于纹理合成[9,10]的想法来解决问题，即 通过将背景色块匹配并复制到从低分辨率到高分辨率或从孔边界传播到孔中。这些方法在背景修复任务中特别有效，并且已在实际应用中广泛部署[3]。 但是，由于他们假设在背景区域中的某处可以找到丢失的色块，因此它们无法为新颖的图像内容产生幻觉，因为这些情况下，修复区域涉及复杂的，非重复性的结构（例如，面孔，物体）。 而且，这些方法不能捕获高级语义。</p>
+<p>深层卷积神经网络（CNN）和生成对抗网络（GAN）的飞速发展[11]启发了最近的工作[15,25,30,39]，将修复图像化为条件图像生成问题，其中高级语义识别和低级像素合成被公式化为编码器-解码器网络，并与对抗网络共同训练以鼓励生成的像素与现有像素之间的一致性。 这些作品显示出可以在高度结构化的图像中生成合理的新内容，例如面部，物体和场景。</p>
+<p>不幸的是，这些基于CNN的方法通常会产生边界伪影，扭曲的结构以及与周围区域不一致的模糊纹理。我们发现这很可能是由于卷积神经网络在建模远处上下文信息与孔区域之间的长期相关性方面的效率低下。例如，要使一个像素受64个像素的内容的影响，它需要至少6层3×3卷积，其膨胀因子为2或等效值[15,40]。然而，膨胀的卷积从规则且对称的网格中采样特征，因此可能无法权衡其他特征。注意，最近的工作[38]试图通过优化生成的补丁与已知区域中匹配的补丁之间的纹理相似性来解决外观差异。尽管改善了视觉质量，但此方法受到数百次梯度下降迭代的拖累，并且花费数分钟才能在GPU上处理分辨率为512×512的图像。</p>
+<p>我们提出了一个统一的前馈生成网络，其中包含用于图像修复的新型上下文关注层。我们提出的网络包括两个阶段。第一阶段是一个简单的扩张式卷积网络，该网络经过重构损失训练，可以粗略估计丢失的内容。在第二阶段整合了语义关注。上下文关注的核心思想是使用已知补丁的特征作为卷积过滤器来处理生成的补丁。它以卷积的形式进行设计和实现，将生成的补丁与已知的上下文补丁进行匹配，使用逐通道方式的softmax加权相关补丁，并进行反卷积以使用上下文补丁重构生成的补丁。上下文注意模块还具有空间传播层，以鼓励上下文的空间连贯性。为了使网络能够使新颖的内容产生想象力，与上下文注意路径平行的还有另一个卷积路径。将这两个路径汇总并馈入单个解码器以获得最终输出。整个网络受到端到端的训练，使用reconstruction损失和两次Wasserstein GAN损失[1,12]，其中一条路径着眼于全局图像，另一条路径着眼于缺失区域的局部补丁。</p>
+<p>在包括面部，纹理和自然图像在内的多个数据集上进行的实验表明，与现有方法相比，该方法可产生更高质量的修复结果。 结果如图1所示。<br><img src="/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/Figure1.png" class=""><br><!-- ![](./Generative%20Image%20Inpainting%20with%20Contextual%20Attention/Figure1.png) --><br>图1：我们的方法在自然场景，面部和纹理图像上的示例修复结果。 缺失的区域以白色显示。 在每对中，左边是输入图像，右边是我们训练之后的神经网络输出，而无需任何后处理。</p>
+<p>我们的贡献总结如下：</p>
+<ul>
+<li>我们提出了一个新颖的上下文关注层，使得相关特征补丁收到远距离空间位置像素的影响。</li>
+<li>在当前最先进的生成图像修复网络的基础上，我们介绍了几种技术，包括修复网络增强，全局和局部WGAN [12]以及空间折衷的重建损失，以提高训练的稳定性和速度。因此，我们能够在一周而不是两个月的时间内训练网络。</li>
+<li>我们统一的前馈生成网络在包括CelebA人脸[26]，CelebA-HQ人脸[20]，DTD纹理[6]，ImageNet [32]和Places2 [41]等各种具有挑战性的数据集上实现了高质量的修复效果。</li>
+</ul>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h2><h3 id="2-1-Image-Inpainting"><a href="#2-1-Image-Inpainting" class="headerlink" title="2.1. Image Inpainting"></a>2.1. Image Inpainting</h3><p>现有的图像修复作品主要可以分为两组。第一组是传统的使用低级特征的基于扩散或基于补丁的方法。 第二组是通过基于学习的方法来解决修复问题，例如训练深度卷积神经网络以预测缺失区域的像素。</p>
+<p>传统的基于扩散或补丁的方法（例如[2,4,9,10]）通常使用变分算法或补丁相似度将信息从背景区域传播到孔中。 这些方法对于静态纹理效果很好，但对于非静态数据（例如自然图像）则受到限制。 Simakov等人[34] 提出了一种基于双向补丁相似度的方案，以更好地对非平稳视觉数据进行建模，以进行重新定位和修复应用。 但是，补丁相似度的密集计算[34]是非常昂贵的操作，这阻碍了这种方法的实际应用。 为了解决这一挑战，提出了一种称为PatchMatch [3]的快速最近邻域算法，该算法对于包括修补在内的图像编辑应用显示了重要的实用价值。</p>
+<p>近年来，深度学习和基于GAN的方法在图像修复方面表现很好。最初他们[21,37]训练卷积神经网络对小区域进行去噪和修复。训练上下文编码器[30]，用于修补大孔的深度神经网络。以128×128的图像来修复64×64的中心区域，并以逐像素l2 reconstruction loss和生成对抗损失为目标函数。最近，lizuka等人[15]。通过引入全局和局部区分因素作为对抗性损失来改进它。全局鉴别器评估整个图像是否在整体上是连贯的，而局部鉴别器集中在以生成区域为中心的小区域上，以增强局部一致性。此外，lizuka等人[15]在修复网络中使用膨胀卷积来代替上下文编码器中采用的逐通道全连接层，两种技术都被是为了增加输出神经元的感受野。同时，针对面部修复的研究也很多。Yeh等[39]在损坏的图像的潜在空间中搜索最接近的编码，然后解码以获得完整的图像。Li等人[25]引入额外的人脸解析损失以完成人脸。然而，这些方法通常需要诸如图像混合操作之类的后处理步骤，以在孔边界附近施加颜色一致性。</p>
+<p>一些工作[35,38]遵循了图像样式化[5,24]的想法，将修复设计为优化问题。 例如，Yang等人[38] 提出了一种基于图像内容和纹理约束的联合优化的多尺度神经补丁合成方法，该方法不仅保留上下文结构，而且通过将补丁与深度分类网络中最相似的中层特征进行匹配，从而产生高频细节 。这种方法显示出令人满意的视觉效果，但是优化过程而非常慢。</p>
+<h3 id="2-2-Attention-Modeling"><a href="#2-2-Attention-Modeling" class="headerlink" title="2.2. Attention Modeling"></a>2.2. Attention Modeling</h3><p>在深度卷积神经网络中，有许多关于学习空间注意力的研究。在这里，我们回顾与所提出的上下文注意模型有关的一些典型代表。Jaderberg等人[17]首先提出了一个用于对象分类任务的参数化空间关注模块，称为空间变换器网络。该模型具有一个定位模块，可以预测向曲面特征进行全局仿射变换的参数。但是，此模型假定进行了全局转换，因此不适合建模逐块注意。 Zhou等人[42]引入了一种appearance flow来预测偏移矢量，该偏移矢量指定了应移动输入视图中的哪些像素以重建目标视图以进行新颖的视图合成。根据我们的实验，该方法显示出对匹配相同对象的相关视图有效，但对预测从背景区域到孔的流场无效。最近，Dai等人[8]和Jeon等人[18]提出学习空间专注和可变卷积核。这些方法可以在训练过程中更好地利用信息来使卷积核变形，但是当我们需要从背景中借用精确特征时，这些方法仍然可能受到限制。</p>
+<h2 id="3-Improved-Generative-Inpainting-Network"><a href="#3-Improved-Generative-Inpainting-Network" class="headerlink" title="3. Improved Generative Inpainting Network"></a>3. Improved Generative Inpainting Network</h2><p>我们首先通过复制和改进最近的最先进的修复模型[15]来构建基础的生成图像修复网络，该模型已显示出对面部，建筑物立面和自然图像进行修复的视觉效果。<br><strong>Coarse-to-ﬁne network architecture</strong>改进后的模型的网络架构如图2所示。我们采用与[15]中相同的输入和输出配置进行训练和推理。 生成器网络将一个使用白色像素填充孔洞的图像和孔区域的二进制掩码作为输入对，并输出最终的完整图像。 我们将输入与相应的二进制掩码配对，以处理尺寸，形状和位置可变的孔。 网络的输入是一个256×256的图像，该图像带有一个在训练过程中随机采样的矩形缺失区域，训练后的模型可以拍摄带有多个孔的不同大小的图像。</p>
+<p>在图像修补任务中，感受野的大小应足够大，Iizuka等[15] 为此，采用膨胀卷积。 为了进一步扩大接收范围并稳定训练，我们引入了两阶段的粗到精网络结构，其中第一个网络进行初始粗略预测，第二个网络将粗略预测作为输入并预测精确结果。 粗略的网络训练有重建损失，而细化的网络训练有重建损失和GAN损失。 直觉上，细化网络比缺少区域的原始图像看到的场景更完整，因此其编码器比粗略网络可以更好地学习特征表示。 这种两阶段的网络架构在本质上类似于残差学习[14]或深度监督[22]。</p>
+<p>同样，我们的修复网络是为提高效率而设计的，它是一种薄而深的方案，其参数少于[15]中的参数。 在层实现方面，我们对所有卷积层使用镜像填充，并删除批处理归一化层[16]（我们发现这会恶化颜色一致性）。 另外，我们将ELU [7]用作激活函数，而不是[15]中的ReLU，并裁剪输出滤波器值，而不是使用tanh或Sigmoid函数。 此外，我们发现将全局和局部特征表示用于GAN训练工作要比特征串联更好[15]。 更多细节可以在补充材料中找到。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E5%9B%BE%E5%83%8F%E4%BF%AE%E5%A4%8D/" rel="tag"># 图像修复</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/11/Gate-Conv/" rel="next" title="Gate_Conv">
+                <i class="fa fa-chevron-left"></i> Gate_Conv
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/11/Non-local-Neural-Networks/" rel="prev" title="Non-local Neural Networks">
+                Non-local Neural Networks <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Generative-Image-Inpainting-with-Contextual-Attention"><span class="nav-number">1.</span> <span class="nav-text">Generative Image Inpainting with Contextual Attention</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.3.</span> <span class="nav-text">2. Related Work</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Image-Inpainting"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1. Image Inpainting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Attention-Modeling"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.2. Attention Modeling</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Improved-Generative-Inpainting-Network"><span class="nav-number">1.4.</span> <span class="nav-text">3. Improved Generative Inpainting Network</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

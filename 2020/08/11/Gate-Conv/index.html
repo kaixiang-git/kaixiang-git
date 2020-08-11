@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,稀疏卷积," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Free-Form Image Inpainting with Gated ConvolutionAbstract我们提出了一种生成式图像修复系统，以使用自由形式的蒙版和引导完成图像。该系统基于从数百万张图像中学习到的门控卷积，无需额外的标记工作。提出的门控卷积解决了将所有输入像素都视为有效像素的原始卷积问题，归纳了Partial卷积，通过为所有通道在所有层上每个空间位置的每个通道提供了一种可学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gate_Conv">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/Gate-Conv/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="Free-Form Image Inpainting with Gated ConvolutionAbstract我们提出了一种生成式图像修复系统，以使用自由形式的蒙版和引导完成图像。该系统基于从数百万张图像中学习到的门控卷积，无需额外的标记工作。提出的门控卷积解决了将所有输入像素都视为有效像素的原始卷积问题，归纳了Partial卷积，通过为所有通道在所有层上每个空间位置的每个通道提供了一种可学习">
+<meta property="article:published_time" content="2020-08-11T12:45:57.000Z">
+<meta property="article:modified_time" content="2020-08-11T12:47:00.830Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="稀疏卷积">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/Gate-Conv/"/>
+
+
+
+
+
+  <title>Gate_Conv | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About-me" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/Gate-Conv/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gate_Conv</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-11T20:45:57+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/11/Gate-Conv/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/Gate-Conv/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/08/11/Gate-Conv/" class="leancloud_visitors" data-flag-title="Gate_Conv">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Free-Form-Image-Inpainting-with-Gated-Convolution"><a href="#Free-Form-Image-Inpainting-with-Gated-Convolution" class="headerlink" title="Free-Form Image Inpainting with Gated Convolution"></a>Free-Form Image Inpainting with Gated Convolution</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>我们提出了一种生成式图像修复系统，以使用自由形式的蒙版和引导完成图像。该系统基于从数百万张图像中学习到的门控卷积，无需额外的标记工作。提出的门控卷积解决了将所有输入像素都视为有效像素的原始卷积问题，归纳了Partial卷积，通过为所有通道在所有层上每个空间位置的每个通道提供了一种可学习的动态特征选择机制。此外，由于自由形式的蒙版可能会出现在具有任何形状的图像中的任何位置，所以为单个矩形蒙版设计的全局和局部GAN就不适用了。因此，通过在密集图像块上应用频谱归一化鉴别器，我们还提出了基于图像块的GAN损失，称为SN-PatchGAN。 SN-PatchGan易于模拟，训练快速且稳定。自动图像修复和用户指导的扩展结果表明，与以前的方法相比，我们的系统可产生更高质量和更灵活的结果。我们的系统可帮助用户快速移除分散注意力的物体，修改图像布局，清除水印并编辑脸部。<br><a id="more"></a></p>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h2><h3 id="2-2-Guided-Image-Inpainting-and-Synthesis"><a href="#2-2-Guided-Image-Inpainting-and-Synthesis" class="headerlink" title="2.2. Guided Image Inpainting and Synthesis"></a>2.2. Guided Image Inpainting and Synthesis</h3><h3 id="2-3-Feature-wise-Gating"><a href="#2-3-Feature-wise-Gating" class="headerlink" title="2.3. Feature-wise Gating"></a>2.3. Feature-wise Gating</h3><h2 id="3-Approach"><a href="#3-Approach" class="headerlink" title="3. Approach"></a>3. Approach</h2><p>在本节中，我们将从下至上描述我们的方法。 我们首先介绍门控卷积（SN-PatchGAN）的详细信息，然后在图3中介绍修复网络的总体结构以及允许用户引导的扩展。</p>
+<h3 id="3-1-Gated-Convolution"><a href="#3-1-Gated-Convolution" class="headerlink" title="3.1. Gated Convolution"></a>3.1. Gated Convolution</h3><p>我们首先解释为什么在【15，49】中使用的普通卷积不适用于自由形式的图像修补任务。 我们考虑一个卷积层，其中将一组滤波器应用于输入特征图作为输出。假设输入是$C$通道，则在$C’$通道输出映射中位于$(y,x)$的每个像素计算为:</p>
+<script type="math/tex; mode=display">O_{y,x}=\sum_{i=-k_h'}^{k_h'}\sum_{j=-k_w'}^{k_w'}W_{k_h'+i,k_w'+j}\cdot I_{y+i,x+j,}</script><p>其中$x,y$代表输出特征图的x轴和y轴，$k_h$和$k_w$是卷积核尺寸（例如$3\times3$）,$k_h’=\frac{k_h-1}2$，$k_w’=\frac{k_w-1}2$，$W\in R^{k_h\times k_w\times C’\times C}$表示卷积核。$I_{y+i,x+j}\in R^C$和$O_{y,x}\in R^{C‘}$分别表示输入和输出。简化起见，忽略卷积层中的偏置。</p>
+<p>该方程表明，对于所有空间位置$(y,x)$，都应用相同的滤波器来产生普通卷积层中的输出。 这对于诸如图像分类和对象检测（其中输入图像的所有像素均有效）之类的任务有意义，以滑动窗口的方式提取局部特征。 但是，对于图像修复，输入是由两个区域组成：具有有效像素/特征（空洞外部）和无效像素/特征（浅层）或合成像素/特征（深层）的区域。 如【23】所述，这会在训练过程中引起歧义，并导致视觉伪影，例如颜色差异，模糊和明显的边缘响应。</p>
+<p>最近提出了Partial卷积【23】，它采用了掩膜和重新归一化步骤，使得卷积仅取决于有效像素，如：</p>
+<script type="math/tex; mode=display">O_{y,x}=\left\{\begin{array}{lc}\underset{}{\sum\sum_{}W\cdot(I\odot\frac M{sum(M)}),}&if\;sum(M)>0\\0,&otherwise\end{array}\right.</script><p>其中$M$是对应区域的二进制掩膜，$1$表示位置$(y,x)$的像素是有效的，$0$表示该像素是无效的，$\odot$表示逐像素相乘。在Partial卷积之后，掩膜需要按照特定的规则更新，具体是如果$sum(M)&gt;0$则$m_{y,x}’=1$。</p>
+<p>Partial卷积【23】提高了不规则蒙版的修复质量，但仍然存在以下问题：（1）通过启发式将所有空间位置分类为有效或无效。无论上一层滤波范围覆盖多少像素，下一层的遮罩都将设置为一个（例如，将1个有效像素和9个有效像素视为相同，以更新当前遮罩）。（2）与其他用户输入不兼容。我们针对的是用户引导的图像修复系统，在该系统中，用户可以有选择地在遮罩内提供稀疏草图作为条件通道。在这种情况下，应该将这些像素位置视为有效还是无效？如何正确更新下一层的遮罩？（3）对于部分卷积，无效像素将在深层逐渐消失，将所有遮罩值逐渐转换为1。但是，我们的研究表明，如果允许网络自动学习最佳蒙版，则即使在较深的层中，网络也会为每个空间位置分配软蒙版值。（4）每层中的所有通道共享同一蒙版，这限制了灵活性。本质上，部分卷积可以看作是难以学习的单通道特征硬门.</p>
+<p>我们提出了用于图像修复网络的门控卷积，如图2所示。门控卷积代替了用规则更新的硬门控遮罩，自动从数据中学习软遮罩。 公式为：</p>
+<script type="math/tex; mode=display">Gating_{y,x}=\sum_{}^{}\sum_{}^{}W_g\cdot I\\Feature_{y,x}=\sum_{}^{}\sum_{}^{}W_f\cdot I\\O_{y,x}=\Phi(Feature_{y,x})\odot\sigma(Gating_{y,x})</script><p>其中$\sigma$表示sigmod激活函数，因此输出的gating值是介于0和1之间的。$\Phi$是任意一种激活函数（例如ReLU，ELU和LeakyReLU）。$w_g$和$w_f$是两种不同的卷积核。</p>
+<p>提出的门控卷积为每个通道和每个空间位置学习一种动态特征选择机制。 有趣的是，中间层门控值的可视化表明，它不仅学习根据背景，蒙版草图选择特征，而且还考虑了某些通道中的语义分割。 即使在较深的层中，门控卷积也可以学习突出显示遮罩的区域并在单独的通道中绘制信息，从而更好地生成修复效果。</p>
+<h3 id="3-2-Spectral-Normalized-Markovian-Discriminator-SN-PatchGAN"><a href="#3-2-Spectral-Normalized-Markovian-Discriminator-SN-PatchGAN" class="headerlink" title="3.2. Spectral-Normalized Markovian Discriminator (SN-PatchGAN)"></a>3.2. Spectral-Normalized Markovian Discriminator (SN-PatchGAN)</h3><p>对于以前尝试填充单个矩形孔的修复网络，在蒙版的矩形区域上使用了额外的局部gan以改善结果【15，49】但是，我们考虑在可能存在多个孔的情况下进行自由形图像修复的任务 在任何位置具有任何形状。 受全局和局部GAN的推动[5]，Marko vianGAN [16、21]，知觉损失【17】以及最近对频谱归一化GAN的研究【24】，我们提出了一种简单有效的GAN损失SN-PatchGAN，用于训练 自由形式的图像修复网络</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E7%A8%80%E7%96%8F%E5%8D%B7%E7%A7%AF/" rel="tag"># 稀疏卷积</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/11/Dual-Attention/" rel="next" title="Dual_Attention">
+                <i class="fa fa-chevron-left"></i> Dual_Attention
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/" rel="prev" title="Generative Image Inpainting with Contextual Attention">
+                Generative Image Inpainting with Contextual Attention <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Free-Form-Image-Inpainting-with-Gated-Convolution"><span class="nav-number">1.</span> <span class="nav-text">Free-Form Image Inpainting with Gated Convolution</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.2.</span> <span class="nav-text">2. Related Work</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Guided-Image-Inpainting-and-Synthesis"><span class="nav-number">1.2.1.</span> <span class="nav-text">2.2. Guided Image Inpainting and Synthesis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Feature-wise-Gating"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.3. Feature-wise Gating</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Approach"><span class="nav-number">1.3.</span> <span class="nav-text">3. Approach</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Gated-Convolution"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1. Gated Convolution</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Spectral-Normalized-Markovian-Discriminator-SN-PatchGAN"><span class="nav-number">1.3.2.</span> <span class="nav-text">3.2. Spectral-Normalized Markovian Discriminator (SN-PatchGAN)</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

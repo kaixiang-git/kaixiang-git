@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,深度图补全," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Depth Estimation via Affinity Learned with Convolutional Spatial Propagation NetworkAbstract从单个图像进行深度估计是计算机视觉中的一个基本问题。在本文中，我们提出了一个简单而有效的卷积空间传播网络（CSPN），以学习深度预测的亲和度矩阵。具体而言，我们采用有效的线性传播模型，其中以递归卷积运算的方式执行传播">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSPN">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/CSPN/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="Depth Estimation via Affinity Learned with Convolutional Spatial Propagation NetworkAbstract从单个图像进行深度估计是计算机视觉中的一个基本问题。在本文中，我们提出了一个简单而有效的卷积空间传播网络（CSPN），以学习深度预测的亲和度矩阵。具体而言，我们采用有效的线性传播模型，其中以递归卷积运算的方式执行传播">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure1.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure2.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure3.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure4.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure5.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure6.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure7.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Tabel2.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/CSPN/Figure8.png">
+<meta property="article:published_time" content="2020-08-11T12:20:30.000Z">
+<meta property="article:modified_time" content="2020-08-11T12:36:22.863Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="深度图补全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/11/CSPN/Figure1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/CSPN/"/>
+
+
+
+
+
+  <title>CSPN | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About-me" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/CSPN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CSPN</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-11T20:20:30+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%B2%BE%E8%AF%BB%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">精读论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/11/CSPN/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/CSPN/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/08/11/CSPN/" class="leancloud_visitors" data-flag-title="CSPN">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Depth-Estimation-via-Affinity-Learned-with-Convolutional-Spatial-Propagation-Network"><a href="#Depth-Estimation-via-Affinity-Learned-with-Convolutional-Spatial-Propagation-Network" class="headerlink" title="Depth Estimation via Affinity Learned with Convolutional Spatial Propagation Network"></a>Depth Estimation via Affinity Learned with Convolutional Spatial Propagation Network</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>从单个图像进行深度估计是计算机视觉中的一个基本问题。在本文中，我们提出了一个简单而有效的卷积空间传播网络（CSPN），以学习深度预测的亲和度矩阵。具体而言，我们采用有效的线性传播模型，其中以递归卷积运算的方式执行传播，并通过深度卷积神经网络（CNN）了解相邻像素之间的亲和力。我们将设计的CSPN应用于给定单个图像的两个深度估计任务：（1）改进现有技术（SOTA）方法的深度输出;（2）通过在传播过程中嵌入稀疏深度样本将稀疏深度信息转换为密集深度图的深度样本。第二项任务是受提供稀疏但准确的深度测量的激光雷达的启发。我们在流行的NYU v2 [1]和KITTI [2]数据集上对提出的CSPN进行了实验，结果表明，我们提出的方法不仅提高了质量（例如，深度误差减少了30％以上），而且还提高了速度（例如，比以前的SOTA方法快5倍）。<br><a id="more"></a></p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1 Introduction"></a>1 Introduction</h2><p>从单个图像的深度估计：即预测到相机每个像素的距离，可以应用于增强现实（AR），自动驾驶到机器人技术等等。 对于单个图像，最近的工作是估计每个像素的深度，通过利用深度的全卷积神经网络[3,4]和来自室内[1,5,6]的大量训练数据而获得了高质量的输出 [2,7,8]。 改进主要在于通过先进的网络（例如VGG [9]和ResNet [10]）更准确地估计全局场景布局和缩放比例，并通过反卷积操作[11]，跳过连接[12]或向上投影[4]。然而，在仔细检查现在的方法[13]的输出后（图1（b）），预测的深度仍然模糊，并且与给定的图像结构（如对象轮廓）无法很好地对齐。</p>
+<img src="/2020/08/11/CSPN/Figure1.png" class="">
+<!-- ![](CSPN/Figure1.png) -->
+<p>图1：（a）输入图像；（b）[13]的深度预测图；（c）双边滤波的深度图；（d）SPN[14]微调的深度图；（e）CSPN的微调结果；（f）稀疏深度样本（500）;（g）真值图；（h）我们网络的输出；（i）使用SPN微调稀疏深度样本的结果；（j）使用CSPN微调稀疏深度样本的结果。对应的均方误差（RMSE）在预测图片的左上角。</p>
+<p>最近，Liu等人[14] 提出通过具有空间传播网络（SPN）的深层CNN直接学习图像相关的亲和力，与手动设计的图像分割亲和力相比，产生了更好的结果。 但是，它的传播是以扫描线或扫描列的方式进行的，本质上是串行的。 例如，当从左向右传播时，最右边一列的像素必须等待最左边一列的信息来更新其值。 凭直觉，深度细化通常只需要局部环境而不是全局环境。</p>
+<p>这里我们提出卷积空间传播网络（CSPN），其中所有像素的深度在局部卷积上下文中同时更新。长距离上下文是通过递归操作获得的。 图1显示了一个示例，从CSPN（e）估计的深度比从SPN（d）和双边过滤（c）估计的深度更准确。 在我们的实验中，我们的并行更新方案与SPN等串行方案相比，在速度和质量上都带来了显着的性能改进。</p>
+<p>实际上，我们证明了所提出的策略也可以轻松扩展，以将稀疏深度样本转换为给定相应图像的密集深度图[15,13]。 该任务可广泛应用于机器人技术和自动驾驶汽车，在这些机器人中，通常通过LiDAR获取深度感知，而LiDAR通常会生成稀疏但准确的深度测量。 通过将稀疏测量值与图像结合起来，我们可以生成一幅全帧密集深度图。 为此，我们考虑了算法的三个重要要求：（1）恢复的密集深度图应与图像结构对齐;（2）应保留稀疏样本的深度值，因为它们通常来自可靠的传感器;（3）稀疏深度样本与其相邻深度之间的过渡应平滑且不引人注意。为了满足这些要求，我们首先基于[13]中的网络添加镜像连接，生成更好的深度，如图1（h）所示。然后，我们尝试将传播嵌入SPN中，以将深度值保持在稀疏点。如图1（i）所示，与没有深度样本的SPN相比，它产生更好的细节和更低的误差（图1（d））。最后，将SPN更改为我们的CSPN可获得最佳结果（图1（j））。可以看出，仅使用500个深度样本的已恢复深度图就可以更准确地估计场景布局和比例。我们在两个流行的深度估计基准上尝试了我们的方法，即NYU v2 [1]和KITTI [2]，具有标准评估标准。在这两个数据集中，我们的方法都比以前基于深度学习的最新算法（SOTA）[15,13]显着更好（大多数关键度量指标均提高了30％）。更重要的是，与SPN相比，它非常有效，可产生2-5倍的加速度。总而言之，本文具有以下贡献：</p>
+<ul>
+<li>我们提出了卷积空间传播网络（CSPN），它比以前的SOTA传播策略更有效，更准确地进行深度估计[14]，而不会牺牲理论上的保证。</li>
+<li>通过将提供的稀疏深度应用于传播过程，我们将CSPN扩展为将稀疏深度样本转换为密集深度图的任务。 它确保稀疏的输入深度值保留在最终深度图中。 它可以实时运行，非常适合机器人技术和自动驾驶应用，这些应用可以将LiDAR的稀疏深度测量与图像数据融合在一起。</li>
+</ul>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2 Related Work"></a>2 Related Work</h2><p>深度估计和增强/细化长期以来一直是计算机视觉和机器人技术的中心问题。由于空间有限，这里我们从多个方面总结了这些工作，而没有一一列举。</p>
+<p><strong>Single view depth estimation via CNN and CRF：</strong> 近年来开发的深度神经网络（DCN）为从单个图像进行每像素深度估计提供了强大的功能表示。 通过监督方法[16,3,4,17]，半监督方法[18]或非监督方法[19,20,21,22]开发了许多算法，并添加了跳过和镜像连接。 其他人则尝试通过附加条件随机场（CRF）[23,24,25]和联合训练[26,27]来进一步改善估计的细节。 然而，用于测量相邻像素的相关性的亲和力是手动设计的。</p>
+<p><strong>Depth Enhancement：</strong> 传统上，深度输出还可以通过显式的设计亲和力矩阵进行图像滤波[28,29]来提高准确性，或通过总变化量[TV] [30,31]并通过将更多先验值引入扩散偏微分方程[32]来学习扩散[32]，从而有效地增强深度输出。 但是，由于缺乏有效的学习策略，它们在大规模复杂视觉增强方面受到限制。</p>
+<p>最近，基于深度学习的增强在图像[33,34]和深度[35,36,37,38]的超分辨率上产生了令人印象深刻的结果。 该网络接受低分辨率输入并输出高分辨率结果，并经过端到端训练，其中隐式学习了输入和输出之间的映射。 但是，这些方法仅使用完善的低分辨率真值图和高分辨率深度图（通常是黑盒模型）进行训练和试验。 在我们的场景中，输入和真值图都不完美，例如 低成本LiDAR或网络的深度，因此必须有明确的扩散过程来引导增强功能（例如SPN）。</p>
+<p><strong>Learning affinity for spatial diffusion：</strong> 近年来，由于其理论支持和保证，具有深度CNN的扩散或空间传播的学习亲和矩阵受到了广泛的关注[39]。 Maire等人[40] 训练了一个深层的CNN来直接预测亲和矩阵的实体，这在图像分割方面表现出良好的性能。 但是，亲和度是一个独立的频谱中嵌入不可微算子，因此无法对端到端进行预测任务的监督。 Bertasius等人[41] 引入了一个随机游走网络，该网络可以优化针对语义细分的逐像素亲和度目标。 然而，它们的亲和度矩阵需要真值稀疏像素对的额外监督，这限制了像素之间的潜在连接。 Chen等[42] 尝试对边缘图进行显式建模以进行域变换，以改善神经网络的输出。</p>
+<p>与我们的方法最相关的工作是SPN [14]，其中将扩散的大型亲和矩阵的学习转换为学习局部线性空间传播，从而产生了一种简单而有效的输出增强方法。 但是，如第1节所述，深度增强通常需要局部上下文，因此可能不必通过扫描整个图像来更新像素。 如我们的实验所示，我们提出的CSPN更有效并且提供了更好的结果。</p>
+<p><strong>Depth estimation with given sparse samples：</strong> 从稀疏深度到密集深度估计的任务由于其在增强3D感知方面的广泛应用而引入了机器人技术[15]。 与深度增强不同，提供的深度通常来自低成本的LiDAR或一线激光传感器，从而仅在几百个像素中产生具有有效深度的地图，如图1（f）所示。 最近，Ma等人[13] 提议将稀疏深度图作为基于ResNet [4]的深度预测器的附加输入，与仅使用图像输入的CNN深度输出相比，产生的结果更好。但是，输出结果仍然模糊，不能满足我们对深度的要求。 在第1节中讨论。 在我们的案例中，我们将采样深度直接嵌入到扩散过程中，所有需求都得到满足和保证。</p>
+<p>其他一些工作直接将稀疏3D点转换为密集的3D点，而无需输入图像[43,44,45]，而稀疏点的密度必须足够高以显示场景结构，这在我们的场景中不可用。</p>
+<h2 id="3-Our-Approach"><a href="#3-Our-Approach" class="headerlink" title="3 Our Approach"></a>3 Our Approach</h2><p>我们将问题表示为各向异性扩散过程，并直接从给定图像中通过深层CNN来学习扩散张量，从而指导输出的细化。</p>
+<h3 id="3-1-Convolutional-Spatial-Propagation-Network"><a href="#3-1-Convolutional-Spatial-Propagation-Network" class="headerlink" title="3.1 Convolutional Spatial Propagation Network"></a>3.1 Convolutional Spatial Propagation Network</h3><p>假设网络的输出为一个深度图$D_0\in R^{m\times n}$和一张图像$X\in R^{m\times n}$，我们的任务是将这个深度图在N个迭代后更新为新的深度图$D_n$，这个过程第一揭示了图像$X$的更多细节，第二提高了每个像素深度估计的准确性。</p>
+<img src="/2020/08/11/CSPN/Figure2.png" class="">
+<!-- ![](CSPN/Figure2.png) -->
+<p>图2：SPN[14]与CSPN的传播方式</p>
+<p>图2（b）解释了我们的更新操作。正式地，在不失一般性的前提下，我们可以将$D_0$嵌入到一些隐藏空间$H\in R^{m\times n\times c}$中，步骤$t$的卷积转换函数的尺寸为$k$的卷积核可以被写为：</p>
+<script type="math/tex; mode=display">
+H_{i,j,t+1}=\sum\limits_{a,b=-\left( k-1 \right) /2}^{\left( k-1 \right) /2}{k_{i,j}\left( a+b \right) \odot H_{i-a,j-b,t}}\\where,k_{i,j}\left( a,b \right) =\frac{\widehat{k}_{i,j}\left( a,b \right)}{\sum\limits_{a,b,a,b\ne 0}^{}{\left| \widehat{k}_{i,j}\left( a,b \right) \right|}},\\k_{i,j}\left( 0,0 \right) =1-\sum\limits_{a,b,a,b\ne 0}^{}{k_{i,j}\left( a,b \right)}\tag{1}</script><p>其中卷积核$\widehat{k}_{i,j}\in R^{k\times k\times c}$是由一个亲和力网络得到，这个网络依赖于输入图像。卷积核尺寸$k$通常被设置为基数，这样像素$(i,j$周围的上下文计算就是对称的。$\odot$表示逐元素相乘。按照[14]，我们将卷积核的权重初始化为$(-1,1)$，这样就能够通过满足条件$\sum\limits_{a,b,a,b\ne 0}^{}{\left| \widehat{k}_{i,j}\left( a,b \right) \right|} \le 1$使模型稳定且收敛。最后我们将这个迭代执行$N$次达到稳定的分布。</p>
+<p><strong>Correspondence to diffusion process with a partial differential equation (PDE)</strong> 与[14]相似，这里我们证明CSPN拥有SPN的所有所需特性。形式上，我们可以通过首先对特征图$H$进行列优先矢量化,将$H$变换为$H_v\in R^{mn\times c}$，来重写等式（1）中的传播，作为扩散演化的过程。</p>
+<script type="math/tex; mode=display">H_{v}^{t+1}=\left[ \begin{matrix}
+    1-\lambda _{0,0}&        k_{0,0}\left( 1,0 \right)&        \cdots&        0\\
+    k_{1,0}\left( -1,0 \right)&        1-\lambda _{1,0}&        \cdots&        0\\
+    \vdots&        \vdots&        \ddots&        \vdots\\
+    \vdots&        \cdots&        \cdots&        1-\lambda _{m,n}\\
+\end{matrix} \right] =GH_{v}^{t}\tag{2}</script><p>其中$\lambda _{i,j}=\sum\limits_{a,b}^{}{k_{i,j}\left( a,b \right)}$,$G$是一个$mn\times mn$的矩阵。由偏微分方程表达的融合过程由下式产生</p>
+<script type="math/tex; mode=display">H_{v}^{t+1}=GH_{v}^{t}=\left( I-D+A \right) H_{v}^{t}\\H_{v}^{t+1}-H_{v}^{t}=-\left( D-A \right) H_{v}^{t}\\\partial _tH_{v}^{t+1}=-LH_{v}^{t}</script><p>其中$L$是拉普拉斯矩阵，$D$是对角矩阵包含所有的$\lambda_{i,j}$，$A$是亲和度矩阵，即$G$的对角线部分。</p>
+<p>在我们的公式中，不同于[14]在四个方向对全图进行扫描（图2（a）中，CSPN每一步中在局部区域对所有方向同时进行传播，例如$k\times k$的局部区域），更大区域的上下文信息由递归的步骤得到，上下文获取率大约为$O(kN)$。</p>
+<p>在实践中，我们选择使用卷积运算，因为它可以通过图像矢量化有效地实现，从而在深度细化任务中产生实时性能。</p>
+<p>原则上，CSPN也可以通过sum-product算法从loopy belief propagation中得出[46]。但是，由于我们的方法采用线性传播，因此效率很高，而在图模型中只是成对空间潜力和L2重建损失的特例。 因此，为了使其更准确，我们在扩散过程领域中将我们的策略称为卷积空间传播。</p>
+<h3 id="3-2-Spatial-Propagation-with-Sparse-Depth-Samples"><a href="#3-2-Spatial-Propagation-with-Sparse-Depth-Samples" class="headerlink" title="3.2 Spatial Propagation with Sparse Depth Samples"></a>3.2 Spatial Propagation with Sparse Depth Samples</h3><p>在此应用程序中，我们有一个额外的稀疏深度图$D_s$（图4（b）），以帮助从RGB图像估计深度深度图。 具体来说，使用来自某些深度传感器的真实深度值设置稀疏像素集，这些像素可用于指导我们的传播过程。</p>
+<p>类似的，我们将稀疏深度图$D_s={d_{i,j}^s}$嵌入隐藏空间$H^s$中，然后我们可以通过在等式（1）的后面简单添加一个替代步骤更新$H$的等式。</p>
+<script type="math/tex; mode=display">H_{i,j,t+1}=(1-m_{i,j})H_{i,j,t+1}+m_{i,j}H_{i,j}^s\tag{4}</script><p>其中$m_{i,j}=\mathbb{I}(d_{i,j}^s&gt;0)$是一个稀疏深度值在$(i,j)$处是否可用的指标。</p>
+<p>这样，我们保证在稀疏深度图中那些有效像素处，精确深度具有完全相同的值。 另外，我们将信息从那些稀疏深度传播到其周围的像素，以便保持稀疏深度与其相邻像素之间的平滑度。 第三，由于扩散过程，最终的深度图与图像结构完全吻合。 这完全满足了我们的简介（1）中讨论的该任务所需的三个属性。</p>
+<p>另外，这个过程仍然遵循偏微分方程的扩散过程，其中转换矩阵能够轻易地将满足在$G$中$m_{i,j}=1$的行替换为$e_{i+j<em>m}^T$，对应于稀疏深度样本。其中$e_{i+j</em>m}^T$表示在位置$i+j*m$值为1的联合向量。因此，每一行的和仍然是1。很明显在这种情况下稳定仍然存在。</p>
+<p>与以前最先进的稀疏到密集方法相比，我们的策略具有多个优势[13,15]。在图3（a）中，我们从Ma等[13]的输出中绘制了在给定的稀疏深度像素处，来自真值图的深度位移直方图。它显示了稀疏深度点的准确性无法保留，并且某些像素可能具有非常大的位移（0.2m），这表明直接训练CNN进行深度预测不会保留所提供的真实稀疏深度的值。为了获得这种特性，可以简单地用那些像素处提供的稀疏深度替换来自输出的深度，但是，它会产生与周围的像素相比不平滑的深度梯度。在图4（c）中，我们绘制了一个示例，在该图的右侧，我们沿x方向计算了深度图的Sobel梯度[47]，在图中我们可以清楚地看到，替换了深度值的像素周围的梯度是不光滑。我们在图3（b）中使用500个稀疏样本进行统计验证，蓝色条形是通过比较稀疏深度替换的梯度和真值图的梯度得到的梯度误差直方图。我们可以看到差异是显着的，稀疏像素的2/3具有较大的梯度误差。另一方面，如图3（b）中的绿色条所示，我们的方法的平均梯度误差要小得多，大多数像素的误差为零。在图4（d）中，我们显示了深度梯度周围的稀疏像素平滑且接近真值图，证明了我们传播方案的有效性。</p>
+<img src="/2020/08/11/CSPN/Figure3.png" class="">
+<!-- ![](CSPN/Figure3.png) -->
+<p>图3：（a）[13]中在给定稀疏深度点处的RMSE直方图。（b）在使用稀疏深度值替换的深度图（蓝色块）与我们的CSPN（绿色块）之间的梯度误差比较。<br><img src="/2020/08/11/CSPN/Figure4.png" class=""><br><!-- ![](CSPN/Figure4.png) --><br>图4：[13]使用稀疏深度值替换的的深度图与我们的CSPN的在稀疏深度点处的梯度平滑性的比较。（a）输入图片。（b）稀疏深度点。（c）使用稀疏深度值替换的深度图。（d）我们的CSPN在稀疏深度点处的深度图。我们在红框中标出了不同之处。</p>
+<h3 id="3-3-Complexity-Analysis"><a href="#3-3-Complexity-Analysis" class="headerlink" title="3.3 Complexity Analysis"></a>3.3 Complexity Analysis</h3><p>如等式（1）所述，我们的CSPN进行卷积运算，其中使用CUDA与GPU并行计算一步迭代的CSPN的复杂度为$O(log_2(k^2))$，其中$k$是内核大小。 这是因为CUDA使用并行对数缩减，具有对数复杂性。 另外，可以针对所有像素和通道并行执行卷积运算，其复杂度恒定为$O(1)$。 因此，执行$N$步传播，CSPN的总体复杂度为$O(log_2(k^2)N)$，与图像大小$(m,n)$无关。</p>
+<p>SPN [14]在四个方向上采用逐行/列扫描的方式的传播。 使用$k$路连接并行运行，一步的复杂度为$O(log_2(k))$。传播需要从一侧到另一侧扫描整个图像，因此SPN的复杂度为$O(log_2(k)(m+n))$。 尽管这已经比[48]提出的紧密连接的CRF更为有效，CRF的排列复杂度为$O(mnN)$，但我们的$O(log_2(k^2)N)$更有效，因为迭代次数$N$总是远小于图像的大小$m,n$。 我们在实验（第4节）中显示，在$k = 3$和$N = 12$的情况下，CSPN已经以较大的幅度（相对30％）优于SPN，证明了该方法的有效性和有效性。</p>
+<h3 id="3-4-End-to-End-Architecture"><a href="#3-4-End-to-End-Architecture" class="headerlink" title="3.4 End-to-End Architecture"></a>3.4 End-to-End Architecture</h3><p>现在，我们解释我们的端到端网络体系结构，以预测亲和度卷积核和深度值，这是CSPN进行深度细化的输入。 如图5所示，我们的网络与Ma等人的网络[13]有一些相似之处，最终的CSPN层输出密集的深度图。</p>
+<p>为了预测等式（1）中的卷积核$k$，而不是像Liu等人[14]那样构建一个新的深度网络来学习亲和力，我们从给定网络中分支一个额外的输出，该输出与深度网络共享相同的特征提取器。这有助于我们节省用于深度估计和亲和度卷积核预测的联合学习的内存和时间成本。</p>
+<p>相似性的学习取决于输入图像的细粒度空间细节。但是，在ResNet的正向过程中，空间信息会随着下采样操作而减弱或丢失[4]。因此，通过将特征从编码器直接连接到上投影层，如图5中的“ UpProj_Cat”层所示，我们添加了与U形网络[12]类似的镜像连接。注意，仔细选择镜像连接的端点很重要。通过试验三个可能的位置来追加连接，即conv之后，在bn之后和relu之后，如图5中的“ UpProj”层所示，我们发现最后一个位置通过使用NYU v2数据集进行验证提供了最佳结果（第4.2节）。这样一来，我们发现不仅可以更好地恢复网络的深度输出，而且可以进一步细化CSPN后的结果，这将显示实验部分（第4节）。最后，我们采用与[13]相同的训练损失，产生了一个端到端的学习系统。<br><img src="/2020/08/11/CSPN/Figure5.png" class=""><br><!-- ![](CSPN/Figure5.png) --><br>图5：通过CSPN的转换卷积核使用镜像连接的深度估计网络结构。稀疏深度是一个可选输入项，能够嵌入进CSPN来引导深度微调。</p>
+<h2 id="4-Experiments"><a href="#4-Experiments" class="headerlink" title="4 Experiments"></a>4 Experiments</h2><p>在本节中，我们描述了实现细节，实验中使用的数据集和评估指标。 然后对CSPN在深度细化和稀疏密集任务两方面进行了综合评估。</p>
+<p><strong>Implementation details</strong> 用于深度估计编码层的ResNet权重（第3.4节）是使用ImageNet数据集上预先训练的模型初始化的[49]。我们的模型使用SGD优化器进行训练，我们使用batch size为24并训练40个epoach，并且使用验证集上表现最佳的模型用于测试。 学习率从0.01开始，每10个epoach减少到20％.权重衰减为$10^{-4}$用于正则化。 我们基于PyTorch平台实现我们的网络，每一步的CSPN采取逐元素乘积和卷积运算。</p>
+<p>对于深度，我们表明具有隐藏表示$H$的传播仅比在深度图$D$域内进行传播获得了边际改进。因此，我们直接用$D$进行所有实验，而不是学习附加的嵌入层。 对于稀疏深度样本，我们采用[13]中使用的500个稀疏样本。</p>
+<h3 id="4-1-Datasets-and-Metrics"><a href="#4-1-Datasets-and-Metrics" class="headerlink" title="4.1 Datasets and Metrics"></a>4.1 Datasets and Metrics</h3><p>我们的实验在两个数据集上进行评估：NYU v2[1]和KITTI[2]，使用通用的度量标准。</p>
+<p><strong>NYU v2</strong> NYU-Depth-v2数据集由从464个不同室内场景收集的RGB和深度图像组成。 我们使用官方的数据划分，其中使用249个场景进行训练，并且以与[13]相同的方式从训练集中采样50K图像。 为了进行测试，遵循标准设置[3,27]，使用具有654张图像的小标签测试集作为最终性能。 首先将尺寸为640×480的原始图像降采样为一半，然后进行中心裁剪，从而产生304×228的网络输入尺寸。</p>
+<p><strong>KITTI odometry dataset</strong> 它包括相机和LiDAR测量，并由22个序列组成。 序列的一半用于训练，而另一半用于评估。 根据[13]，我们使用训练序列中的所有46k图像进行训练，并使用测试序列中的3200个图像的随机子集进行评估。具体而言，由于顶部区域没有深度，因此我们取底部912×228， 并且只评估具有地面真实性的像素。</p>
+<p><strong>Metrics.</strong> 我们与[13]采取相同的度量。假设真值深度图$D^<em>={d^</em>}$和预测深度图$D={d}$，度量包括：<br>（1）RMSE：$\sqrt{\frac{1}{\left| D \right|}\sum\limits_{d\in D}^{}{\lVert d^<em>-d \rVert ^2}}$.（2）Abs Rel：$\frac{1}{\left| D \right|}\sum\limits_{d\in D}^{}{\left| d^</em>-d \right|}/d^<em>$.（3）$\delta_t$:约束条件$max(\frac{d^</em>}{d},\frac{d}{d^*})&lt;t$，其中$t\in \{1.25,1.25^2,1.25^3\}$。<br>尽管如此，对于第三个度量，我们发现稀疏深度图的深度精度非常高，t = 1.25已经是一个非常宽松的标准，其中几乎100％的像素被认为是正确的，几乎无法区分所示的不同方法 因此，我们通过选择$t\in \{1.02,1.05^2,1.10^3\}$来采用更严格的正确性标准。</p>
+<h3 id="4-2-Parameter-Tuning-and-Speed-Study"><a href="#4-2-Parameter-Tuning-and-Speed-Study" class="headerlink" title="4.2 Parameter Tuning and Speed Study"></a>4.2 Parameter Tuning and Speed Study</h3><p>我们首先使用NYU v2数据集评估各种超参数，包括卷积核大小$k$，等式（1）中的迭代次数$N$。 然后，我们对配备16 GB内存的Titan X GPU的运行速度进行实证评估。</p>
+<p><strong>Number of iterations</strong> 我们采用卷积核大小为3来验证CSPN中迭代次数$N$的影响。如图6（a）所示，仅迭代4次，我们的CSPN的性能就优于SPN [14]（水平线）。 此外，在训练过程中在模型中应用更多迭代时，我们可以获得更好的性能。 根据我们的实验，当迭代次数增加到24时，精度达到饱和。<br><img src="/2020/08/11/CSPN/Figure6.png" class=""><br><!-- ![](CSPN/Figure6.png) --><br>图6：消融研究。（a）CSPN的迭代次数与RMSE（左边的轴，越低越好）和$\delta&lt;1.02$（右边的轴，越高越好）的关系。水平线显示了对应的SPN[14]的结果。（b）CSPN的卷积核与RMSE和$\delta&lt;1.02$的关系。（c）测试时间与输入图像尺寸的关系</p>
+<p><strong>Size of convolutional kernel</strong> 如图6（b）所示，较大的卷积核具有类似的效果，但迭代次数更多，这是因为在每个时间步长中考虑将较大的上下文用于传播。在这里，我们将迭代次数保持为N = 12，我们可以看到，当k较大而在大小为7时饱和时，性能会更好。我们注意到，当内核大小设置为9时，性能会略有下降。对于所有实验，请使用固定的epoach，即40，而较大的内核尺寸会导致传播过程中学习的亲和力更高，这需要更多的epoach来收敛。后来，当我们训练更多的epoach时，模型的性能达到了与卷积核大小为7类似的水平。因此，我们可以看到使用7的内核大小进行12次迭代可以达到与使用3的卷积核大小进行20次迭代达到相似的性能，这表明CSPN具有卷积核核大小和迭代之间的权衡。实际上，这两个设置以相似的速度运行，而后者花费更少的内存。因此，在比较中，我们采用内核大小为3，迭代次数为24。</p>
+<p><strong>Concatenation end-point for mirror connection</strong> 如第3.4节所述，根据给定的指标，我们尝试了三个串联位置，即conv后，bn之后和relu之后，通过从编码器网络训练的，没有镜像连接的初始化权重进行微调。 相应的RMSE分别为0.531、0.158和0.137。 因此，我们采用了提出的级联端点。</p>
+<p><strong>Running speed</strong> 在图6（c）中，我们显示了卷积核大小为3的SPN和CSPN之间的运行时间比较。我们使用了作者的PyTorch实现。可以看出，我们可以在更短的时间内获得更好的性能。例如，在一幅1024×768图像上CSPN的四次迭代仅需3.689毫秒，而SPN需127.902毫秒。此外，SPN的时间成本与图像尺寸呈线性增长。而CSPN的时间成本与图像大小无关，并且如第3.3节中所分析的要快得多。但是，实际上，当迭代次数较大时，例如“ CSPN Iter20”，我们发现CSPN的实际时间成本也随着图片大小的增加而增加。这是因为基于PyTorch的实现将测试过程中每次迭代的所有变量都保留在内存中。对于大图像，内存分页成本占主导地位。原则上，我们可以通过定制新操作来消除这种内存瓶颈，这将是我们未来的工作。但是，即使没有编码优化，即使在具有大图像的高迭代中，CSPN的速度仍然是SPN的两倍。</p>
+<h3 id="4-3-Comparisons"><a href="#4-3-Comparisons" class="headerlink" title="4.3 Comparisons"></a>4.3 Comparisons</h3><p>我们根据两个任务将我们的方法与各种SOTA基线进行了比较。（1）使用相应的彩色图像细化深度图。（2）使用彩色图像和稀疏深度样本细化深度。 对于诸如SPN [32]和稀疏到密集[13]之类的基准方法，我们使用作者在线发布的代码。</p>
+<p><strong>NYU v2</strong> 表1显示了比较结果。我们的基准方法是从[13]的网络输出的深度，以及相应的彩色图像。在表1的上部，我们仅显示RGB的深度细化结果。在“双边”行中，我们使用双边过滤[28]作为后处理模块来优化[13]的网络输出，并根据我们的验证集调整其空间颜色亲和力卷积核。尽管输出深度会捕捉到图像边缘（图1（c）），但由于过滤会使原始深度过平滑，因此绝对深度精度会下降。在“ SPN”行中，我们使用作者提供的相似性网络显示了用SPN [14]过滤的结果。由于进行了联合训练，通过学习的亲和力可以改善深度，从而产生更好的深度细节和绝对精度。将SPN切换为CSPN（行“ CSPN”）可获得相对较好的结果。最后，在“ UNet”行中，我们显示了仅按第3.4节中所述使用镜像连接修改网络的结果。结果证明比SPN和CSPN的结果还要好，表明通过简单地从起始层添加特征，可以更好地学习深度。<br><br><!-- ![](CSPN/Tabel1.png) --><br>表1：在NYU v2数据集上的比较结果，使用不同变量的CSPN与SOTA相比。这里”preserve SD”是指在稀疏深度样本中保留深度值。</p>
+<p>在表1的下部，我们同时使用彩色图像和稀疏深度样本，所有结果都保留了所提供的稀疏深度值。 我们从真值图中随机选择500张深度样本。</p>
+<p>为了进行比较，我们考虑使用as-rigid-as-possible（ASAP）[50]的基线方法。将输入的深度图以稀疏的深度样本作为控制点进行变形。在“ASAP”行中，我们显示了其结果，该结果仅略微改善了基线网络上的估算。对于SPN，我们也将等式（4）中的替换操作应用于传播，结果显示在“ SPN”行中，由于联合训练，该结果优于ASAP和SPN的结果，而没有SD传播，这有助于修复wrap错误。在“ UNet + SPN”行中，我们使用UNet体系结构来学习与SPN的亲和力，该性能优于“ SPN”，而与仅使用UNet相比，我们没有看到任何改进。但是，通过用我们的CSPN替换SPN（如“ UNet + CSPN”行中所示），可以大大改善结果，并在所有情况下均表现最佳。我们认为这主要是因为在训练期间，CSPN比SPN更有效地进行更新。一些可视化效果如图7所示。我们发现CSPN的结果比其他最新策略的确能更好地捕获图像（以虚线框突出显示）的结构。<br><img src="/2020/08/11/CSPN/Figure7.png" class=""><br><!-- ![](CSPN/Figure7.png) --><br>图7：在NYU v2数据集上的定性对比。（a）输入图像；（b）稀疏深度样本（500）；（c）Ma等人[13]的效果；（d）UNet+SPN[32]；（e）UNet+CSPN（我们的方法）;（f）真值图。提升最显著二点区域用黄色虚线框画出。</p>
+<p><strong>KITTI</strong> 表2显示了使用RGB和稀疏深度样本进行的深度细化。我们的最终模型“ UNet + CSPN”在很大程度上优于其他SOTA策略，这表明了该方法的推广。例如，在非常严格的指标$\delta <1.02$的情况下，我们的基准将基线[13]从30％提高到70％，提高了2倍以上。更重要的是，CSPN运行效率非常高，因此可以应用于实际应用程序。一些可视化结果显示在图8的底部。与[13]和SPN细化的网络输出相比，CSPN看到了更多细节和细微结构，例如道路附近的电线杆（第一张图片（f））和草地上的树干（第二张图片（f））。对于第三张图像，我们在左侧阴影下突出显示了一辆汽车，该汽车的深度很难学习。我们可以看到，由于全局范围内广泛的光照变化，SPN无法在（e）中改进这种情况，而CSPN则学习了局部对比度并成功地恢复了汽车的轮廓。最后，我们还将结果提交给新的KITTI深度补全挑战，并表明我们的结果优于以前的SOTA方法[45]。
+<img src="/2020/08/11/CSPN/Tabel2.png" class=""><br><!-- ![](CSPN/Tabel2.png) --></p>
+<img src="/2020/08/11/CSPN/Figure8.png" class="">
+<!-- ![](CSPN/Figure8.png) -->
+<p>图8：在KITTI数据集上的定性对比。（a）输入图像；（b）稀疏深度样本（500）；（c）Ma等人[13]的效果；（d）UNet+SPN[32]；（e）UNet+CSPN（我们的方法）;（f）真值图。提升最显著二点区域用红色虚线框画出。</p>
+<h2 id="5-Conclusion"><a href="#5-Conclusion" class="headerlink" title="5 Conclusion"></a>5 Conclusion</h2><p>在本文中，我们提出了卷积空间传播网络（CSPN），可以与任何类型的CNN共同学习。 可以认为是线性扩散过程，可以保证收敛。 与先前学习相似性的空间传播网络[14]相比，CSPN不仅在深度细化方面效率更高（提高了2-5倍），而且更加准确（提高了30％以上）。 我们还通过将稀疏深度样本嵌入到传播过程中来扩展CSPN，这比其他SOTA方法提供了更好的改进[13]。 由于我们的框架是通用的，因此在将来，我们计划将其应用于其他任务，例如图像分割和增强。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%9B%BE%E8%A1%A5%E5%85%A8/" rel="tag"># 深度图补全</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/05/01/Path-Restore/" rel="next" title="Path-Restore">
+                <i class="fa fa-chevron-left"></i> Path-Restore
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/11/Dual-Attention/" rel="prev" title="Dual_Attention">
+                Dual_Attention <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Depth-Estimation-via-Affinity-Learned-with-Convolutional-Spatial-Propagation-Network"><span class="nav-number">1.</span> <span class="nav-text">Depth Estimation via Affinity Learned with Convolutional Spatial Propagation Network</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1 Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.3.</span> <span class="nav-text">2 Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Our-Approach"><span class="nav-number">1.4.</span> <span class="nav-text">3 Our Approach</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Convolutional-Spatial-Propagation-Network"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1 Convolutional Spatial Propagation Network</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Spatial-Propagation-with-Sparse-Depth-Samples"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2 Spatial Propagation with Sparse Depth Samples</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Complexity-Analysis"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.3 Complexity Analysis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-End-to-End-Architecture"><span class="nav-number">1.4.4.</span> <span class="nav-text">3.4 End-to-End Architecture</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Experiments"><span class="nav-number">1.5.</span> <span class="nav-text">4 Experiments</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Datasets-and-Metrics"><span class="nav-number">1.5.1.</span> <span class="nav-text">4.1 Datasets and Metrics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-Parameter-Tuning-and-Speed-Study"><span class="nav-number">1.5.2.</span> <span class="nav-text">4.2 Parameter Tuning and Speed Study</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-Comparisons"><span class="nav-number">1.5.3.</span> <span class="nav-text">4.3 Comparisons</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Conclusion"><span class="nav-number">1.6.</span> <span class="nav-text">5 Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>

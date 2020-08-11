@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="计算机视觉,注意力机制," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Non-local Neural NetworksAbstract卷积运算和递归运算都是一次处理一个局部区域。 本文我们将Non-Local操作作为捕获远程依赖关系的通用构建块。受计算机视觉中经典的非局部均值方法[4]的启发，我们的非局部运算将某个位置的响应计算为所有位置的特征的加权总和。该构件可以插入许多计算机视觉体系结构中。在视频分类的任务上，即使没有任何调参，我们的非局部模型在Kinetic">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Non-local Neural Networks">
+<meta property="og:url" content="http://yoursite.com/2020/08/11/Non-local-Neural-Networks/index.html">
+<meta property="og:site_name" content="Blind Lover">
+<meta property="og:description" content="Non-local Neural NetworksAbstract卷积运算和递归运算都是一次处理一个局部区域。 本文我们将Non-Local操作作为捕获远程依赖关系的通用构建块。受计算机视觉中经典的非局部均值方法[4]的启发，我们的非局部运算将某个位置的响应计算为所有位置的特征的加权总和。该构件可以插入许多计算机视觉体系结构中。在视频分类的任务上，即使没有任何调参，我们的非局部模型在Kinetic">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Non-local-Neural-Networks/Figure1.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/11/Non-local-Neural-Networks/Figure2.png">
+<meta property="article:published_time" content="2020-08-11T12:50:17.000Z">
+<meta property="article:modified_time" content="2020-08-11T12:51:48.136Z">
+<meta property="article:author" content="kaixiang Liu">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="注意力机制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/11/Non-local-Neural-Networks/Figure1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/11/Non-local-Neural-Networks/"/>
+
+
+
+
+
+  <title>Non-local Neural Networks | Blind Lover</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blind Lover</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/About-me" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/11/Non-local-Neural-Networks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="kaixiang Liu">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/zhenzhu.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blind Lover">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Non-local Neural Networks</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-11T20:50:17+08:00">
+                2020-08-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%BA%E6%96%87/" itemprop="url" rel="index">
+                    <span itemprop="name">论文</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2020/08/11/Non-local-Neural-Networks/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2020/08/11/Non-local-Neural-Networks/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2020/08/11/Non-local-Neural-Networks/" class="leancloud_visitors" data-flag-title="Non-local Neural Networks">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Non-local-Neural-Networks"><a href="#Non-local-Neural-Networks" class="headerlink" title="Non-local Neural Networks"></a>Non-local Neural Networks</h1><h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>卷积运算和递归运算都是一次处理一个局部区域。 本文我们将Non-Local操作作为捕获远程依赖关系的通用构建块。受计算机视觉中经典的非局部均值方法[4]的启发，我们的非局部运算将某个位置的响应计算为所有位置的特征的加权总和。该构件可以插入许多计算机视觉体系结构中。在视频分类的任务上，即使没有任何调参，我们的非局部模型在Kinetics和Charades数据集上都可以胜过当前的竞争优胜者。在静态图像识别中，我们的非局部模型可改进对象检测/细分以及对COCO任务套件的姿态估计。<br><a id="more"></a></p>
+<h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>在深度神经网络中，捕获远距离依赖关系至关重要。对于顺序数据（例如语音，语言），递归操作[38，23]是远距离依赖建模的主要解决方案。对于图像数据，通过深层卷积运算形成的大接收场来模拟远距离依赖性[14，30]。</p>
+<p>卷积运算和递归运算都在空间或时间上都处理局部邻域；因此，只有重复应用这些运算，并逐步通过数据传播信号，才能捕获远距离依赖项。 重复局部操作有几个限制。 首先，它在计算上效率低下。 其次，它优化困难【23，21】。 最后，这些挑战使多跳依赖关系建模非常困难，例如，当需要在远距离位置之间来回传递消息时，就很难了。</p>
+<p>在本文中，我们将非局部操作作为一种高效，简单且通用的组件，用于通过深度神经网络捕获远程依赖关系。 我们提出的非局部运算是计算机视觉中经典非局部均值运算【4】的推广。 直观地，非局部操作将位置的响应计算为所输入特征图中所有位置的特征的加权总和（图1）。位置集合可以在空间，时间或时空中，这意味着我们的操作适用于图像，序列和视频问题。<br><img src="/2020/08/11/Non-local-Neural-Networks/Figure1.png" class=""><br><!-- ![](./Non-Local-Neural-Network/Figure1.png) --><br>图1：我们的网络中的时空非局部操作经过Kinetics视频分类训练。位置$x_i$响应是通过所有位置$x_j$的特征的加权平均来计算的（此处仅显示最高权重的那些）。在我们的模型计算的此示例中，请注意它如何将第一帧中的球与最后两个帧中的球相关联。更多示例在图3中。</p>
+<p>使用非局部操作有几个优点：（a）与递归和卷积操作的渐进行为相反，非局部操作通过计算任意两个位置之间的相互作用直接捕获远程依赖关系，而不管它们的位置距离如何； （b）正如我们在实验中所示，即使只有几层（例如5层）；（c）最后，我们的非局部操作可以保持可变的输入大小，并且可以轻松地与其他操作组合（例如，我们将使用的卷积）。</p>
+<p>我们展示了视频分类应用中非局部操作的有效性。在视频中，空间中的远处像素之间以及不同时间之间都发生了联系。作为我们基本单元的单个非局部块可以以前馈方式直接捕获这些时空相关性。 与一些非局部块相比，我们的称为非局部神经网络的架构比2D和3D卷积网络[48]（包括其变体[7]）对视频分类的准确性更高。 此外，非局部神经网络比其3D卷积对应部分在计算上更经济。我们在Kinetics[27]和Charades [44]数据集上进行了全面的消融研究。 仅使用RGB且没有任何训练技巧（例如光流，多尺度测试），我们的方法在两个数据集上均获得了与SOTA相同或更好的结果。</p>
+<p>为了证明非局部操作的泛化性，我们在CoCo数据集上进一步展示了目标检测/分割和姿态估计实验【33】。 在强大的Msk R-cnn【19】的基础上，我们的非局部块可以以较小的额外计算成本提高所有三个任务的准确性。 结合视频中的证据，这些图像实验表明，非局部操作通常很有用，并且可以成为设计深度神经网络的基本要素。</p>
+<h2 id="2-Related-Work"><a href="#2-Related-Work" class="headerlink" title="2. Related Work"></a>2. Related Work</h2><p><strong>Non-local image processing</strong>非局部均值【4】是一种经典的滤波算法，它计算图像中所有像素的加权均值。它允许远距离像素在基于领域外观相似性的基础上加权滤波后的响应。这种非局部滤波的思想后来被发展成BM3D（块匹配3D）【10】，它对一组相似但非局部的补丁进行滤波。 甚至与深层神经网络相比，BM3D还是一个实用的去噪baseline[5]。 块匹配与神经网络一起用于图像去噪【6，3】。 非局部匹配也是成功的纹理合成【12】，超分辨率【16】和修复【1】算法的本质。</p>
+<p><strong>Graphical models</strong>远距离依赖关系可以通过图网络的模型来建模，例如条件随机场（CRF）【29，28】。 在深度神经网络的背景下，可以利用CRF对网络的语义分割预测进行后处理【9】。 Crf的迭代平均域推理可以转化为递归网络并训练【56，42，8，18，34】。 相反，我们的方法是用于计算非局部滤波的更简单的前馈块。与为分割而开发的这些方法不同，我们的通用组件用于分类和检测。这些方法和我们的方法还与称为图神经网络的更抽象的模型有关【41】</p>
+<p><strong>Feedforward modeling for sequences</strong>近年来，出现了一种使用前馈网络（例如非递归模型）对语音和语言序列进行建模的趋势【36，54，15】。 在这些方法中，远距离依赖是由非常深的一维卷积贡献的大接受场捕获的。 这些前馈模型适用于并行实现，并且比广泛使用的递归模型更有效。</p>
+<p><strong>Self-attention</strong>我们的工作与最近的机器翻译中的Self-attention【49】方法有关。 Self-attention模块通过关注所有位置并在embedding空间中获取它们的加权平均值，来计算序列（例如句子）中某个位置的响应。正如我们将在下面讨论的那样，可以通过非局部均值的形式来查看Self-attention【4】，从这个意义上说，我们的工作将机器翻译的Self-attention与更通用的非局部过滤操作联系起来 适用于计算机视觉中的图像和视频问题。</p>
+<p><strong>Video classification architectures</strong>视频分类的一种自然解决方案是将图像的cnns和序列的RNN的成功结合起来【55，11】。相比之下，前馈模型是通过时空的3D卷积（C3D）【26，48】来实现的，而3D滤波器可以通过对【13，7】预训练的2D滤波器进行扩展来形成。在原始视频输入的最终建模中，发现光流[45]和轨迹[50、51]会有所帮助，流和轨迹都是现成的模块，可能会发现长期的，非局部的依赖性。 视频架构的系统比较可以在【7】中找到。</p>
+<h2 id="3-Non-local-Neural-Networks"><a href="#3-Non-local-Neural-Networks" class="headerlink" title="3. Non-local Neural Networks"></a>3. Non-local Neural Networks</h2><p>我们首先给出非局部操作的一般定义，然后提供它的几个特定实例。</p>
+<h3 id="3-1-Formulation"><a href="#3-1-Formulation" class="headerlink" title="3.1. Formulation"></a>3.1. Formulation</h3><p>遵循非局部均值运算【4】，我们在深度神经网络中定义一个通用的非局部运算为：</p>
+<script type="math/tex; mode=display">y_i=\frac1{C(x)}\sum_{\forall j}f(x_i,x_j)g(x_j)\tag{1}</script><p>这里$i$是要计算响应的输出的下标，$j$是所有可能的位置的下标。$x$是输入信号，$y$是与$x$大小相同的输出信号。$f$计算$i$和$j$之间的相似性度量。一元函数$g$计算输入信号在$j$处的表示。响应由因子$C(x)$归一化。</p>
+<p>等式（1）中的非局部操作考虑了所有位置$\forall j$。 作为比较，卷积运算对局部邻域中的加权输入求和（例如，在内核大小为3的一维情况下，i-1≤i≤i+ 1），而在时间i处的递归运算通常仅基于 当前和最近的时间步长（例如，j = i或i-1）。</p>
+<p>非局部操作也不同于完全连接（fc）层。 等式（1）基于不同位置之间的关系计算响应，而fc使用学习的权重。 换句话说，与非局部层不同，$x_i$和$x_j$之间的关系不是fc中输入的函数。 此外，我们在等式（1）中的公式支持可变大小的输入，并在输出中保持相应的大小。 相反，fc层需要固定大小的输入/输出并丢失位置对应关系（例如，在位置$i$处从$x_i$到$x_j$的位置对应）。</p>
+<p>非局部操作是一个灵活的构建块，可以轻松地与卷积/循环层一起使用。 可以将其添加到深度神经网络的较早部分，这与最终经常使用的fc层不同。 这使我们可以构建更丰富的层次结构，将非局部信息和局部信息结合在一起.</p>
+<h3 id="3-2-Instantiations"><a href="#3-2-Instantiations" class="headerlink" title="3.2. Instantiations"></a>3.2. Instantiations</h3><p>接下来，我们描述$f$和$g$的几种版本。有趣的是，我们将通过实验（表2a）表明我们的Non-Local模型对这些选择不敏感，这表明通用的Non-Local行为是观察到的改进的主要原因。</p>
+<p>为简单起见，我们仅考虑线性embedding形式的$g(x_j)=W_gx_j$，其中$W_g$是要学习的权重矩阵。这被实现为例如空间中的1×1卷积或时空中的1×1×1卷积。接下来，我们讨论成对函数f的选择。</p>
+<p><strong>Gaussian</strong>遵循非局部均值【4】和双边滤波器【47】，$f$的自然选择是高斯函数，本文考虑：</p>
+<script type="math/tex; mode=display">f(x_i,x_j)=e^{x_i^Tx_j}\tag{2}</script><p>其中$x_i^Tx_j$是点积相似度，也可以使用【4，47】中的欧氏距离，但是点积在现代深度学习平台中更易于实现。归一化因子设置为$C(x)={\textstyle\sum_{\forall j}}f(x_i,x_j)$</p>
+<p><strong>Embedded Gaussian</strong></p>
+<p>……</p>
+<h3 id="3-3-Non-local-Block"><a href="#3-3-Non-local-Block" class="headerlink" title="3.3. Non-local Block"></a>3.3. Non-local Block</h3><p>我们将等式（1）中的Non-Local包装到一个可以合并到许多现有体系结构中的Non-Local块中。 我们将Non-Local块定义为：</p>
+<script type="math/tex; mode=display">z_i=W_zy_i+x_i\tag{6}</script><p>其中$y_i$在等式（1）中给出，$+x_i$表示一个残差连接。残差连接使我们能够在不破坏其初始行为的情况下将新的Non-local块插入任何预先训练的模型中（例如，如果$W$初始化为零）。图2显示了一个示例Non-local块。 方程（2），（3）或（4）中的成对计算可以通过矩阵乘法简单完成，如图2所示。 （5）中的串联版本很简单。<br><img src="/2020/08/11/Non-local-Neural-Networks/Figure2.png" class=""><br><!-- ![](Non-Local-Neural-Network/Figure2.png) --></p>
+<p>图2：一个Non-local块。特征图以其张量的形状显示，例如1024个通道的$TxHxWx1024$，“$\otimes$”表示矩阵乘法，“$\oplus$”表示逐像素相加，每一行的最后加上softmax。蓝色框表示1x1x1卷积。</p>
+<p>当将其用于高级别的特征图子样本中时，Non-local的成对计算是轻量级的。 例如，图2中的典型值为T = 4，H = W = 14或7。通过矩阵乘法完成的成对计算与标准网络中的典型卷积层相当。 我们进一步采用以下实现，使其更加高效。</p>
+<p><strong>Implementation of Non-local Blocks</strong>我们将由$W_g$，$W_\theta$和$W_\Phi$表示的通道数设置为$x$中通道数的一半。 这遵循[21]的瓶颈设计，并将块的计算量减少了大约一半。等式（6）中的权重矩阵$W_z$计算在$y_i$上的逐位置embedding，使通道数与$x$匹配。 参见图2。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/%E6%B3%A8%E6%84%8F%E5%8A%9B%E6%9C%BA%E5%88%B6/" rel="tag"># 注意力机制</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/11/Generative-Image-Inpainting-with-Contextual-Attention/" rel="next" title="Generative Image Inpainting with Contextual Attention">
+                <i class="fa fa-chevron-left"></i> Generative Image Inpainting with Contextual Attention
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/11/SA-Gate/" rel="prev" title="SA-Gate">
+                SA-Gate <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/zhenzhu.png"
+                alt="kaixiang Liu" />
+            
+              <p class="site-author-name" itemprop="name">kaixiang Liu</p>
+              <p class="site-description motion-element" itemprop="description">臭弟弟的blog</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">14</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/kaixiang-git" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/BlindLover0403" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.zhihu.com/people/liu-kai-40-21/activities" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Non-local-Neural-Networks"><span class="nav-number">1.</span> <span class="nav-text">Non-local Neural Networks</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">1.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Introduction"><span class="nav-number">1.2.</span> <span class="nav-text">1. Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Related-Work"><span class="nav-number">1.3.</span> <span class="nav-text">2. Related Work</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Non-local-Neural-Networks"><span class="nav-number">1.4.</span> <span class="nav-text">3. Non-local Neural Networks</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Formulation"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1. Formulation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Instantiations"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2. Instantiations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Non-local-Block"><span class="nav-number">1.4.3.</span> <span class="nav-text">3.3. Non-local Block</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">kaixiang Liu</span>
+
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz',
+        appKey: 'GxriBt0fbPKm8K8m2Txay28O',
+        placeholder: 'Just go go',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("gQYYj7rbQ6uHgwmIHMOb9fn7-gzGzoHsz", "GxriBt0fbPKm8K8m2Txay28O");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config("");
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
